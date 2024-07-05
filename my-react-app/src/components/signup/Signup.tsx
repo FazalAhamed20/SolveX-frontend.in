@@ -1,39 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { userSignupValidation } from "../../validation/UserSignup";
+import { useDispatch } from "react-redux";
+import { SignUp } from "../../redux/actions/AuthActions";
+import { AppDispatch } from "../../redux/Store";
+import { useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  const dispatch: AppDispatch = useDispatch();
+  const navigate=useNavigate()
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Implement signup logic here
-    console.log("Signup form submitted:", formData);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSubmit =async (values:any) => {
+    console.log(values);
+    
+    await dispatch(SignUp(values));
   };
 
   const handleGoogleSignup = () => {
-    // Implement Google signup logic here
     console.log("Google signup clicked");
   };
 
   const handleLinkedInSignup = () => {
-    // Implement LinkedIn signup logic here
     console.log("LinkedIn signup clicked");
   };
 
   const handleGitHubSignup = () => {
-    // Implement GitHub signup logic here
     console.log("GitHub signup clicked");
   };
 
   const handleFacebookSignup = () => {
-    // Implement Facebook signup logic here
     console.log("Facebook signup clicked");
   };
 
@@ -41,7 +37,7 @@ const Signup: React.FC = () => {
     <div className="flex justify-center items-center bg-white py-10 px-4">
       <div className="w-full max-w-4xl">
         <div className="flex flex-col lg:flex-row gap-5">
-        <div className="flex items-center justify-center w-full lg:w-1/2 lg:pl-5">
+          <div className="flex items-center justify-center w-full lg:w-1/2">
             <img
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/7595c4513233f6b0b3c670645bca9de8076d0b9dd73193bbdde534838f5ad586?"
@@ -54,63 +50,65 @@ const Signup: React.FC = () => {
               <div className="mt-2 text-xl font-bold text-zinc-900">
                 Create a SolveX account
               </div>
-              <form onSubmit={handleSubmit} className="mt-4">
+              <Formik
+                initialValues={{ name: '', email: '', password: '', terms: false }}
+                validationSchema={userSignupValidation}
+                onSubmit={handleSubmit}
+              >
+                <Form className="mt-4">
                 <div className="mb-3">
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Full Name"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Email"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Your password"
-                    required
-                  />
-                </div>
-                <div className="flex items-center mb-3">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 bg-white rounded border border-gray-600"
-                    required
-                  />
-                  <div className="ml-2 text-sm leading-7 text-zinc-900">
-                    I agree to SolveX Terms of Service and Privacy Policy.
+  <Field
+    type="text"
+    name="name"
+    className="w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    placeholder="Full Name"
+  />
+  <ErrorMessage name="name" component="div" className="text-red-500" />
+</div>
+
+                  <div className="mb-3">
+                    <Field
+                      type="email"
+                      name="email"
+                      className="w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Email"
+                    />
+                    <ErrorMessage name="email" component="div" className="text-red-500" />
                   </div>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full px-8 py-3 mt-3 text-sm leading-5 text-white bg-green-700 rounded"
-                >
-                  Sign up
-                </button>
-              </form>
+                  <div className="mb-3">
+                    <Field
+                      type="password"
+                      name="password"
+                      className="w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Your password"
+                    />
+                    <ErrorMessage name="password" component="div" className="text-red-500" />
+                  </div>
+                  <div className="flex items-center mb-3">
+                    <Field
+                      type="checkbox"
+                      name="terms"
+                      className="w-5 h-5 bg-white rounded border border-gray-600"
+                    />
+                    <div className="ml-2 text-sm leading-7 text-zinc-900">
+                      I agree to SolveX Terms of Service and Privacy Policy.
+                    </div>
+                  </div>
+                  <ErrorMessage name="terms" component="div" className="text-red-500 mb-3" />
+                  <button
+                    type="submit"
+                    className="w-full px-8 py-3 mt-3 text-sm leading-5 text-white bg-green-700 rounded"
+                  >
+                    Sign up
+                  </button>
+                </Form>
+              </Formik>
               <div className="flex items-center justify-between mt-3 flex-wrap">
                 <div className="text-sm leading-7 text-zinc-900">
                   Already have an account?
                 </div>
-                <div className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0">
-                  <div>Sign In</div>
+                <div className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer">
+                  <div onClick={()=>navigate('/login')}>Sign In</div>
                   <img
                     loading="lazy"
                     src="https://cdn.builder.io/api/v1/image/assets/TEMP/4b4dd86799c516d59b78dc6ab7ce16a924324c921558d4915043f930cf409d4a?"
