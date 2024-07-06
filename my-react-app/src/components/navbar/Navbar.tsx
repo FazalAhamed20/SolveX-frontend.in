@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navigate=useNavigate()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -51,6 +54,7 @@ const Navbar: React.FC = () => {
               <a
                 href="#"
                 className="bg-green-500 text-white px-4 py-2 rounded-md text-sm font-medium"
+                onClick={()=>navigate('/signup')}
               >
                 Register
               </a>

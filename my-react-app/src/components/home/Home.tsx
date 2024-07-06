@@ -1,6 +1,9 @@
 
 
+
 const Home = () => {
+
+  
   return (
     <div className="bg-slate-100">
       {/* Hero Section */}

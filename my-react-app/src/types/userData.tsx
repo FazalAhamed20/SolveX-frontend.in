@@ -3,7 +3,7 @@ export interface UserData{
     name:string,
     password:string,
     email:string,
-    otp:string
+    otp?:string
 }
 
 export type Signup={
