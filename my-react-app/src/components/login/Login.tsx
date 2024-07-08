@@ -1,12 +1,40 @@
 import React  from "react";
 import { Formik,Form,Field,ErrorMessage } from "formik";
 import { userLoginValidation } from "../../validation/UserLogin";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../redux/Store";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { SignIn } from "../../redux/actions/AuthActions";
 
 const Login: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
  
 const initialValues={
   name:'',email:''
 }
+const [data, setData] = useState({
+ 
+  email: "",
+  password: "",
+ 
+});
+
+
+const handleSubmit = async (values: any) => {
+  ;
+  
+
+  const response = await dispatch(SignIn(values));
+  console.log("SignUp response:", response);
+
+  if (response.payload && response.payload.message === "OTP Created") {
+   
+  } else {
+    toast.error(`${response.payload?.message}`);
+  }
+};
 
   const handleGoogleLogin = () => {
     // Implement Google login logic here
@@ -49,9 +77,7 @@ const initialValues={
               <Formik
                 initialValues={{ initialValues }}
                 validationSchema={userLoginValidation}
-                onSubmit={(values) => {
-                  console.log('Signup form submitted:', values);
-                }}
+                onSubmit={handleSubmit}
               >
               <Form className="mt-4">
               <div className="mb-3">

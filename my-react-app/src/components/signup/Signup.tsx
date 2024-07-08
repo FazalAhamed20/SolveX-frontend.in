@@ -5,28 +5,43 @@ import { useDispatch } from "react-redux";
 import { SignUp } from "../../redux/actions/AuthActions";
 import { AppDispatch } from "../../redux/Store";
 import OtpPage from "./Otp";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
+
 const Signup: React.FC = () => {
   const [showOtpPage, setShowOtpPage] = useState(false);
-
-  const formData = new FormData();
+  const [data, setData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    otp: "",
+  });
+  const navigate=useNavigate()
 
   const dispatch: AppDispatch = useDispatch();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+  const test = (payload: any) => {
+    setData({
+      username: payload.name,
+      email: payload.email,
+      password: payload.password,
+      otp: "",
+    });
+  };
+
   const handleSubmit = async (values: any) => {
-    console.log(values);
+    console.log("Form values:", values);
+    test(values);
 
-    formData.append("email", values.email);
-    formData.append("name", values.name);
-    formData.append("password", values.password);
-    formData.append("term", String(values.term));
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
+    const response = await dispatch(SignUp(values.email));
+    console.log("SignUp response:", response);
+
+    if (response.payload && response.payload.message === "OTP Created") {
+      setShowOtpPage(true);
+    } else {
+      toast.error(`${response.payload?.message}`);
     }
-    console.log(formData.get("name"));
-
-    await dispatch(SignUp(values.email));
-
-    setShowOtpPage(true);
   };
 
   const handleGoogleSignup = () => {
@@ -46,7 +61,10 @@ const Signup: React.FC = () => {
   };
 
   return (
+    <>
+    
     <div className="flex justify-center items-center bg-white py-10 px-4">
+     
       {!showOtpPage ? (
         <div className="w-full max-w-4xl">
           <div className="flex flex-col lg:flex-row gap-5">
@@ -55,6 +73,7 @@ const Signup: React.FC = () => {
                 loading="lazy"
                 src="https://cdn.builder.io/api/v1/image/assets/TEMP/7595c4513233f6b0b3c670645bca9de8076d0b9dd73193bbdde534838f5ad586?"
                 className="w-full aspect-video lg:aspect-auto"
+                alt="Signup banner"
               />
             </div>
             <div className="flex flex-col w-full lg:w-1/2">
@@ -141,12 +160,13 @@ const Signup: React.FC = () => {
                   <div className="text-sm leading-7 text-zinc-900">
                     Already have an account?
                   </div>
-                  <div className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer">
+                  <div onClick={()=>(navigate('/login'))} className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer">
                     <div>Sign In</div>
                     <img
                       loading="lazy"
                       src="https://cdn.builder.io/api/v1/image/assets/TEMP/4b4dd86799c516d59b78dc6ab7ce16a924324c921558d4915043f930cf409d4a?"
                       className="w-[11px] aspect-square ml-2"
+                      alt="Sign in icon"
                     />
                   </div>
                 </div>
@@ -163,6 +183,7 @@ const Signup: React.FC = () => {
                         loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/589fe21936d246a88bf3409989c1959e4ca43f7be0847947c16cb51553bbba2c?"
                         className="w-[23px] aspect-square"
+                        alt="Google logo"
                       />
                       <div>Continue with Google</div>
                     </div>
@@ -176,6 +197,7 @@ const Signup: React.FC = () => {
                         loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/15b9d1b7d3a3462c8704392710c1884f11a7b534e97f97db5125527ad34339e8?"
                         className="w-[23px] aspect-square"
+                        alt="LinkedIn logo"
                       />
                       <div>LinkedIn</div>
                     </button>
@@ -187,6 +209,7 @@ const Signup: React.FC = () => {
                         loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/973def7342300a36b6dec382e0b89b4c6d6d6e9210ba1d867dfeae2af0440fcf?"
                         className="w-6 aspect-square"
+                        alt="GitHub logo"
                       />
                       <div>GitHub</div>
                     </button>
@@ -198,6 +221,7 @@ const Signup: React.FC = () => {
                         loading="lazy"
                         src="https://cdn.builder.io/api/v1/image/assets/TEMP/f83774a3dd6803fb37aba08ce8c27d8f2fa7689111287cf0fd4aab05ead17699?"
                         className="w-[23px] aspect-square"
+                        alt="Facebook logo"
                       />
                       <div>Facebook</div>
                     </button>
@@ -208,9 +232,10 @@ const Signup: React.FC = () => {
           </div>
         </div>
       ) : (
-        <OtpPage Data={formData} />
+        <OtpPage data={data} />
       )}
     </div>
+    </>
   );
 };
 

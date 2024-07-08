@@ -1,26 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../redux/Store";
+import { SignUp, Verify } from "../../redux/actions/AuthActions";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-
-interface OtpPageProps{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Data:any
+interface UserData {
+  data: {
+    username: string;
+    email: string;
+    password: string;
+    otp: string;
+  };
 }
 
-const OtpPage: React.FC<OtpPageProps> = ({Data}) => {
+const OtpPage: React.FC<UserData> = ({ data }) => {
   const [otp, setOtp] = useState<string>("");
-  const [timer, setTimer] = useState<number>(60); 
+  const [timer, setTimer] = useState<number>(60);
   const [showResendButton, setShowResendButton] = useState<boolean>(false);
   const inputRefs = useRef<HTMLInputElement[]>([]);
- 
-  for (const [key, value] of Data.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-  console.log(Data.get("email"));
   
-  
+const navigate=useNavigate()
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
-    
     const storedTimer = localStorage.getItem("otpTimer");
     if (storedTimer) {
       setTimer(parseInt(storedTimer));
@@ -35,17 +38,12 @@ const OtpPage: React.FC<OtpPageProps> = ({Data}) => {
           if (prevTimer === 1) {
             clearInterval(countdown);
             setShowResendButton(true);
-            localStorage.removeItem("otpTimer"); 
-          } else {
-            localStorage.setItem("otpTimer", (prevTimer - 1).toString());
           }
           return prevTimer - 1;
         });
       }, 1000);
 
       return () => clearInterval(countdown);
-    } else {
-      localStorage.removeItem("otpTimer");
     }
   }, [timer]);
 
@@ -65,20 +63,31 @@ const OtpPage: React.FC<OtpPageProps> = ({Data}) => {
     };
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (otp.length === 4) {
+      data.otp = otp;
+
       console.log("OTP submitted:", otp);
+      const response = await dispatch(Verify(data));
+
+      if (response.payload?.status == 201) {
+        navigate('/home')
+       
+      }
     } else {
-      console.log("Please enter a 4-digit OTP");
+      
+      toast.error("Please enter a 4-digit OTP")
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setOtp("");
     setTimer(60);
     setShowResendButton(false);
-    localStorage.removeItem("otpTimer"); 
+    const response = await dispatch(SignUp(data.email));
+
+    console.log(response);
   };
 
   return (

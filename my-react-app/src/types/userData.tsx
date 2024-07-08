@@ -13,7 +13,7 @@ export type Signup={
     otp?:string
 }
 
-export type Login={
+export type Signin={
     email:string,
     password:string
 }
