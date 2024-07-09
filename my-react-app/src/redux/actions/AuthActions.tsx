@@ -5,17 +5,11 @@ import { Signin, Signup } from "../../types/userData";
 import { ErrorPayload } from "../../types/Helper";
 
 
-interface User {
-  success: boolean;
-  data: string;
-  message: string;
-  status:number
-}
+
 interface VerifyResponse {
-  success: boolean;
+  success: any;
   data:string,
   message: string;
-  status:any
  
 }
 interface LogoutResponse {
@@ -24,14 +18,14 @@ interface LogoutResponse {
 }
 
 export const SignUp = createAsyncThunk<
-  User,
+  VerifyResponse,
   String,
   { rejectValue: ErrorPayload }
 >("user/userSignup", async (userData: String, { rejectWithValue }) => {
   try {
     console.log(userData);
 
-    const { data } = await AuthAxios.post<User>("/signup", {
+    const { data } = await AuthAxios.post<VerifyResponse>("/signup", {
       email: userData,
     });
     console.log("data",data);
@@ -61,7 +55,7 @@ export const Verify = createAsyncThunk<
 });
 
 export const SignIn = createAsyncThunk<
-  User,
+  VerifyResponse,
  Signin,
  
   { rejectValue: ErrorPayload }
@@ -69,7 +63,7 @@ export const SignIn = createAsyncThunk<
   try {
     console.log(userData.email);
 
-    const { data } = await AuthAxios.post<User>("/login", {
+    const { data } = await AuthAxios.post<VerifyResponse>("/login", {
       email:userData.email,
       password:userData.password
     });
@@ -102,6 +96,22 @@ export const Logout = createAsyncThunk<
     return rejectWithValue(handleErrors(error));
   }
 });
+
+export const GoogleAuth = createAsyncThunk<
+  VerifyResponse,
+  Signup,
+  { rejectValue: ErrorPayload }
+>("user/userGoogleAuth", async (userData: Signup, { rejectWithValue }) => {
+  console.log("Auth",userData);
+  
+  try {
+    const { data } = await AuthAxios.post<VerifyResponse>("/googleAuth", userData);
+    return data;
+  } catch (error) {
+    return rejectWithValue(handleErrors(error));
+  }
+});
+
 
 
 

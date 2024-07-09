@@ -1,13 +1,17 @@
 import React, { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { LoginButton } from "react-facebook";
+import { useNavigate } from "react-router-dom";
+import OtpPage from "./Otp";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { userSignupValidation } from "../../validation/UserSignup";
 import { useDispatch } from "react-redux";
-import { SignUp } from "../../redux/actions/AuthActions";
+import { GoogleAuth, SignUp } from "../../redux/actions/AuthActions";
 import { AppDispatch } from "../../redux/Store";
-import OtpPage from "./Otp";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-
+import { jwtDecode } from "jwt-decode";
+import { FaFacebook } from "react-icons/fa";
+import axios from "axios";
 
 const Signup: React.FC = () => {
   const [showOtpPage, setShowOtpPage] = useState(false);
@@ -17,8 +21,7 @@ const Signup: React.FC = () => {
     password: "",
     otp: "",
   });
-  const navigate=useNavigate()
-
+  const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
 
   const test = (payload: any) => {
@@ -35,36 +38,60 @@ const Signup: React.FC = () => {
     test(values);
 
     const response = await dispatch(SignUp(values.email));
-    console.log("SignUp response:", response);
+    console.log("SignUp response:", response.payload?.success);
 
-    if (response.payload && response.payload.message === "OTP Created") {
+    if (response.payload && response.payload?.success === true) {
       setShowOtpPage(true);
     } else {
       toast.error(`${response.payload?.message}`);
     }
   };
 
-  const handleGoogleSignup = () => {
-    console.log("Google signup clicked");
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (credentialResponse.credential) {
+      const decodedToken: any = jwtDecode(credentialResponse.credential);
+
+      const response = await dispatch(GoogleAuth(decodedToken));
+      if (response.payload && response.payload.success) {
+        toast.success("Google login successful!");
+        navigate("/home");
+      } else {
+        toast.error("Google login failed. Please try again.");
+      }
+    }
   };
 
-  const handleLinkedInSignup = () => {
-    console.log("LinkedIn signup clicked");
+  const handleGoogleFailure = () => {
+    console.log("Google Signup Error");
+    toast.error("Google Signup failed. Please try again.");
   };
 
-  const handleGitHubSignup = () => {
-    console.log("GitHub signup clicked");
+  const handleFacebookResponse = async (response: any) => {
+    const { accessToken, userID } = response.authResponse;
+    console.log("Access Token:", accessToken);
+    console.log("User ID:", userID);
+
+    const result = await axios.get(
+      `https://graph.facebook.com/v12.0/me?fields=id,name,email&access_token=${accessToken}`
+    );
+    console.log("Facebook User Data:", result.data);
+
+    const answer = await dispatch(GoogleAuth(result.data));
+    if (answer.payload && answer.payload.success) {
+      toast.success("Google login successful!");
+      navigate("/home");
+    } else {
+      toast.error("Facebook login failed. Please try again.");
+    }
   };
 
-  const handleFacebookSignup = () => {
-    console.log("Facebook signup clicked");
+  const handleFacebookError = (error: any) => {
+    console.log("Facebook login error:", error);
+    toast.error("Facebook login failed. Please try again.");
   };
 
   return (
-    <>
-    
     <div className="flex justify-center items-center bg-white py-10 px-4">
-     
       {!showOtpPage ? (
         <div className="w-full max-w-4xl">
           <div className="flex flex-col lg:flex-row gap-5">
@@ -160,7 +187,10 @@ const Signup: React.FC = () => {
                   <div className="text-sm leading-7 text-zinc-900">
                     Already have an account?
                   </div>
-                  <div onClick={()=>(navigate('/login'))} className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer">
+                  <div
+                    onClick={() => navigate("/login")}
+                    className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer"
+                  >
                     <div>Sign In</div>
                     <img
                       loading="lazy"
@@ -173,60 +203,22 @@ const Signup: React.FC = () => {
                 <div className="self-center mt-4 text-sm leading-5 text-neutral-300">
                   or
                 </div>
-                <div className="mt-4">
-                  <button
-                    className="w-full px-4 py-2 bg-white rounded border border-gray-400 text-sm leading-5"
-                    onClick={handleGoogleSignup}
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/589fe21936d246a88bf3409989c1959e4ca43f7be0847947c16cb51553bbba2c?"
-                        className="w-[23px] aspect-square"
-                        alt="Google logo"
-                      />
-                      <div>Continue with Google</div>
-                    </div>
-                  </button>
-                  <div className="flex flex-wrap gap-3 mt-3">
-                    <button
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-400 flex-1"
-                      onClick={handleLinkedInSignup}
-                    >
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/15b9d1b7d3a3462c8704392710c1884f11a7b534e97f97db5125527ad34339e8?"
-                        className="w-[23px] aspect-square"
-                        alt="LinkedIn logo"
-                      />
-                      <div>LinkedIn</div>
-                    </button>
-                    <button
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-400 flex-1"
-                      onClick={handleGitHubSignup}
-                    >
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/973def7342300a36b6dec382e0b89b4c6d6d6e9210ba1d867dfeae2af0440fcf?"
-                        className="w-6 aspect-square"
-                        alt="GitHub logo"
-                      />
-                      <div>GitHub</div>
-                    </button>
-                    <button
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-400 flex-1"
-                      onClick={handleFacebookSignup}
-                    >
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/f83774a3dd6803fb37aba08ce8c27d8f2fa7689111287cf0fd4aab05ead17699?"
-                        className="w-[23px] aspect-square"
-                        alt="Facebook logo"
-                      />
-                      <div>Facebook</div>
-                    </button>
-                  </div>
-                </div>
+                <div className="mt-4 flex flex-col md:flex-row justify-center space-y-3 md:space-y-0 md:space-x-3">
+  <GoogleLogin
+    onSuccess={handleGoogleSuccess}
+    onError={handleGoogleFailure}
+    className="w-full md:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+  />
+  <LoginButton
+    scope="email"
+    onSuccess={handleFacebookResponse}
+    onError={handleFacebookError}
+    className="flex items-center justify-center w-full md:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+  >
+    <FaFacebook className="w-6 h-6 mr-1" />
+    <span>Facebook</span>
+  </LoginButton>
+</div>
               </div>
             </div>
           </div>
@@ -235,7 +227,6 @@ const Signup: React.FC = () => {
         <OtpPage data={data} />
       )}
     </div>
-    </>
   );
 };
 

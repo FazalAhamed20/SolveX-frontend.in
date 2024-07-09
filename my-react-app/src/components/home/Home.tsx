@@ -1,7 +1,9 @@
-
+import { useNavigate } from "react-router-dom";
 
 
 const Home = () => {
+
+  const navigate=useNavigate()
 
   
   return (
@@ -17,7 +19,7 @@ const Home = () => {
               We help companies develop the strongest tech teams around. We help
               candidates sharpen their tech skills and pursue job opportunities.
             </p>
-            <button className="bg-green-500 text-white font-medium py-3 px-6 rounded-md hover:bg-green-600 transition-colors">
+            <button className="bg-green-500 text-white font-medium py-3 px-6 rounded-md hover:bg-green-600 transition-colors" onClick={() => navigate("/signup")}>
               Register
             </button>
           </div>

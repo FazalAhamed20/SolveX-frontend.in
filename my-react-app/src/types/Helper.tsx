@@ -3,13 +3,15 @@ export type userReducerInitial = {
     err: boolean | string;
     user: null | any;
     message?: string;
-    status?: number;
+    success?:boolean;
+
    
   };
   
   export interface ErrorPayload {
     message: string;
     status?:number;
+    success?:boolean
     
     
     

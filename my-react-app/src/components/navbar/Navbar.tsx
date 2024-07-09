@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/Store";
 import { Logout } from "../../redux/actions/AuthActions";
+import {  googleLogout} from "@react-oauth/google";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+ 
 
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -23,6 +25,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(Logout());
+    googleLogout()
     setIsDropdownOpen(false);
     navigate("/");
   };
@@ -45,32 +48,33 @@ const Navbar: React.FC = () => {
 
           {/* Navigation Links */}
           <div className="hidden sm:flex sm:items-center sm:ml-6">
-            <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Home
-              </a>
-              <a
-                href="#"
-                className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Problem
-              </a>
-              <a
-                href="#"
-                className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Categories
-              </a>
-              <a
-                href="#"
-                className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Leaderboard
-              </a>
-              {user ? (
+            {user ? (
+              <div className="flex space-x-4">
+                <a
+                  href="#"
+                  className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
+                  onClick={()=>{navigate('/home')}}
+                >
+                  Home
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Problem
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Categories
+                </a>
+                <a
+                  href="#"
+                  className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Leaderboard
+                </a>
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
@@ -100,16 +104,16 @@ const Navbar: React.FC = () => {
                     </div>
                   )}
                 </div>
-              ) : (
-                <a
-                  href="#"
-                  className="bg-green-500 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  onClick={() => navigate("/signup")}
-                >
-                  Register
-                </a>
-              )}
-            </div>
+              </div>
+            ) : (
+              <a
+                href="#"
+                className="bg-green-500 text-white px-4 py-2 rounded-md text-sm font-medium"
+                onClick={() => navigate("/signup")}
+              >
+                Register
+              </a>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -142,60 +146,63 @@ const Navbar: React.FC = () => {
       {/* Responsive Menu */}
       <div className={`sm:hidden ${isMenuOpen ? "block" : "hidden"}`}>
         <div className="px-2 pt-2 pb-3 space-y-1">
-          <a
-            href="#"
-            className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
-          >
-            Home
-          </a>
-          <a
-            href="#"
-            className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
-          >
-            Problem
-          </a>
-          <a
-            href="#"
-            className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
-          >
-            Category
-          </a>
-          <a
-            href="#"
-            className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
-          >
-            Leaderboard
-          </a>
           {user ? (
-            <div className="relative">
-              <button
-                onClick={toggleDropdown}
-                className="bg-green-500 text-white h-10 w-10 flex items-center justify-center rounded-full text-sm font-medium mx-auto focus:outline-none"
+            <>
+              <a
+                href="#"
+                className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
+                onClick={()=>{navigate('/home')}}
               >
-                {user.username.charAt(0).toUpperCase()}
-              </button>
-              {isDropdownOpen && (
-                <div className="mt-2 w-48 bg-white rounded-md shadow-lg py-2 mx-auto">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    onClick={() => {
-                      navigate("/profile");
-                      setIsDropdownOpen(false);
-                    }}
-                  >
-                    Profile
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </a>
-                </div>
-              )}
-            </div>
+                Home
+              </a>
+              <a
+                href="#"
+                className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
+              >
+                Problem
+              </a>
+              <a
+                href="#"
+                className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
+              >
+                Category
+              </a>
+              <a
+                href="#"
+                className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
+              >
+                Leaderboard
+              </a>
+              <div className="relative">
+                <button
+                  onClick={toggleDropdown}
+                  className="bg-green-500 text-white h-10 w-10 flex items-center justify-center rounded-full text-sm font-medium mx-auto focus:outline-none"
+                >
+                  {user.username.charAt(0).toUpperCase()}
+                </button>
+                {isDropdownOpen && (
+                  <div className="mt-2 w-48 bg-white rounded-md shadow-lg py-2 mx-auto">
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        navigate("/profile");
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      Profile
+                    </a>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </a>
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <a
               href="#"

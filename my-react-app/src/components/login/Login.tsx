@@ -1,25 +1,22 @@
 import React  from "react";
 import { Formik,Form,Field,ErrorMessage } from "formik";
 import { userLoginValidation } from "../../validation/UserLogin";
-import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/Store";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { SignIn } from "../../redux/actions/AuthActions";
+import { SignIn,GoogleAuth } from "../../redux/actions/AuthActions";
+import { jwtDecode } from "jwt-decode";
 
 const Login: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate=useNavigate()
  
 const initialValues={
   name:'',email:''
 }
-const [data, setData] = useState({
- 
-  email: "",
-  password: "",
- 
-});
+
 
 
 const handleSubmit = async (values: any) => {
@@ -29,18 +26,32 @@ const handleSubmit = async (values: any) => {
   const response = await dispatch(SignIn(values));
   console.log("SignUp response:", response);
 
-  if (response.payload && response.payload.message === "OTP Created") {
+  if (response.payload && response.payload.success === true) {
+    navigate('/home')
    
   } else {
     toast.error(`${response.payload?.message}`);
   }
 };
 
-  const handleGoogleLogin = () => {
-    // Implement Google login logic here
-    console.log("Google login clicked");
-  };
-
+const handleGoogleSuccess = async(credentialResponse: any) => {
+  if (credentialResponse.credential) {
+    const decodedToken: any = jwtDecode(credentialResponse.credential);
+    
+    
+    const response = await dispatch(GoogleAuth(decodedToken));
+    if (response.payload && response.payload.success) {
+      toast.success("Google login successful!");
+      navigate("/home"); 
+    } else {
+      toast.error("Google login failed. Please try again.");
+    }
+  }
+};
+const handlegoogleFailure = () => {
+  console.log("Google Signup Error");
+  toast.error("Google Signup failed. Please try again.");
+};
   const handleLinkedInLogin = () => {
     // Implement LinkedIn login logic here
     console.log("LinkedIn login clicked");
@@ -57,17 +68,18 @@ const handleSubmit = async (values: any) => {
   };
 
   return (
-    <div className="flex justify-center items-center bg-white h-screen">
+<div className="flex justify-center items-center bg-white h-screen">
       <div className="w-full max-w-4xl px-4 sm:px-0">
         <div className="flex flex-col lg:flex-row gap-5">
-          <div className="flex items-center justify-center w-full lg:w-1/2 ">
+          <div className="flex items-center justify-center w-full lg:w-1/2">
             <img
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/3237df55a7454687bc27b3e9e3d38470613cab1fc208242a27bc7cd9c458e8dc?"
               className="w-full aspect-video lg:aspect-auto"
+              alt="Login Image"
             />
           </div>
-          
+
           <div className="flex flex-col w-full lg:w-1/2">
             <div className="flex flex-col p-8 bg-white rounded shadow-lg">
               <div className="text-xl font-bold text-zinc-900">Welcome back</div>
@@ -75,12 +87,12 @@ const handleSubmit = async (values: any) => {
                 Sign In to SolveX Account
               </div>
               <Formik
-                initialValues={{ initialValues }}
+                initialValues={{initialValues}}
                 validationSchema={userLoginValidation}
                 onSubmit={handleSubmit}
               >
-              <Form className="mt-4">
-              <div className="mb-3">
+                <Form className="mt-4">
+                  <div className="mb-3">
                     <Field
                       type="email"
                       name="email"
@@ -98,68 +110,40 @@ const handleSubmit = async (values: any) => {
                     />
                     <ErrorMessage name="password" component="div" className="text-red-500" />
                   </div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      className="w-5 h-5 bg-white rounded border border-gray-600"
-                    />
-                    <div className="ml-2 text-sm leading-7 text-zinc-900">
-                      Remember me
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        className="w-5 h-5 bg-white rounded border border-gray-600"
+                      />
+                      <div className="ml-2 text-sm leading-7 text-zinc-900">
+                        Remember me
+                      </div>
+                    </div>
+                    <div className="text-sm leading-7 text-blue-500 hover:underline cursor-pointer">
+                      Forgot password?
                     </div>
                   </div>
-                  <div className="text-sm leading-7 text-blue-500 hover:underline cursor-pointer">
-                    Forgot password?
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full px-8 py-3 mt-3 text-sm leading-5 text-white bg-green-700 rounded"
-                >
-                  Sign In
-                </button>
-              </Form>
+                  <button
+                    type="submit"
+                    className="w-full px-8 py-3 mt-3 text-sm leading-5 text-white bg-green-700 rounded"
+                  >
+                    Sign In
+                  </button>
+                </Form>
               </Formik>
-              <div className="self-center mt-4 text-sm leading-5 text-neutral-300">
-                or
-              </div>
+              <div className="self-center mt-4 text-sm leading-5 text-neutral-300">or</div>
               <div className="mt-4">
-                <button
-                  className="w-full px-4 py-2 bg-white rounded border border-gray-400 text-sm leading-5"
-                  onClick={handleGoogleLogin}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <img
-                      loading="lazy"
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/589fe21936d246a88bf3409989c1959e4ca43f7be0847947c16cb51553bbba2c?"
-                      className="w-[23px] aspect-square"
+                <div className="mt-4 flex justify-center">
+                <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handlegoogleFailure}
+                      width="250"
                     />
-                    <div>Continue with Google</div>
-                  </div>
-                </button>
+                </div>
                 <div className="flex flex-wrap gap-3 mt-3">
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-400 flex-1"
-                    onClick={handleLinkedInLogin}
-                  >
-                    <img
-                      loading="lazy"
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/15b9d1b7d3a3462c8704392710c1884f11a7b534e97f97db5125527ad34339e8?"
-                      className="w-[23px] aspect-square"
-                    />
-                    <div>LinkedIn</div>
-                  </button>
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-400 flex-1"
-                    onClick={handleGitHubLogin}
-                  >
-                    <img
-                      loading="lazy"
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/973def7342300a36b6dec382e0b89b4c6d6d6e9210ba1d867dfeae2af0440fcf?"
-                      className="w-6 aspect-square"
-                    />
-                    <div>GitHub</div>
-                  </button>
+                 
+                 
                   <button
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-400 flex-1"
                     onClick={handleFacebookLogin}
@@ -168,6 +152,7 @@ const handleSubmit = async (values: any) => {
                       loading="lazy"
                       src="https://cdn.builder.io/api/v1/image/assets/TEMP/f83774a3dd6803fb37aba08ce8c27d8f2fa7689111287cf0fd4aab05ead17699?"
                       className="w-[23px] aspect-square"
+                      alt="Facebook Logo"
                     />
                     <div>Facebook</div>
                   </button>
