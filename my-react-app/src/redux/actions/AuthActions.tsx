@@ -10,6 +10,7 @@ interface VerifyResponse {
   success: any;
   data:string,
   message: string;
+  status?:number
  
 }
 interface LogoutResponse {
@@ -106,6 +107,24 @@ export const GoogleAuth = createAsyncThunk<
   
   try {
     const { data } = await AuthAxios.post<VerifyResponse>("/googleAuth", userData);
+    return data;
+  } catch (error) {
+    return rejectWithValue(handleErrors(error));
+  }
+});
+
+
+export const checkMail = createAsyncThunk<
+  VerifyResponse,
+  String,
+  { rejectValue: ErrorPayload }
+>("user/userCheckMail", async (userData: String, { rejectWithValue }) => {
+  console.log("Mail", userData);
+
+  try {
+    const { data } = await AuthAxios.post<VerifyResponse>("/checkmail", {
+      email:userData
+    });
     return data;
   } catch (error) {
     return rejectWithValue(handleErrors(error));

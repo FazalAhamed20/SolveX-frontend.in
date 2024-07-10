@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
-import { LoginButton } from "react-facebook";
+import { useLogin } from "react-facebook";
 import { useNavigate } from "react-router-dom";
 import OtpPage from "./Otp";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -10,7 +10,7 @@ import { GoogleAuth, SignUp } from "../../redux/actions/AuthActions";
 import { AppDispatch } from "../../redux/Store";
 import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
-import { FaFacebook } from "react-icons/fa";
+
 import axios from "axios";
 
 const Signup: React.FC = () => {
@@ -23,7 +23,7 @@ const Signup: React.FC = () => {
   });
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
-
+  const { login, isLoading } = useLogin();
   const test = (payload: any) => {
     setData({
       username: payload.name,
@@ -66,7 +66,13 @@ const Signup: React.FC = () => {
     toast.error("Google Signup failed. Please try again.");
   };
 
-  const handleFacebookResponse = async (response: any) => {
+  const handleFacebookLogin = async () => {
+    const response = await login({
+      scope: "email",
+    });
+
+    console.log(response);
+
     const { accessToken, userID } = response.authResponse;
     console.log("Access Token:", accessToken);
     console.log("User ID:", userID);
@@ -83,11 +89,6 @@ const Signup: React.FC = () => {
     } else {
       toast.error("Facebook login failed. Please try again.");
     }
-  };
-
-  const handleFacebookError = (error: any) => {
-    console.log("Facebook login error:", error);
-    toast.error("Facebook login failed. Please try again.");
   };
 
   return (
@@ -203,22 +204,33 @@ const Signup: React.FC = () => {
                 <div className="self-center mt-4 text-sm leading-5 text-neutral-300">
                   or
                 </div>
-                <div className="mt-4 flex flex-col md:flex-row justify-center space-y-3 md:space-y-0 md:space-x-3">
-  <GoogleLogin
-    onSuccess={handleGoogleSuccess}
-    onError={handleGoogleFailure}
-    className="w-full md:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-  />
-  <LoginButton
-    scope="email"
-    onSuccess={handleFacebookResponse}
-    onError={handleFacebookError}
-    className="flex items-center justify-center w-full md:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-  >
-    <FaFacebook className="w-6 h-6 mr-1" />
-    <span>Facebook</span>
-  </LoginButton>
-</div>
+                <div className="mt-4">
+                  <div className="mt-4 flex justify-center">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleFailure}
+                      useOneTap
+                      text="continue_with"
+                      shape="circle"
+                      width={150}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-3 mt-3 justify-center">
+                    <button
+                      className="w-[200px] flex items-center justify-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-400"
+                      onClick={handleFacebookLogin}
+                      disabled={isLoading}
+                    >
+                      <img
+                        loading="lazy"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/f83774a3dd6803fb37aba08ce8c27d8f2fa7689111287cf0fd4aab05ead17699?"
+                        className="w-[23px] aspect-square"
+                        alt="Facebook Logo"
+                      />
+                      <div>Facebook</div>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { SignUp, SignIn, GoogleAuth } from "../actions/AuthActions";
+import { SignUp, SignIn, GoogleAuth ,checkMail } from "../actions/AuthActions";
 import { Verify, Logout } from "../actions/AuthActions";
 import { toast } from "react-toastify";
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
@@ -101,6 +101,27 @@ const Authreducer = createSlice({
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = errorPayload.message;
+        toast.error(errorPayload.message);
+        state.user = null;
+      })
+      .addCase(checkMail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkMail.fulfilled, (state, { payload }) => {
+        console.log("checkmail",payload);
+        
+        state.loading = false;
+        state.err = false;
+        state.user = payload.data;
+        state.message = payload.message;
+        state.success=payload.success
+      })
+      .addCase(checkMail.rejected, (state, { payload }) => {
+        state.loading = false;
+        const errorPayload = payload as ErrorPayload;
+        state.err = errorPayload.message;
+        console.log(errorPayload.message);
+        
         toast.error(errorPayload.message);
         state.user = null;
       });
