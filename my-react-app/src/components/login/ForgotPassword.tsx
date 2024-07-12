@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { ForgotPasswordValidation } from "../../validation/ForgotPassword";
+import { ForgotPasswordValidation } from "../../utils/validation/ForgotPassword";
 import { checkMail, Verify } from "../../redux/actions/AuthActions";
 import { AppDispatch, RootState } from "../../redux/Store";
-import OtpPasswordModal from "../../modal/OtpPasswordModal";
+import OtpPasswordModal from "../../utils/modal/OtpPasswordModal";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -45,14 +45,8 @@ const ForgotPasswordForm: React.FC = () => {
             otp: otp,
           };
       
-          const response = await dispatch(Verify(data));
-      
-          if (response.payload && response.payload.success === true) {
-            closeModal();
-            navigate("/login");
-          } else {
-            toast.error(`${response.payload?.message}`);
-          }
+           await dispatch(Verify(data));
+          
 
     }else{
         toast.error("Please enter a 4-digit OTP");

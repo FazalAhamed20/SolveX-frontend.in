@@ -10,6 +10,9 @@ const initialState: userReducerInitial = {
   user: null,
   message: "",
   success:false,
+  isUser:false,
+  isAdmin:false
+
   
 };
 
@@ -31,7 +34,7 @@ const Authreducer = createSlice({
         state.err = false;
         state.user = payload.data;
         state.message = payload.message;
-        state.success=payload.success
+        state.success=payload.success;
       })
       .addCase(SignUp.rejected, (state, { payload }) => {
         state.loading = false;
@@ -48,7 +51,8 @@ const Authreducer = createSlice({
         state.err = false;
         state.user = payload.data;
         state.message = payload.message;
-        state.success=payload.success
+        state.success=payload.success;
+        state.isUser=true;
       })
       .addCase(Verify.rejected, (state, { payload }) => {
         state.loading = false;
@@ -62,6 +66,9 @@ const Authreducer = createSlice({
       .addCase(Logout.fulfilled, (state) => {
         state.loading = false;
         state.user = null;
+        state.isAdmin=false
+       
+        state.isUser=false
       })
       .addCase(Logout.rejected, (state, { payload }) => {
         state.loading = false;
@@ -72,11 +79,17 @@ const Authreducer = createSlice({
         state.loading = true;
       })
       .addCase(SignIn.fulfilled, (state, { payload }) => {
+       
+        
         state.loading = false;
         state.err = false;
         state.user = payload.data;
         state.message = payload.message;
-        state.success=payload.success
+        state.success=payload.success,
+        payload.isAdmin ? state.isUser=false : state.isUser=true;
+        
+        state.isAdmin=payload.isAdmin
+        
       })
       .addCase(SignIn.rejected, (state, { payload }) => {
         state.loading = false;
@@ -95,7 +108,8 @@ const Authreducer = createSlice({
         state.err = false;
         state.user = payload.data;
         state.message = payload.message;
-        state.success=payload.success
+        state.success=payload.success;
+        state.isUser=true;
       })
       .addCase(GoogleAuth.rejected, (state, { payload }) => {
         state.loading = false;

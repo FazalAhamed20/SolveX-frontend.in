@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useLogin } from "react-facebook";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import OtpPage from "./Otp";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { userSignupValidation } from "../../validation/UserSignup";
+import { userSignupValidation } from "../../utils/validation/UserSignup";
 import { useDispatch } from "react-redux";
 import { GoogleAuth, SignUp } from "../../redux/actions/AuthActions";
 import { AppDispatch } from "../../redux/Store";
@@ -21,7 +21,7 @@ const Signup: React.FC = () => {
     password: "",
     otp: "",
   });
-  const navigate = useNavigate();
+
   const dispatch: AppDispatch = useDispatch();
   const { login, isLoading } = useLogin();
   const test = (payload: any) => {
@@ -37,27 +37,15 @@ const Signup: React.FC = () => {
     console.log("Form values:", values);
     test(values);
 
-    const response = await dispatch(SignUp(values.email));
-    console.log("SignUp response:", response.payload?.success);
-
-    if (response.payload && response.payload?.success === true) {
-      setShowOtpPage(true);
-    } else {
-      toast.error(`${response.payload?.message}`);
-    }
+    await dispatch(SignUp(values.email));
+    setShowOtpPage(true)
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     if (credentialResponse.credential) {
       const decodedToken: any = jwtDecode(credentialResponse.credential);
 
-      const response = await dispatch(GoogleAuth(decodedToken));
-      if (response.payload && response.payload.success) {
-        toast.success("Google login successful!");
-        navigate("/home");
-      } else {
-        toast.error("Google login failed. Please try again.");
-      }
+      await dispatch(GoogleAuth(decodedToken));
     }
   };
 
@@ -82,13 +70,7 @@ const Signup: React.FC = () => {
     );
     console.log("Facebook User Data:", result.data);
 
-    const answer = await dispatch(GoogleAuth(result.data));
-    if (answer.payload && answer.payload.success) {
-      toast.success("Google login successful!");
-      navigate("/home");
-    } else {
-      toast.error("Facebook login failed. Please try again.");
-    }
+    await dispatch(GoogleAuth(result.data));
   };
 
   return (
@@ -188,11 +170,10 @@ const Signup: React.FC = () => {
                   <div className="text-sm leading-7 text-zinc-900">
                     Already have an account?
                   </div>
-                  <div
-                    onClick={() => navigate("/login")}
-                    className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer"
-                  >
-                    <div>Sign In</div>
+                  <div className="flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer">
+                    <div>
+                      <Link to="/login">Sign In</Link>
+                    </div>
                     <img
                       loading="lazy"
                       src="https://cdn.builder.io/api/v1/image/assets/TEMP/4b4dd86799c516d59b78dc6ab7ce16a924324c921558d4915043f930cf409d4a?"

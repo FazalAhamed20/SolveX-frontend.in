@@ -4,6 +4,10 @@ export type userReducerInitial = {
     user: null | any;
     message?: string;
     success?:boolean;
+    isUser?:Boolean;
+    isAdmin?:Boolean
+  
+   
 
    
   };

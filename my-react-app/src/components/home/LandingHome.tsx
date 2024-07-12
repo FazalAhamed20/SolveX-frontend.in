@@ -12,7 +12,7 @@ function LandingHome() {
             The platform to sharpen your coding skills.
           </p>
           <a
-            href="#"
+            href=""
             className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg shadow-lg transition duration-300 inline-block"
           >
             Get Started
@@ -121,7 +121,7 @@ function LandingHome() {
             next level.
           </p>
           <a
-            href="#"
+            href=""
             className="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg shadow-lg transition duration-300 inline-block"
           >
             Get Started

@@ -33,6 +33,7 @@
     "react-toastify": "^10.0.5",
     "react-tooltip": "^5.27.1",
     "reactjs-social-login": "^2.6.3",
+    "recharts": "^2.12.7",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "toast": "^0.5.4",

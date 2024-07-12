@@ -6,10 +6,10 @@ import "./UserProfile.css";
 
 const UserProfile: React.FC = () => {
   const today = new Date();
-  const startDate = new Date(today.getFullYear(), today.getMonth() - 9, 1); // Start date 10 months ago
+  const startDate = new Date(today.getFullYear(), today.getMonth() - 9, 1); 
   const endDate = today;
 
-  // Dummy submission data for the last ten months
+ 
   const submissionData = Array.from({ length: 300 }, (_, i) => {
     const date = new Date(today.getFullYear(), today.getMonth() - 9, i + 1);
     return {
@@ -18,7 +18,7 @@ const UserProfile: React.FC = () => {
     };
   });
 
-  // Track solved problems by difficulty level
+  
   const [solvedProblems, setSolvedProblems] = useState({
     easy: 10,
     medium: 5,

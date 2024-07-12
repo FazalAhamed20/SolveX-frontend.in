@@ -10,7 +10,8 @@ interface VerifyResponse {
   success: any;
   data:string,
   message: string;
-  status?:number
+  status?:number;
+  isAdmin?:boolean
  
 }
 interface LogoutResponse {

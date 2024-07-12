@@ -10,6 +10,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import Store, { persistor } from "./redux/Store";
 import { PersistGate } from "redux-persist/integration/react";
 import { FacebookProvider } from 'react-facebook'
+import {
+  BrowserRouter as Router,} from "react-router-dom"
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -18,7 +20,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <GoogleOAuthProvider clientId="508751020640-37gfseobr7qv95n8b5ri5amd4sfd0q8l.apps.googleusercontent.com">
       <FacebookProvider appId="890234692922522">
         <ToastContainer />
+        <Router>
+
         <App />
+        </Router>
         </FacebookProvider>
       </GoogleOAuthProvider>
       </PersistGate>

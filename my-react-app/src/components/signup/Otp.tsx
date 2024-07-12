@@ -70,6 +70,8 @@
 
         console.log("OTP submitted:", otp);
         const response = await dispatch(Verify(data));
+        console.log(response);
+        
 
         if (response.payload?.status == 201) {
           navigate("/home");

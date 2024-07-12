@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/Store";
 import { Logout } from "../../redux/actions/AuthActions";
@@ -27,14 +27,14 @@ const Navbar: React.FC = () => {
     dispatch(Logout());
     googleLogout()
     setIsDropdownOpen(false);
-    navigate("/");
+    navigate("/",{replace:false});
   };
 
   return (
     <nav className="bg-white shadow-md z-10">
       <div className="max-w-full mx-auto px-2 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-16">
-          {/* Logo and Company Name */}
+       
           <div className="flex items-center">
             <img
               className="h-6 w-auto"
@@ -46,31 +46,27 @@ const Navbar: React.FC = () => {
             </span>
           </div>
 
-          {/* Navigation Links */}
+      
           <div className="hidden sm:flex sm:items-center sm:ml-6">
             {user ? (
               <div className="flex space-x-4">
                 <a
-                  href="#"
                   className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-                  onClick={()=>{navigate('/home')}}
                 >
-                  Home
+                 <Link to="/home">Home</Link>
                 </a>
                 <a
-                  href="#"
                   className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Problem
                 </a>
                 <a
-                  href="#"
                   className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Categories
                 </a>
                 <a
-                  href="#"
+                 
                   className="text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Leaderboard
@@ -85,17 +81,17 @@ const Navbar: React.FC = () => {
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2">
                       <a
-                        href="#"
+                       
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         onClick={() => {
-                          navigate("/profile");
+                          
                           setIsDropdownOpen(false);
                         }}
                       >
-                        Profile
+                       <Link to="/profile">Profile</Link>
                       </a>
                       <a
-                        href="#"
+                       
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         onClick={handleLogout}
                       >
@@ -107,11 +103,11 @@ const Navbar: React.FC = () => {
               </div>
             ) : (
               <a
-                href="#"
+               
                 className="bg-green-500 text-white px-4 py-2 rounded-md text-sm font-medium"
-                onClick={() => navigate("/signup")}
+                
               >
-                Register
+              <Link to="/signup">Register</Link>
               </a>
             )}
           </div>
@@ -149,26 +145,26 @@ const Navbar: React.FC = () => {
           {user ? (
             <>
               <a
-                href="#"
+               
                 className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
                 onClick={()=>{navigate('/home')}}
               >
                 Home
               </a>
               <a
-                href="#"
+               
                 className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
               >
                 Problem
               </a>
               <a
-                href="#"
+               
                 className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
               >
                 Category
               </a>
               <a
-                href="#"
+               
                 className="text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium"
               >
                 Leaderboard
@@ -179,21 +175,22 @@ const Navbar: React.FC = () => {
                   className="bg-green-500 text-white h-10 w-10 flex items-center justify-center rounded-full text-sm font-medium mx-auto focus:outline-none"
                 >
                   {user.username.charAt(0).toUpperCase()}
+                  
                 </button>
                 {isDropdownOpen && (
                   <div className="mt-2 w-48 bg-white rounded-md shadow-lg py-2 mx-auto">
                     <a
-                      href="#"
+                     
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       onClick={() => {
-                        navigate("/profile");
+                       
                         setIsDropdownOpen(false);
                       }}
                     >
-                      Profile
+                     <Link to='/profile'>Profile</Link> 
                     </a>
                     <a
-                      href="#"
+                     
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       onClick={handleLogout}
                     >
@@ -205,7 +202,7 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <a
-              href="#"
+             
               className="bg-green-500 text-white px-4 py-2 rounded-md text-sm font-medium"
               onClick={() => navigate("/signup")}
             >
