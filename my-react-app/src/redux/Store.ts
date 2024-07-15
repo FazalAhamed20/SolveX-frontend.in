@@ -3,10 +3,12 @@ import { combineReducers } from "redux";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import AuthReducer from "./reducers/AuthReducer";
+import AdminReducer from "./reducers/AdminReducer";
 
 
 const rootReducer = combineReducers({
   user: AuthReducer,
+  admin:AdminReducer
  
 });
 

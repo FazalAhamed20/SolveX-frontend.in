@@ -1,4 +1,4 @@
-import { SignUp, SignIn, GoogleAuth ,checkMail } from "../actions/AuthActions";
+import { SignUp, SignIn, GoogleAuth ,checkMail,updateProfile } from "../actions/AuthActions";
 import { Verify, Logout } from "../actions/AuthActions";
 import { toast } from "react-toastify";
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
@@ -11,7 +11,8 @@ const initialState: userReducerInitial = {
   message: "",
   success:false,
   isUser:false,
-  isAdmin:false
+  isAdmin:false,
+  
 
   
 };
@@ -131,6 +132,29 @@ const Authreducer = createSlice({
         state.success=payload.success
       })
       .addCase(checkMail.rejected, (state, { payload }) => {
+        state.loading = false;
+        const errorPayload = payload as ErrorPayload;
+        state.err = errorPayload.message;
+        console.log(errorPayload.message);
+        
+        toast.error(errorPayload.message);
+        state.user = null;
+      })
+
+
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateProfile.fulfilled, (state, { payload }) => {
+        console.log("update",payload);
+        
+        state.loading = false;
+        state.err = false;
+        state.user = payload.data;
+        state.message = payload.message;
+        state.success=payload.success
+      })
+      .addCase(updateProfile.rejected, (state, { payload }) => {
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = errorPayload.message;

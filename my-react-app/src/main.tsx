@@ -13,12 +13,19 @@ import { FacebookProvider } from 'react-facebook'
 import {
   BrowserRouter as Router,} from "react-router-dom"
 
+  const clientId = String(
+    import.meta.env.VITE_CLIENTID
+  );
+  const appId = String(
+    import.meta.env.VITE_APPID
+  );
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={Store}>
     <PersistGate loading={null} persistor={persistor}>
-      <GoogleOAuthProvider clientId="508751020640-37gfseobr7qv95n8b5ri5amd4sfd0q8l.apps.googleusercontent.com">
-      <FacebookProvider appId="890234692922522">
+      <GoogleOAuthProvider clientId={clientId}>
+      <FacebookProvider appId={appId}>
         <ToastContainer />
         <Router>
 

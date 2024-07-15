@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../redux/Store';
+import { blockUser } from '../../redux/actions/AdminActions';
 
 interface User {
   _id: string;
   username: string;
   email: string;
-  isBlocked: boolean; 
+  isBlocked: boolean;
 }
 
 interface Props {
@@ -13,14 +16,40 @@ interface Props {
 
 const UserTable: React.FC<Props> = ({ users }) => {
   const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
+  const dispatch: AppDispatch = useDispatch();
 
-  const toggleBlockUser = (userId: string) => {
-    const updatedUsers = filteredUsers.map(user =>
-      user._id === userId ? { ...user, isBlocked: !user.isBlocked } : user
-    );
-    console.log(updatedUsers);
-    
-    setFilteredUsers(updatedUsers);
+  const toggleBlockUser = async (userId: string) => {
+    const userToBlock = filteredUsers.find(user => user._id === userId);
+
+    if (userToBlock) {
+      try {
+       
+        const newBlockedStatus = !userToBlock.isBlocked;
+
+       
+        const response = await dispatch(blockUser({ ...userToBlock, isBlocked: newBlockedStatus }));
+
+        
+        if (blockUser.fulfilled.match(response)) {
+          const updatedUser = response.payload.data as unknown as User;
+
+         
+          setFilteredUsers(prevUsers =>
+            prevUsers.map(user =>
+              user._id === updatedUser._id ? { ...user, isBlocked: updatedUser.isBlocked } : user
+            )
+          );
+
+          console.log("Filtered Users after update:", filteredUsers);
+        } else {
+          console.error('Failed to block/unblock user:', response.payload);
+        }
+      } catch (error) {
+        console.error('Failed to block/unblock user:', error);
+      }
+    } else {
+      console.error('User not found');
+    }
   };
 
   const handleSearch = (query: string) => {

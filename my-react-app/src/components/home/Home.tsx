@@ -54,9 +54,9 @@ const Home = () => {
               </p>
             </div>
             <div className="bg-slate-100 p-6 rounded-md shadow-md">
-              <h3 className="text-xl font-bold mb-3">Job Opportunities</h3>
+              <h3 className="text-xl font-bold mb-3">Coding Skills</h3>
               <p className="text-neutral-500">
-                Connect with top companies and explore job opportunities.
+                Learn how to code and improve your coding skills.
               </p>
             </div>
           </div>

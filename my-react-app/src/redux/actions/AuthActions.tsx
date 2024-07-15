@@ -1,7 +1,7 @@
 import { AuthAxios } from "../../constants/AxiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleErrors } from "../../helper/HandleErrors";
-import { Signin, Signup } from "../../types/userData";
+import { Signin, Signup,Profile } from "../../types/userData";
 import { ErrorPayload } from "../../types/Helper";
 
 
@@ -11,7 +11,8 @@ interface VerifyResponse {
   data:string,
   message: string;
   status?:number;
-  isAdmin?:boolean
+  isAdmin?:boolean;
+  isBlocked?:boolean
  
 }
 interface LogoutResponse {
@@ -125,6 +126,30 @@ export const checkMail = createAsyncThunk<
   try {
     const { data } = await AuthAxios.post<VerifyResponse>("/checkmail", {
       email:userData
+    });
+    return data;
+  } catch (error) {
+    return rejectWithValue(handleErrors(error));
+  }
+});
+
+export const updateProfile = createAsyncThunk<
+  VerifyResponse,
+  Profile,
+  { rejectValue: ErrorPayload }
+>("user/userProfile", async (userData: Profile, { rejectWithValue }) => {
+  console.log("userprofile", userData);
+
+  try {
+    const { data } = await AuthAxios.post<VerifyResponse>("/ProfileUpdate", {
+      email:userData.email,
+      profileImage:userData.profileImage,
+      bio:userData.bio,
+      username:userData.username,
+      role:userData.role,
+      linkedin:userData.linkedin,
+      github:userData.github,
+      twitter:userData.twitter
     });
     return data;
   } catch (error) {
