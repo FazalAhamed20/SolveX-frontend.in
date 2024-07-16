@@ -37,8 +37,18 @@ const Signup: React.FC = () => {
     console.log("Form values:", values);
     test(values);
 
-    await dispatch(SignUp(values.email));
-    setShowOtpPage(true)
+    const response=await dispatch(SignUp(values.email));
+    console.log("response",response);
+    
+    if(response.payload?.success==true){
+      setShowOtpPage(true)
+
+    }
+    
+  
+   
+    
+    
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
