@@ -1,12 +1,11 @@
-import Signup from "../components/signup/Signup"
+import Signup from '../components/signup/Signup';
 
 function SignupPage() {
   return (
     <div>
-        <Signup/>
-      
+      <Signup />
     </div>
-  )
+  );
 }
 
-export default SignupPage
+export default SignupPage;

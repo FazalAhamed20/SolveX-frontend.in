@@ -1,12 +1,11 @@
-import AdminHome from "../components/admin/AdminHome"
+import AdminHome from '../components/admin/AdminHome';
 
 const AdminHomePage = () => {
   return (
     <div>
-        <AdminHome/>
-      
+      <AdminHome />
     </div>
-  )
-}
+  );
+};
 
-export default AdminHomePage
+export default AdminHomePage;

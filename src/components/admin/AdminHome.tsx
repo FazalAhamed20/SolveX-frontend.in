@@ -13,8 +13,9 @@
     Tooltip,
     Legend,
   } from "recharts";
-  import { AuthAxios } from "../../constants/AxiosInstance";
+  import { AuthAxios } from "../../config/AxiosInstance";
   import UserTable from "./UserTable";
+import LogoutModal from "../../utils/modal/LogoutModal";
 
   const AdminDashboard: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -22,6 +23,7 @@
     const [users, setUsers] = useState<any[]>([]);
     const [problems, setProblemData] = useState<any[]>([]);
     const [activeSection, setActiveSection] = useState("problems");
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
       fetchUserData();
@@ -127,7 +129,7 @@
           <header className="bg-white shadow-md rounded-lg p-4 flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
             <button
-              onClick={handleLogout}
+              onClick={()=>{setShowModal(true)}}
               className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
             >
               Logout
@@ -200,8 +202,18 @@
             </div>
           )}
         </div>
+        <LogoutModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onLogout={handleLogout}
+                data={"Logout"}
+            />
       </div>
     );
   };
 
   export default AdminDashboard;
+
+  
+
+ 

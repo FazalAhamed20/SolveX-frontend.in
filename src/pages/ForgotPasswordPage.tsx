@@ -1,12 +1,11 @@
-import ForgotPasswordForm from "../components/login/ForgotPassword"
+import ForgotPasswordForm from '../components/login/ForgotPassword';
 
 function ForgotPasswordPage() {
   return (
     <div>
-        < ForgotPasswordForm/>
-      
+      <ForgotPasswordForm />
     </div>
-  )
+  );
 }
 
-export default ForgotPasswordPage
+export default ForgotPasswordPage;

@@ -1,5 +1,3 @@
-
-
 export interface GoogleValues {
   name: string;
   email: string;

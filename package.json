@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -40,6 +41,8 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.1.1",
+    "@eslint/js": "^9.7.0",
     "@reduxjs/toolkit": "^2.2.6",
     "@types/react": "^18.3.3",
     "@types/react-calendar-heatmap": "^1.6.7",
@@ -49,13 +52,16 @@
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.0",
+    "eslint": "^9.7.0",
+    "eslint-plugin-react": "^7.34.4",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "globals": "^15.8.0",
     "postcss": "^8.4.39",
     "react-redux": "^9.1.2",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
+    "typescript-eslint": "^7.16.1",
     "vite": "^5.3.1"
   }
 }

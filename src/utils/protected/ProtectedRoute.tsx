@@ -6,8 +6,11 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ isLoggedIn, children }) => {
-  return isLoggedIn ? <>{children}</> : <Navigate to="/login" />;
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  isLoggedIn,
+  children,
+}) => {
+  return isLoggedIn ? <>{children}</> : <Navigate to='/login' />;
 };
 
 export default ProtectedRoute;

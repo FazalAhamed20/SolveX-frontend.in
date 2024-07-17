@@ -1,15 +1,15 @@
-import Navbar from "../components/navbar/Navbar"
-import Home from "../components/home/Home"
-import Footer from "../components/footer/Footer"
+import Navbar from '../components/navbar/Navbar';
+import Home from '../components/home/Home';
+import Footer from '../components/footer/Footer';
 
 const LandingPage = () => {
   return (
     <div>
-        <Navbar/>
-        <Home/>
-        <Footer/>
+      <Navbar />
+      <Home />
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

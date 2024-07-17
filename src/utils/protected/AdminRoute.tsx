@@ -9,7 +9,7 @@ interface AdminRouteProps {
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const isAdmin = useSelector((state: any) => state.user.isAdmin);
 
-  return isAdmin ? <>{children}</> : <Navigate to="/home" />;
+  return isAdmin ? <>{children}</> : <Navigate to='/home' />;
 };
 
 export default AdminRoute;
