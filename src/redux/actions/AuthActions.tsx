@@ -157,6 +157,28 @@ export const updateProfile = createAsyncThunk<
   }
 });
 
+export const ResendOtp = createAsyncThunk<
+  VerifyResponse,
+  String,
+  { rejectValue: ErrorPayload }
+>("user/userResendOtp", async (userData: String, { rejectWithValue }) => {
+  try {
+    console.log(userData);
+
+    const { data } = await AuthAxios.post<VerifyResponse>("/resendotp", {
+      email: userData,
+    });
+    console.log("data",data);
+    
+
+    return data
+  } catch (error:any) {
+    console.log(error);
+    
+    return rejectWithValue(handleErrors(error));
+  }
+});
+
 
 
 

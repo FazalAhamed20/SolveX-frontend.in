@@ -14,8 +14,6 @@ const AdminDashboard = lazy(() => import("./pages/AdminHomePage"));
 const App: React.FC = () => {
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
   const isAdmin = useSelector((state: any) => state.user.isAdmin);
-  console.log("....", isLoggedIn);
-  console.log("...", isAdmin);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

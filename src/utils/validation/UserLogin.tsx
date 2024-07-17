@@ -6,7 +6,7 @@ export const userLoginValidation=Yup.object({
   email: Yup.string()
     .email("Invalid email format")
     .required("Please enter your email")
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format"),
+    .matches(/^[A-Z0-9]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, "Invalid email format"),
   
   password: Yup.string()
     .required("Please enter your password")

@@ -5,16 +5,15 @@ import { checkMail, Verify } from "../../redux/actions/AuthActions";
 import { AppDispatch, RootState } from "../../redux/Store";
 import OtpPasswordModal from "../../utils/modal/OtpPasswordModal";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const ForgotPasswordForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [email, setEmail] = useState("");
   const user = useSelector((state: RootState) => state.user.user);
   console.log("user", user);
-  const navigate = useNavigate();
 
   const handleSubmit = async (values: any, actions: any) => {
     console.log(values.email);
@@ -23,6 +22,7 @@ const ForgotPasswordForm: React.FC = () => {
     console.log(response);
 
     if (response.payload && response.payload.success === true) {
+      setEmail(values.email);
       setIsModalOpen(true);
       setIsFormSubmitted(true);
     }
@@ -37,21 +37,18 @@ const ForgotPasswordForm: React.FC = () => {
   };
 
   const handleModalSubmit = async (otp: string, newPassword: string) => {
-    if(otp.length==4){
-        const data = {
-            username: user.username,
-            email: user.email,
-            password: newPassword,
-            otp: otp,
-          };
-      
-           await dispatch(Verify(data));
-          
+    if (otp.length === 4) {
+      const data = {
+        username: user.username,
+        email: email,
+        password: newPassword,
+        otp: otp,
+      };
 
-    }else{
-        toast.error("Please enter a 4-digit OTP");
+      await dispatch(Verify(data));
+    } else {
+      toast.error("Please enter a 4-digit OTP");
     }
-   
   };
 
   return (
@@ -101,6 +98,7 @@ const ForgotPasswordForm: React.FC = () => {
           isOpen={isModalOpen}
           onClose={closeModal}
           onSubmit={handleModalSubmit}
+          email={email} // Pass the email as a prop to the modal
         />
       )}
     </div>

@@ -4,10 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/Store";
 import { Logout } from "../../redux/actions/AuthActions";
 import { googleLogout } from "@react-oauth/google";
+import LogoutModal from "../../utils/modal/LogoutModal";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
   const navigate = useNavigate();
@@ -21,11 +23,14 @@ const Navbar: React.FC = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleLogout = () => {
-    dispatch(Logout());
-    googleLogout();
+  const handleLogout = async() => {
+    
+   await dispatch(Logout());
+    await googleLogout();
     setIsDropdownOpen(false);
-    navigate("/", { replace: false });
+    setShowModal(false)
+    navigate("/login", { replace: false });
+    
   };
 
   return (
@@ -77,8 +82,8 @@ const Navbar: React.FC = () => {
                         Profile
                       </Link>
                       <a
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        onClick={handleLogout}
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => setShowModal(true)}
                       >
                         Logout
                       </a>
@@ -173,7 +178,7 @@ const Navbar: React.FC = () => {
                     </Link>
                     <a
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      onClick={handleLogout}
+                      onClick={() => setShowModal(true)}
                     >
                       Logout
                     </a>
@@ -191,6 +196,11 @@ const Navbar: React.FC = () => {
           )}
         </div>
       </div>
+      <LogoutModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onLogout={handleLogout}
+            />
     </nav>
   );
 };

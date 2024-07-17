@@ -7,8 +7,10 @@ export const userSignupValidation=Yup.object({
     .required("Please enter your name"),
   email: Yup.string()
     .email("Invalid email format")
+    .trim('The contact name cannot include leading and trailing spaces')
+    .strict(true)
     .required("Please enter your email")
-    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format"),
+    .matches(/^[A-Z0-9]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, "Invalid email format"),
   
   password: Yup.string()
     .required("Please enter your password")
