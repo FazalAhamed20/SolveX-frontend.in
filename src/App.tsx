@@ -1,7 +1,9 @@
 import React, { Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import LoadingSpinner from './utils/modal/LoadingSpinnerModal';
+import { AppDispatch } from './redux/Store';
+import { setGlobalDispatch } from './redux/dispatchStore';
 
 const LandingPage = lazy(() => import('./pages/HomePage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
@@ -14,6 +16,12 @@ const AdminDashboard = lazy(() => import('./pages/AdminHomePage'));
 const App: React.FC = () => {
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
   const isAdmin = useSelector((state: any) => state.user.isAdmin);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  React.useEffect(() => {
+    setGlobalDispatch(dispatch);
+  }, [dispatch]);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

@@ -1,4 +1,4 @@
-import { AuthAxios } from "../../config/AxiosInstance";
+import { AdminAxios } from "../../config/AxiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleErrors } from "../../helper/HandleErrors";
 import { UserData } from "../../types/userData";
@@ -20,7 +20,7 @@ export const blockUser = createAsyncThunk<
   try {
     console.log(userData);
 
-    const { data } = await AuthAxios.post<VerifyResponse>("/blockuser", {
+    const { data } = await AdminAxios.post<VerifyResponse>("/blockuser", {
       email: userData.email,
       isBlocked:userData.isBlocked
     });
