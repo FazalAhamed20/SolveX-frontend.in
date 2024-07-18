@@ -1,5 +1,4 @@
-import { AppDispatch } from "./Store";
-
+import { AppDispatch } from './Store';
 
 let globalDispatch: AppDispatch | null = null;
 

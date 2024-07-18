@@ -4,10 +4,12 @@ import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import AuthReducer from './reducers/AuthReducer';
 import AdminReducer from './reducers/AdminReducer';
+import ProblemReducer from './reducers/ProblemReducer';
 
 const rootReducer = combineReducers({
   user: AuthReducer,
   admin: AdminReducer,
+  problem:ProblemReducer
 });
 
 const persistConfig = {

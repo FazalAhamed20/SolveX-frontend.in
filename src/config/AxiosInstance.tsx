@@ -9,7 +9,7 @@ import { getGlobalDispatch } from '../redux/dispatchStore';
 import { Logout } from '../redux/actions/AuthActions';
 
 const authbaseUrl = import.meta.env.VITE_AUTHENTICATION_SERVICE as string;
-
+const problemUrl=import.meta.env.VITE_PROBLEM_SERVICE as string;
 export const AuthAxios: AxiosInstance = axios.create({
   baseURL: authbaseUrl,
   withCredentials: true,
@@ -107,3 +107,8 @@ export const AdminAxios: AxiosInstance = axios.create({
 });
 
 export default AuthAxios;
+
+export const ProblemAxios: AxiosInstance = axios.create({
+  baseURL:  problemUrl,
+  withCredentials: true,
+});

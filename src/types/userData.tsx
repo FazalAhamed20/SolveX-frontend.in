@@ -35,3 +35,18 @@ export type Profile = {
   twitter?: string;
   profileImage?: string;
 };
+
+
+export type Problem={
+  _id: string;
+    title: string;
+    description: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    tags: string[];
+    code:string,
+    javascript:true,
+    isBlocked?:boolean,
+    status: 'Solved' | 'Attempted' | 'Todo';
+
+}
+

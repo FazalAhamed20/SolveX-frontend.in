@@ -12,8 +12,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { FacebookProvider } from 'react-facebook';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-
-
 const clientId = String(import.meta.env.VITE_CLIENTID);
 const appId = String(import.meta.env.VITE_APPID);
 

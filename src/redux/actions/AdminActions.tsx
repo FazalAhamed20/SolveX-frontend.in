@@ -1,30 +1,30 @@
-import { AdminAxios } from "../../config/AxiosInstance";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { handleErrors } from "../../helper/HandleErrors";
-import { UserData } from "../../types/userData";
-import { ErrorPayload } from "../../types/Helper";
+import { AdminAxios } from '../../config/AxiosInstance';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { handleErrors } from '../../helper/HandleErrors';
+import { UserData } from '../../types/userData';
+import { ErrorPayload } from '../../types/Helper';
 
 interface VerifyResponse {
   success: any;
   data: string;
   message: string;
   status?: number;
-  isBlocked?:boolean
+  isBlocked?: boolean;
 }
 
 export const blockUser = createAsyncThunk<
   VerifyResponse,
   UserData,
   { rejectValue: ErrorPayload }
->("admin/adminBlock", async (userData: UserData, { rejectWithValue }) => {
+>('admin/adminBlock', async (userData: UserData, { rejectWithValue }) => {
   try {
     console.log(userData);
 
-    const { data } = await AdminAxios.post<VerifyResponse>("/blockuser", {
+    const { data } = await AdminAxios.post<VerifyResponse>('/blockuser', {
       email: userData.email,
-      isBlocked:userData.isBlocked
+      isBlocked: userData.isBlocked,
     });
-    console.log("data", data);
+    console.log('data', data);
 
     return data;
   } catch (error: any) {
@@ -32,5 +32,3 @@ export const blockUser = createAsyncThunk<
     return rejectWithValue(handleErrors(error));
   }
 });
-
-

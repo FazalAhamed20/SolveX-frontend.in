@@ -95,10 +95,9 @@ const UserProfile: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
- 
- 
+
     const response = await dispatch(updateProfile(profile));
-    console.log("isBlock",response);
+    console.log('isBlock', response);
     if (response.payload?.success === true) {
       toast.success('Profile Updated');
       closeModal();
