@@ -17,7 +17,7 @@ export type adminReducerInitial = {
 export type problemReducerInitial = {
   loading: boolean;
   err: boolean | string;
-  problem: [];
+  problem:Problem [];
   message?: string;
   success?: boolean;
 };

@@ -39,6 +39,7 @@ export type Profile = {
 
 export type Problem={
   _id: string;
+  id:string;
     title: string;
     description: string;
     difficulty: 'Easy' | 'Medium' | 'Hard';

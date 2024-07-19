@@ -13,6 +13,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminHomePage'));
 const ProblemPage= lazy(() => import('./pages/ProblemPage'));
+const EditorPage= lazy(() => import('./pages/EditorPage'));
 
 const App: React.FC = () => {
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
@@ -59,6 +60,7 @@ const App: React.FC = () => {
         <Route path='/profile' element={<ProfilePage />} />
         <Route path='/problem' element={<ProblemPage />} />
         <Route path='/forgot' element={<ForgotPasswordPage />} />
+        <Route path='/code/:id' element={<EditorPage />} />
 
         <Route
           path='*'

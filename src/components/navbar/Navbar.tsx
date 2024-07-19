@@ -58,9 +58,10 @@ const Navbar: React.FC = () => {
                 >
                   Home
                 </Link>
-                <a className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
+                <Link to='/problem'
+                className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
                   Problem
-                </a>
+                </Link>
                 <a className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
                   Categories
                 </a>

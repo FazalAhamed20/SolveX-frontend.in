@@ -6,7 +6,7 @@ import { ErrorPayload } from '../../types/Helper';
 
 interface VerifyResponse {
   success: any;
-  data: [];
+  data:[];
   message: string;
   status?: number;
   isBlocked?: boolean;
@@ -34,14 +34,14 @@ export const blockProblem= createAsyncThunk<
 });
 
 export const problemlist= createAsyncThunk<
-  VerifyResponse,
+  Problem[],
   void,
   { rejectValue: ErrorPayload }
 >('problem/problemlist', async (_, { rejectWithValue }) => {
   try {
    
 
-    const { data } = await ProblemAxios.get<VerifyResponse>('/problemlist', {
+    const { data } = await ProblemAxios.get<Problem[]>('/problemlist', {
      
     });
     console.log('data', data);

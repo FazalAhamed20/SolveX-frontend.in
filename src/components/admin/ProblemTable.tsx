@@ -8,8 +8,9 @@ interface Problem {
   _id: string;
   title: string;
   description: string;
-  difficulty: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
   isBlocked: boolean;
+  
 }
 
 interface Props {
@@ -54,6 +55,8 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
               tags: [],
               code: '',
               javascript: true,
+              id: '',
+              status: 'Solved'
             }),
           );
 
