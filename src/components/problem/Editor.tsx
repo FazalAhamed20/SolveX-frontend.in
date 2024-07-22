@@ -1,7 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ProblemAxios } from '../../config/AxiosInstance';
+import { ProblemAxios, SubmissionAxios } from '../../config/AxiosInstance';
 import Editor from '@monaco-editor/react';
 import ChatBot from '../../utils/chatBot/ChatBot';
 
@@ -14,18 +14,17 @@ interface TestCase {
 const CodeEditor: React.FC = () => {
   const [code, setCode] = useState<string>('');
   const [output, setOutput] = useState<string>('');
+  const [testCaseOutputs, setTestCaseOutputs] = useState<string[]>([]);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [testResults, setTestResults] = useState<boolean[]>([]);
   const [language, setLanguage] = useState<string>('javascript');
   const [selectedTestCase, setSelectedTestCase] = useState<number | null>(null);
-
 
   const { id } = useParams<{ id: string }>();
 
   const problems = useSelector((state: any) => state.problem.problem);
   const problem = problems.find((p: any) => p.id === id);
   const supportedLanguages = problem?.language || [];
-  console.log('Supported languages:', supportedLanguages);
 
   const availableLanguages = supportedLanguages
     .filter((langObj: { [x: string]: any }) => {
@@ -33,8 +32,6 @@ const CodeEditor: React.FC = () => {
       return langObj[langName];
     })
     .map((langObj: {}) => Object.keys(langObj)[0]);
-
-  console.log('Available languages:', availableLanguages);
 
   const fetchTestCases = async () => {
     try {
@@ -44,8 +41,9 @@ const CodeEditor: React.FC = () => {
         `/fetchProblem/${id}-${problem.title}?language=${language}`,
       );
       const data = await response.data;
+
       setCode(data.solutionTemplate || '');
-      console.log('Fetched Data:', data);
+
       if (
         !Array.isArray(data.input) ||
         !Array.isArray(data.output) ||
@@ -89,8 +87,6 @@ const CodeEditor: React.FC = () => {
         },
       );
 
-      console.log('Formatted Test Cases:', fetchedTestCases);
-
       setTestCases(fetchedTestCases);
       setTestResults(new Array(fetchedTestCases.length).fill(false));
     } catch (error) {
@@ -99,30 +95,51 @@ const CodeEditor: React.FC = () => {
   };
 
   useEffect(() => {
+    // Load code from local storage on component mount
+    const savedCode = localStorage.getItem('code');
+    if (savedCode) {
+      setCode(savedCode);
+    }
     fetchTestCases();
   }, [id, problem, language]);
 
-  const handleRun = () => {
-    console.log("code",code);
-    
-    const results = testCases.map(testCase => {
-      try {
-        const inputCode = `${testCase.input}\n${code}`;
-        let result;
-        if (language === 'javascript') {
-          result = eval(inputCode);
-        } 
-        return result === JSON.parse(testCase.output);
-      } catch (error) {
-        console.error('Error executing code:', error);
+  useEffect(() => {
+    // Save code to local storage whenever it changes
+    localStorage.setItem('code', code);
+  }, [code]);
+
+  const handleRun = async () => {
+    try {
+      const submitResponse = await SubmissionAxios.post(`/submit`, {
+        source: code,
+        lang: language,
+        testCases: testCases,
+      });
+
+      const results = submitResponse.data.results;
+
+      const updatedTestResults = testCases.map((testCase, index) => {
+        const result = results[index];
+        if (result) {
+          const isCorrect = result.output === testCase.output;
+          return isCorrect;
+        }
         return false;
+      });
+
+      setTestResults(updatedTestResults);
+      setTestCaseOutputs(results.map((result: { output: any; }) => result?.output || ''));
+
+      if (selectedTestCase !== null) {
+        setOutput(testCaseOutputs[selectedTestCase] || '');
       }
-    });
-    setTestResults(results);
-    setOutput(JSON.stringify(results, null, 2));
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const handleSubmit = () => {
+    localStorage.removeItem('code'); // Clear code from local storage upon submit
     setOutput('Code submitted successfully!');
   };
 
@@ -195,7 +212,7 @@ const CodeEditor: React.FC = () => {
                 className='h-full border border-gray-300 rounded-md'
               >
                 <Editor
-                  height="45vh"
+                  height='45vh'
                   language={language}
                   value={code}
                   onChange={value => setCode(value || '')}
@@ -219,6 +236,7 @@ const CodeEditor: React.FC = () => {
                     </button>
                   ))}
                 </div>
+
                 {selectedTestCase !== null && (
                   <div className='mt-4 p-4 bg-gray-100 rounded-md'>
                     <h3 className='font-bold mb-2'>
@@ -233,7 +251,7 @@ const CodeEditor: React.FC = () => {
                       {testCases[selectedTestCase].output}
                     </p>
                     <p className='text-sm'>
-                      <strong>Actual Output:</strong> {output}
+                      <strong>Actual Output:</strong> {testCaseOutputs[selectedTestCase] || 'No output'}
                     </p>
                   </div>
                 )}
@@ -281,53 +299,11 @@ const CodeEditor: React.FC = () => {
               </p>
             </div>
           ))}
-          <ChatBot/>
+          <ChatBot />
         </div>
-        
       </div>
-      
-      
     </div>
   );
 };
 
 export default CodeEditor;
-
-
-
-
-
-
-
-
-
-
-
- // useEffect(() => {
-  //   const editorElement = document.getElementById('code-editor');
-  //   if (!editorElement) {
-  //     console.error('Editor container not found');
-  //     return;
-  //   }
-  
-  //   const editor = monaco.editor.create(editorElement, {
-  //     value: code,
-  //     language: language,
-  //     theme: 'vs-dark',
-  //     automaticLayout: true,
-     
-  //   });
-  
-  //   editorRef.current = editor;
-  
-  //   const handleEditorChange = () => {
-  //     const editorValue = editor.getValue();
-  //     setCode(editorValue);
-  //   };
-  
-  //   editor.onDidChangeModelContent(handleEditorChange);
-  
-  //   return () => {
-  //     editor.dispose();
-  //   };
-  // }, [language]); 

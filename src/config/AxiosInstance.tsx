@@ -10,6 +10,7 @@ import { Logout } from '../redux/actions/AuthActions';
 
 const authbaseUrl = import.meta.env.VITE_AUTHENTICATION_SERVICE as string;
 const problemUrl=import.meta.env.VITE_PROBLEM_SERVICE as string;
+const submissionUrl=import.meta.env.VITE_SUBMISSION_SERVICE as string;
 export const AuthAxios: AxiosInstance = axios.create({
   baseURL: authbaseUrl,
   withCredentials: true,
@@ -110,5 +111,10 @@ export default AuthAxios;
 
 export const ProblemAxios: AxiosInstance = axios.create({
   baseURL:  problemUrl,
+  withCredentials: true,
+});
+
+export const SubmissionAxios: AxiosInstance = axios.create({
+  baseURL:  submissionUrl,
   withCredentials: true,
 });
