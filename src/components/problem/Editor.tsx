@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ProblemAxios, SubmissionAxios } from '../../config/AxiosInstance';
@@ -12,19 +12,26 @@ interface TestCase {
 }
 
 const CodeEditor: React.FC = () => {
-  const [code, setCode] = useState<string>('');
+  const [code, setCode] = useState(() => {
+    const savedCode = localStorage.getItem('code');
+    return savedCode || ''; // or your default value
+  });
   const [output, setOutput] = useState<string>('');
-  const [testCaseOutputs, setTestCaseOutputs] = useState<string[]>([]);
+  const [testCaseOutputs, setTestCaseOutputs] = useState<any[][]>([]);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const[raw,setRaw]=useState([])
   const [testResults, setTestResults] = useState<boolean[]>([]);
   const [language, setLanguage] = useState<string>('javascript');
   const [selectedTestCase, setSelectedTestCase] = useState<number | null>(null);
+  const [functionName, setFunctionName] = useState('');
+  const [loading,setLoading]=useState<boolean>(false)
 
   const { id } = useParams<{ id: string }>();
 
   const problems = useSelector((state: any) => state.problem.problem);
   const problem = problems.find((p: any) => p.id === id);
   const supportedLanguages = problem?.language || [];
+  console.log('problem', problem);
 
   const availableLanguages = supportedLanguages
     .filter((langObj: { [x: string]: any }) => {
@@ -41,8 +48,16 @@ const CodeEditor: React.FC = () => {
         `/fetchProblem/${id}-${problem.title}?language=${language}`,
       );
       const data = await response.data;
+      console.log("data",data)
+      console.log(data.input);
 
       setCode(data.solutionTemplate || '');
+      setFunctionName(data.driver);
+      data.input.forEach((inputItem: number[]) => {
+        console.log(inputItem);
+    });
+      console.log("..../..../",data.input)
+      setRaw(data.input)
 
       if (
         !Array.isArray(data.input) ||
@@ -76,7 +91,7 @@ const CodeEditor: React.FC = () => {
               )
               .join(', ');
           } else {
-            formattedInput = `X = ${JSON.stringify(inputItem)}`;
+            formattedInput = `x = ${JSON.stringify(inputItem)}`;
           }
 
           return {
@@ -89,57 +104,76 @@ const CodeEditor: React.FC = () => {
 
       setTestCases(fetchedTestCases);
       setTestResults(new Array(fetchedTestCases.length).fill(false));
+      if (fetchedTestCases.length > 0) {
+        setSelectedTestCase(0);
+      }
     } catch (error) {
       console.error('Error fetching test cases:', error);
     }
   };
 
   useEffect(() => {
-    // Load code from local storage on component mount
     const savedCode = localStorage.getItem('code');
+    console.log('Saved', savedCode);
+
     if (savedCode) {
       setCode(savedCode);
     }
     fetchTestCases();
   }, [id, problem, language]);
-
-  useEffect(() => {
-    // Save code to local storage whenever it changes
-    localStorage.setItem('code', code);
-  }, [code]);
+  console.log("raw",raw);
+  
 
   const handleRun = async () => {
+    setLoading(true)
     try {
       const submitResponse = await SubmissionAxios.post(`/submit`, {
         source: code,
         lang: language,
-        testCases: testCases,
+        testCases: raw,
+        functionName: functionName,
       });
 
       const results = submitResponse.data.results;
+      console.log(submitResponse.data);
 
       const updatedTestResults = testCases.map((testCase, index) => {
         const result = results[index];
+        console.log('/////', result.output);
+        console.log('/////', testCase.output);
+
         if (result) {
-          const isCorrect = result.output === testCase.output;
+          const expectedOutput = JSON.parse(testCase.output);
+          console.log('expected', expectedOutput);
+
+          const actualOutput = result.output;
+          console.log('actual', actualOutput);
+
+          const isCorrect =
+            JSON.stringify(expectedOutput) === JSON.stringify(actualOutput);
           return isCorrect;
         }
         return false;
       });
 
       setTestResults(updatedTestResults);
-      setTestCaseOutputs(results.map((result: { output: any; }) => result?.output || ''));
+      console.log('.../...', testResults);
 
-      if (selectedTestCase !== null) {
-        setOutput(testCaseOutputs[selectedTestCase] || '');
-      }
+      setTestCaseOutputs(
+        results.map((result: { output: any }) => result?.output || ''),
+      );
+      console.log('test-----------------', testCaseOutputs);
+      console.log('././/....', selectedTestCase);
     } catch (error) {
       console.error('Error:', error);
+    }finally{
+      setLoading(false)
     }
   };
 
+  console.log('./././out', output);
+
   const handleSubmit = () => {
-    localStorage.removeItem('code'); // Clear code from local storage upon submit
     setOutput('Code submitted successfully!');
   };
 
@@ -188,11 +222,12 @@ const CodeEditor: React.FC = () => {
           ))}
         </select>
         <div className='space-x-2'>
-          <button
+        <button
             className='bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md'
             onClick={handleRun}
+            disabled={loading} 
           >
-            Run
+            {loading ? 'Running...' : 'Run'} 
           </button>
           <button
             className='bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded-md'
@@ -251,7 +286,10 @@ const CodeEditor: React.FC = () => {
                       {testCases[selectedTestCase].output}
                     </p>
                     <p className='text-sm'>
-                      <strong>Actual Output:</strong> {testCaseOutputs[selectedTestCase] || 'No output'}
+                      <strong>Actual Output:</strong>
+                      {testCaseOutputs[selectedTestCase]
+                        ? JSON.stringify(testCaseOutputs[selectedTestCase])
+                        : 'No output'}
                     </p>
                   </div>
                 )}
