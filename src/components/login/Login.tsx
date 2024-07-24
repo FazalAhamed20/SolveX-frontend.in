@@ -12,21 +12,28 @@ import { useLogin } from 'react-facebook';
 import axios from 'axios';
 import ForgotPasswordForm from './ForgotPassword';
 import { Link } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
 const Login: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const initialValues = {
     email: '',
     password: '',
   };
 
-  const { login, isLoading } = useLogin();
+  const { login } = useLogin();
 
   const handleSubmit = async (values: any) => {
-    await dispatch(SignIn(values));
+    setIsLoading(true);
+    try {
+      await dispatch(SignIn(values));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
@@ -148,11 +155,18 @@ const Login: React.FC = () => {
                       </div>
                     </div>
                     <button
-                      type='submit'
-                      className='w-full px-8 py-3 mt-3 text-sm leading-5 text-white bg-green-700 rounded hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50'
-                    >
-                      Sign In
-                    </button>
+  type='submit'
+  disabled={isLoading}
+  className={`w-full px-8 py-3 mt-3 text-sm leading-5 text-white ${
+    isLoading ? 'bg-green-500' : 'bg-green-700 hover:bg-green-800'
+  } rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50`}
+>
+{isLoading ? (
+  <ClipLoader color="#ffffff" loading={isLoading} size={20} />
+) : (
+  'Sign In'
+)}
+</button>
                   </Form>
                 </Formik>
                 <div className='self-center mt-4 text-sm leading-5 text-neutral-300'>

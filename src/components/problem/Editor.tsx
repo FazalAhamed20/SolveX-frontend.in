@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ProblemAxios, SubmissionAxios } from '../../config/AxiosInstance';
 import Editor from '@monaco-editor/react';
 import ChatBot from '../../utils/chatBot/ChatBot';
+import { toast } from 'react-toastify';
 
 interface TestCase {
   description: string;
@@ -12,19 +13,20 @@ interface TestCase {
 }
 
 const CodeEditor: React.FC = () => {
-  const [code, setCode] = useState(() => {
-    const savedCode = localStorage.getItem('code');
-    return savedCode || ''; // or your default value
-  });
+  const [code, setCode] = useState('');
   const [output, setOutput] = useState<string>('');
   const [testCaseOutputs, setTestCaseOutputs] = useState<any[][]>([]);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
-  const[raw,setRaw]=useState([])
+  const [raw, setRaw] = useState([]);
+  const [display, setDisplay] = useState('');
   const [testResults, setTestResults] = useState<boolean[]>([]);
   const [language, setLanguage] = useState<string>('javascript');
   const [selectedTestCase, setSelectedTestCase] = useState<number | null>(null);
   const [functionName, setFunctionName] = useState('');
-  const [loading,setLoading]=useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingTestCases, setLoadingTestCases] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSolved, setIsSolved] = useState(false);
 
   const { id } = useParams<{ id: string }>();
 
@@ -41,6 +43,8 @@ const CodeEditor: React.FC = () => {
     .map((langObj: {}) => Object.keys(langObj)[0]);
 
   const fetchTestCases = async () => {
+    setLoadingTestCases(true);
+
     try {
       if (!problem) return;
 
@@ -48,16 +52,17 @@ const CodeEditor: React.FC = () => {
         `/fetchProblem/${id}-${problem.title}?language=${language}`,
       );
       const data = await response.data;
-      console.log("data",data)
+      console.log('data', data);
       console.log(data.input);
 
       setCode(data.solutionTemplate || '');
       setFunctionName(data.driver);
+      setDisplay(data.display);
       data.input.forEach((inputItem: number[]) => {
         console.log(inputItem);
-    });
-      console.log("..../..../",data.input)
-      setRaw(data.input)
+      });
+      console.log('..../..../', data.input);
+      setRaw(data.input);
 
       if (
         !Array.isArray(data.input) ||
@@ -84,7 +89,7 @@ const CodeEditor: React.FC = () => {
           } else if (typeof inputItem === 'object') {
             formattedInput = Object.entries(inputItem)
               .map(
-                ([key, value], i) =>
+                ([value], i) =>
                   `${
                     variableNames[i % variableNames.length]
                   } = ${JSON.stringify(value)}`,
@@ -109,6 +114,8 @@ const CodeEditor: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching test cases:', error);
+    } finally {
+      setLoadingTestCases(false);
     }
   };
 
@@ -121,21 +128,35 @@ const CodeEditor: React.FC = () => {
     }
     fetchTestCases();
   }, [id, problem, language]);
-  console.log("raw",raw);
-  
+  console.log('raw', raw);
 
   const handleRun = async () => {
-    setLoading(true)
+    setLoading(true);
+    setError(null);
     try {
       const submitResponse = await SubmissionAxios.post(`/submit`, {
         source: code,
         lang: language,
         testCases: raw,
         functionName: functionName,
+        display: display,
       });
 
       const results = submitResponse.data.results;
-      console.log(submitResponse.data);
+      console.log('.../.../////', results);
+      console.log('error', submitResponse.data);
+      const hasError = results.some((result: any) => result.error);
+      if (hasError) {
+        const errorMessages = results
+          .filter((result: any) => result.error)
+          .map((result: any) => result.error)
+          .join(', ');
+
+        setError(`Errors encountered: ${errorMessages}`);
+        setTestResults(new Array(testCases.length).fill(false));
+        setTestCaseOutputs([]); 
+        return;
+      }
 
       const updatedTestResults = testCases.map((testCase, index) => {
         const result = results[index];
@@ -166,21 +187,30 @@ const CodeEditor: React.FC = () => {
       console.log('././/....', selectedTestCase);
     } catch (error) {
       console.error('Error:', error);
-    }finally{
-      setLoading(false)
+      setError('An unexpected error occurred.');
+    } finally {
+      setLoading(false);
     }
   };
 
   console.log('./././out', output);
 
   const handleSubmit = () => {
-    setOutput('Code submitted successfully!');
+    if (testResults.every(result => result)) {
+      toast.success("Submitted Successfully")
+      setOutput('Code submitted successfully!');
+      setError(null);
+      setIsSolved(true);
+    } else {
+      setError('Not all test cases passed. Please fix your code.');
+    }
   };
 
-  const handleLanguageChange = (
+  const handleLanguageChange = async (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setLanguage(event.target.value);
+    setCode('');
     fetchTestCases();
   };
 
@@ -222,12 +252,12 @@ const CodeEditor: React.FC = () => {
           ))}
         </select>
         <div className='space-x-2'>
-        <button
+          <button
             className='bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded-md'
             onClick={handleRun}
-            disabled={loading} 
+            disabled={loading}
           >
-            {loading ? 'Running...' : 'Run'} 
+            {loading ? 'Running...' : 'Run'}
           </button>
           <button
             className='bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded-md'
@@ -237,6 +267,12 @@ const CodeEditor: React.FC = () => {
           </button>
         </div>
       </div>
+      {error && (
+        <div className='bg-red-100 border border-red-500 text-red-700 px-4 py-3 rounded relative'>
+          <strong className='font-bold'>Error:</strong>
+          <span className='block sm:inline'>{error}</span>
+        </div>
+      )}
       <div className='flex-1 flex flex-col md:flex-row gap-4 mt-2'>
         <div className='md:w-1/2 bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
           <h2 className='text-xl font-bold mb-2'>Code Editor</h2>
@@ -258,40 +294,46 @@ const CodeEditor: React.FC = () => {
             <div className='h-48 md:h-64'>
               <div className='bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
                 <h2 className='text-xl font-bold mb-2'>Test Cases</h2>
-                <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
-                  {testCases.map((_testCase, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleTestCaseClick(index)}
-                      className={`p-1 rounded-md text-white text-xs font-bold ${
-                        testResults[index] ? 'bg-green-500' : 'bg-red-500'
-                      }`}
-                    >
-                      Case {index + 1}
-                    </button>
-                  ))}
-                </div>
+                {loadingTestCases ? (
+                  <div className='text-center'>Loading test cases...</div>
+                ) : (
+                  <>
+                    <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+                      {testCases.map((testCase, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleTestCaseClick(index)}
+                          className={`p-1 rounded-md text-white text-xs font-bold ${
+                            testResults[index] ? 'bg-green-500' : 'bg-red-500'
+                          }`}
+                        >
+                          Case {index + 1}
+                        </button>
+                      ))}
+                    </div>
 
-                {selectedTestCase !== null && (
-                  <div className='mt-4 p-4 bg-gray-100 rounded-md'>
-                    <h3 className='font-bold mb-2'>
-                      Case {selectedTestCase + 1}
-                    </h3>
-                    <p className='text-sm'>
-                      <strong>Input:</strong>{' '}
-                      {testCases[selectedTestCase].input}
-                    </p>
-                    <p className='text-sm'>
-                      <strong>Expected Output:</strong>{' '}
-                      {testCases[selectedTestCase].output}
-                    </p>
-                    <p className='text-sm'>
-                      <strong>Actual Output:</strong>
-                      {testCaseOutputs[selectedTestCase]
-                        ? JSON.stringify(testCaseOutputs[selectedTestCase])
-                        : 'No output'}
-                    </p>
-                  </div>
+                    {selectedTestCase !== null && (
+                      <div className='mt-4 p-4 bg-gray-100 rounded-md'>
+                        <h3 className='font-bold mb-2'>
+                          Case {selectedTestCase + 1}
+                        </h3>
+                        <p className='text-sm'>
+                          <strong>Input:</strong>{' '}
+                          {testCases[selectedTestCase].input}
+                        </p>
+                        <p className='text-sm'>
+                          <strong>Expected Output:</strong>{' '}
+                          {testCases[selectedTestCase].output}
+                        </p>
+                        <p className='text-sm'>
+                          <strong>Actual Output:</strong>
+                          {testCaseOutputs[selectedTestCase]
+                            ? JSON.stringify(testCaseOutputs[selectedTestCase])
+                            : 'No output'}
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -299,6 +341,14 @@ const CodeEditor: React.FC = () => {
         </div>
         <div className='md:w-1/2 bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
           <h2 className='text-xl font-bold mb-2'>Problem Description</h2>
+          {isSolved && (
+      <div className="flex items-center text-green-600">
+        <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span className="font-semibold">Solved</span>
+      </div>
+    )}
           <div className='flex justify-between items-center mb-4'>
             <h3 className='text-lg font-semibold'>{problem?.title}</h3>
             <p className='text-md'>

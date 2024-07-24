@@ -13,10 +13,12 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 const facebookId = String(import.meta.env.VITE_FACEBOOK_ID);
+import { ClipLoader } from 'react-spinners';
 
 const Signup: React.FC = () => {
   const [showOtpPage, setShowOtpPage] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     username: '',
     email: '',
@@ -36,14 +38,17 @@ const Signup: React.FC = () => {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log('Form values:', values);
-    test(values);
-
-    const response = await dispatch(SignUp(values.email));
-    console.log('response', response);
-
-    if (response.payload?.success == true) {
-      setShowOtpPage(true);
+    setLoading(true);
+    try {
+      console.log('Form values:', values);
+      test(values);
+      const response = await dispatch(SignUp(values.email));
+      console.log('response', response);
+      if (response.payload?.success == true) {
+        setShowOtpPage(true);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,12 +178,19 @@ const Signup: React.FC = () => {
                       component='div'
                       className='text-red-500 mb-3'
                     />
-                    <button
-                      type='submit'
-                      className='w-full px-8 py-3 mt-3 text-sm leading-5 text-white bg-green-700 rounded'
-                    >
-                      Sign up
-                    </button>
+                   <button
+  type='submit'
+  disabled={loading}
+  className={`w-full px-8 py-3 mt-3 text-sm leading-5 text-white ${
+    isLoading ? 'bg-green-500' : 'bg-green-700'
+  } rounded`}
+>
+  {loading ? (
+    <ClipLoader color="#ffffff" loading={loading} size={20} />
+  ) : (
+    'Sign up'
+  )}
+</button>
                   </Form>
                 </Formik>
                 <div className='flex items-center justify-between mt-3 flex-wrap'>

@@ -4,6 +4,7 @@ import { AppDispatch } from '../../redux/Store';
 import { SignUp, Verify } from '../../redux/actions/AuthActions';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
 interface UserData {
   data: {
@@ -18,6 +19,8 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
   const [otp, setOtp] = useState<string>('');
   const [timer, setTimer] = useState<number>(60);
   const [showResendButton, setShowResendButton] = useState<boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+const [isResending, setIsResending] = useState<boolean>(false);
   const inputRefs = useRef<HTMLInputElement[]>([]);
 
   const navigate = useNavigate();
@@ -66,14 +69,21 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (otp.length === 4) {
-      data.otp = otp;
-
-      console.log('OTP submitted:', otp);
-      const response = await dispatch(Verify(data));
-      console.log(response);
-
-      if (response.payload?.status == 201) {
-        navigate('/home');
+      setIsVerifying(true);
+      try {
+        data.otp = otp;
+        console.log('OTP submitted:', otp);
+        const response = await dispatch(Verify(data));
+        console.log(response);
+  
+        if (response.payload?.status == 201) {
+          navigate('/home');
+        }
+      } catch (error) {
+        console.error('OTP verification error:', error);
+        toast.error('OTP verification failed. Please try again.');
+      } finally {
+        setIsVerifying(false);
       }
     } else {
       toast.error('Please enter a 4-digit OTP');
@@ -81,12 +91,20 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
   };
 
   const handleResend = async () => {
-    setOtp('');
-    setTimer(60);
-    setShowResendButton(false);
-    const response = await dispatch(SignUp(data.email));
-
-    console.log(response);
+    setIsResending(true);
+    try {
+      setOtp('');
+      setTimer(60);
+      setShowResendButton(false);
+      const response = await dispatch(SignUp(data.email));
+      console.log(response);
+      toast.success('OTP resent successfully');
+    } catch (error) {
+      console.error('OTP resend error:', error);
+      toast.error('Failed to resend OTP. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -108,24 +126,38 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
               ))}
             </div>
             {showResendButton ? (
-              <button
-                type='button'
-                className='w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded focus:outline-none focus:shadow-outline'
-                onClick={handleResend}
-              >
-                Resend OTP
-              </button>
-            ) : (
-              <div className='text-center mb-4'>Time left: {timer} seconds</div>
-            )}
+  <button
+    type='button'
+    disabled={isResending}
+    className={`w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded focus:outline-none focus:shadow-outline ${
+      isResending ? 'opacity-50 cursor-not-allowed' : ''
+    }`}
+    onClick={handleResend}
+  >
+    {isResending ? (
+      <ClipLoader color="#ffffff" loading={isResending} size={20} />
+    ) : (
+      'Resend OTP'
+    )}
+  </button>
+) : (
+  <div className='text-center mb-4'>Time left: {timer} seconds</div>
+)}
             {!showResendButton && (
-              <button
-                type='submit'
-                className='w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded focus:outline-none focus:shadow-outline'
-              >
-                Verify OTP
-              </button>
-            )}
+  <button
+    type='submit'
+    disabled={isVerifying}
+    className={`w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 rounded focus:outline-none focus:shadow-outline ${
+      isVerifying ? 'opacity-50 cursor-not-allowed' : ''
+    }`}
+  >
+    {isVerifying ? (
+      <ClipLoader color="#ffffff" loading={isVerifying} size={20} />
+    ) : (
+      'Verify OTP'
+    )}
+  </button>
+)}
           </form>
         </div>
       </div>
