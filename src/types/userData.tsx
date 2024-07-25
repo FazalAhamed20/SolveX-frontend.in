@@ -51,3 +51,15 @@ export type Problem={
 
 }
 
+
+export type Submission={
+  email?:String,
+  code?:String,
+  id?:String;
+  title?:string;
+  difficuly?:String;
+  language?:String;
+  isSubmit?:Boolean
+
+}
+

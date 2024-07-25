@@ -5,11 +5,13 @@ import { persistReducer, persistStore } from 'redux-persist';
 import AuthReducer from './reducers/AuthReducer';
 import AdminReducer from './reducers/AdminReducer';
 import ProblemReducer from './reducers/ProblemReducer';
+import SubmissionReducer from './reducers/SubmissionReducer';
 
 const rootReducer = combineReducers({
   user: AuthReducer,
   admin: AdminReducer,
-  problem:ProblemReducer
+  problem:ProblemReducer,
+  submission:SubmissionReducer
 });
 
 const persistConfig = {

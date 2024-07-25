@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ProblemAxios, SubmissionAxios } from '../../config/AxiosInstance';
 import Editor from '@monaco-editor/react';
 import ChatBot from '../../utils/chatBot/ChatBot';
 import { toast } from 'react-toastify';
+import { fetchSubmission, submitProblem } from '../../redux/actions/SubmissionAction';
+import { AppDispatch } from '../../redux/Store';
 
 interface TestCase {
   description: string;
@@ -31,9 +33,13 @@ const CodeEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   const problems = useSelector((state: any) => state.problem.problem);
+  const user = useSelector((state: any) => state.user.user);
   const problem = problems.find((p: any) => p.id === id);
   const supportedLanguages = problem?.language || [];
+  const dispatch: AppDispatch = useDispatch();
   console.log('problem', problem);
+  console.log('user',user);
+  
 
   const availableLanguages = supportedLanguages
     .filter((langObj: { [x: string]: any }) => {
@@ -41,6 +47,33 @@ const CodeEditor: React.FC = () => {
       return langObj[langName];
     })
     .map((langObj: {}) => Object.keys(langObj)[0]);
+
+    useEffect(() => {
+      const fetchSubmissionProblem = async () => {
+        try {
+          const response = await dispatch(fetchSubmission({
+            email: user.email,
+            id:id
+          }));
+     
+      
+          if (response.payload) {
+            console.log("Submission fetched:", response.payload);
+            setIsSolved(response.payload?.success);
+           
+          } else {
+            console.log("No submission found for this email");
+           
+          }
+        } catch (error) {
+          console.error("Error fetching submission:", error);
+         
+        }
+      };
+  
+      fetchSubmissionProblem();
+    }, [dispatch, user.email,id]);
+  
 
   const fetchTestCases = async () => {
     setLoadingTestCases(true);
@@ -134,7 +167,7 @@ const CodeEditor: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const submitResponse = await SubmissionAxios.post(`/submit`, {
+      const submitResponse = await SubmissionAxios.post(`/run`, {
         source: code,
         lang: language,
         testCases: raw,
@@ -143,8 +176,7 @@ const CodeEditor: React.FC = () => {
       });
 
       const results = submitResponse.data.results;
-      console.log('.../.../////', results);
-      console.log('error', submitResponse.data);
+
       const hasError = results.some((result: any) => result.error);
       if (hasError) {
         const errorMessages = results
@@ -154,21 +186,17 @@ const CodeEditor: React.FC = () => {
 
         setError(`Errors encountered: ${errorMessages}`);
         setTestResults(new Array(testCases.length).fill(false));
-        setTestCaseOutputs([]); 
+        setTestCaseOutputs([]);
         return;
       }
 
       const updatedTestResults = testCases.map((testCase, index) => {
         const result = results[index];
-        console.log('/////', result.output);
-        console.log('/////', testCase.output);
 
         if (result) {
           const expectedOutput = JSON.parse(testCase.output);
-          console.log('expected', expectedOutput);
 
           const actualOutput = result.output;
-          console.log('actual', actualOutput);
 
           const isCorrect =
             JSON.stringify(expectedOutput) === JSON.stringify(actualOutput);
@@ -178,13 +206,10 @@ const CodeEditor: React.FC = () => {
       });
 
       setTestResults(updatedTestResults);
-      console.log('.../...', testResults);
 
       setTestCaseOutputs(
         results.map((result: { output: any }) => result?.output || ''),
       );
-      console.log('test-----------------', testCaseOutputs);
-      console.log('././/....', selectedTestCase);
     } catch (error) {
       console.error('Error:', error);
       setError('An unexpected error occurred.');
@@ -193,14 +218,26 @@ const CodeEditor: React.FC = () => {
     }
   };
 
-  console.log('./././out', output);
-
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     if (testResults.every(result => result)) {
-      toast.success("Submitted Successfully")
+            const response=await dispatch(submitProblem({
+              id: problem.id,
+              code:problem.code,
+              email:user.email,
+              title:problem.title,
+              difficuly:problem.difficulty,
+              language:language,
+              isSubmit:true
+            }));
+            console.log("ressss.....",response)
+            if(response.payload?.success){
+              toast.success('Submitted Successfully');
+
+            }
+      
       setOutput('Code submitted successfully!');
       setError(null);
-      setIsSolved(true);
+      
     } else {
       setError('Not all test cases passed. Please fix your code.');
     }
@@ -342,13 +379,24 @@ const CodeEditor: React.FC = () => {
         <div className='md:w-1/2 bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
           <h2 className='text-xl font-bold mb-2'>Problem Description</h2>
           {isSolved && (
-      <div className="flex items-center text-green-600">
-        <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span className="font-semibold">Solved</span>
-      </div>
-    )}
+            <div className='flex items-center text-green-600'>
+              <svg
+                className='w-6 h-6 mr-1'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+              <span className='font-semibold'>Solved</span>
+            </div>
+          )}
           <div className='flex justify-between items-center mb-4'>
             <h3 className='text-lg font-semibold'>{problem?.title}</h3>
             <p className='text-md'>

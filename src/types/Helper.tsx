@@ -35,3 +35,12 @@ export interface Problem {
   tags: string[];
   status: 'Solved' | 'Attempted' | 'Todo';
 }
+
+
+export type submissionReducerInitial = {
+  loading: boolean;
+  err: boolean | string;
+  data:null | any;
+  message?: string;
+  success?: boolean;
+};
