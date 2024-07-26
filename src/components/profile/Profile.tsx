@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import CalendarHeatmap from 'react-calendar-heatmap';
@@ -10,6 +10,8 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../redux/Store';
 import { updateProfile } from '../../redux/actions/AuthActions';
+import { fetchSolved } from '../../redux/actions/SubmissionAction';
+
 
 Modal.setAppElement('#root');
 
@@ -17,7 +19,11 @@ const UserProfile: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
   console.log('user', user);
-
+ const [submissionData, setSubmissionData] = useState([]);
+ const [todaySubmissions, setTodaySubmissions] = useState([]);
+ const [totalSubmissions, setTotalSubmissions] = useState(0);
+ const [averageSubmissions, setAverageSubmissions] = useState(0);
+ const [bestStreak, setBestStreak] = useState(0);
   const [profile, setProfile] = useState({
     username: user.username,
     role: user.role,
@@ -30,16 +36,9 @@ const UserProfile: React.FC = () => {
   });
 
   const today = new Date();
-  const startDate = new Date(today.getFullYear(), today.getMonth() - 9, 1);
-  const endDate = today;
-
-  const submissionData = Array.from({ length: 300 }, (_, i) => {
-    const date = new Date(today.getFullYear(), today.getMonth() - 9, i + 1);
-    return {
-      date: date.toISOString().split('T')[0],
-      count: Math.floor(Math.random() * 5),
-    };
-  });
+  const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endDate = new Date(today.getFullYear(), today.getMonth() + 7, today.getDate());
+  const formattedToday = today.toISOString().split('T')[0];
 
   const [solvedProblems, setSolvedProblems] = useState({
     easy: 10,
@@ -92,6 +91,72 @@ const UserProfile: React.FC = () => {
       }
     }
   };
+useEffect(() => {
+    const fetchSubmissionProblem = async () => {
+      try {
+        const response = await dispatch(
+          fetchSolved({ email: user.email })
+        ).unwrap();
+
+        // Update solved problems count
+        const problemCount = { easy: 0, medium: 0, hard: 0 };
+        const submissionDates = response.map((submission: { createdAt: string | number | Date; }) => {
+          const date = new Date(submission.createdAt);
+          return {
+            date: date.toISOString().split('T')[0],
+            count: 1,
+          };
+        });
+
+        response.forEach((submission: { difficulty: string; }) => {
+          if (submission.difficulty === 'Easy') {
+            problemCount.easy += 1;
+          } else if (submission.difficulty === 'Medium') {
+            problemCount.medium += 1;
+          } else if (submission.difficulty === 'Hard') {
+            problemCount.hard += 1;
+          }
+        });
+
+        setSolvedProblems(problemCount);
+        setSubmissionData(submissionDates);
+
+        const todaysSubmissions = response.filter((submission: { createdAt: string | number | Date; }) => {
+          const submissionDate = new Date(submission.createdAt).toISOString().split('T')[0];
+          return submissionDate === formattedToday;
+        });
+
+        setTodaySubmissions(todaysSubmissions);
+        setTotalSubmissions(response.length);
+
+        const uniqueDates = [...new Set(submissionDates.map((sub: { date: any; }) => sub.date))];
+        const avgSubmissions = response.length / uniqueDates.length;
+        setAverageSubmissions(avgSubmissions);
+
+        // Calculate best streak
+        let currentStreak = 0;
+        let maxStreak = 0;
+        submissionDates.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        for (let i = 0; i < submissionDates.length; i++) {
+          if (i === 0 || new Date(submissionDates[i].date).getTime() === new Date(submissionDates[i - 1].date).getTime() + 24 * 60 * 60 * 1000) {
+            currentStreak++;
+          } else {
+            currentStreak = 1;
+          }
+          if (currentStreak > maxStreak) {
+            maxStreak = currentStreak;
+          }
+        }
+
+        setBestStreak(maxStreak);
+      } catch (error) {
+        console.error('Error fetching submission:', error);
+      }
+    };
+
+    fetchSubmissionProblem();
+  }, [dispatch, user.email]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -204,22 +269,22 @@ const UserProfile: React.FC = () => {
               <div className='flex mb-4'>
                 <div className='w-1/2 pr-2'>
                   <div className='text-gray-600'>Submissions Today:</div>
-                  <div className='font-bold'>3</div>
+                  <div className='font-bold'> {todaySubmissions.length}</div>
                 </div>
                 <div className='w-1/2 pl-2'>
                   <div className='text-gray-600'>Total Submissions:</div>
-                  <div className='font-bold'>150</div>
+                  <div className='font-bold'>{totalSubmissions}</div>
                 </div>
               </div>
               {/* Second Row of Submission Activity */}
               <div className='flex'>
                 <div className='w-1/2 pr-2'>
                   <div className='text-gray-600'>Average Submissions:</div>
-                  <div className='font-bold'>5 per day</div>
+                  <div className='font-bold'>{averageSubmissions.toFixed(2)}</div>
                 </div>
                 <div className='w-1/2 pl-2'>
                   <div className='text-gray-600'>Best Streak:</div>
-                  <div className='font-bold'>12 days</div>
+                  <div className='font-bold'>{bestStreak} days</div>
                 </div>
               </div>
             </div>

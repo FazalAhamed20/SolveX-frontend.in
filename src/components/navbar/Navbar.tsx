@@ -62,9 +62,10 @@ const Navbar: React.FC = () => {
                 className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
                   Problem
                 </Link>
-                <a className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
-                  Categories
-                </a>
+                <Link to='/context'
+                className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
+                  Practice
+                </Link>
                 <a className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
                   Leaderboard
                 </a>
@@ -153,12 +154,14 @@ const Navbar: React.FC = () => {
               >
                 Home
               </Link>
-              <a className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
-                Problem
-              </a>
-              <a className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
-                Category
-              </a>
+              <Link to='/problem'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
+                  Problem
+                </Link>
+                <Link to='/context'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
+                  Practice
+                </Link>
               <a className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
                 Leaderboard
               </a>

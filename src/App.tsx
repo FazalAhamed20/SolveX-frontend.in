@@ -14,6 +14,9 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminHomePage'));
 const ProblemPage= lazy(() => import('./pages/ProblemPage'));
 const EditorPage= lazy(() => import('./pages/EditorPage'));
+const ContextPage=lazy(()=>import ('./pages/ContextPage'))
+
+import CodePlatform from './components/practice/Practice';
 
 const App: React.FC = () => {
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
@@ -57,10 +60,12 @@ const App: React.FC = () => {
             )
           }
         />
-        <Route path='/profile' element={<ProfilePage />} />
-        <Route path='/problem' element={<ProblemPage />} />
+        <Route path='/profile' element={isLoggedIn ?<ProfilePage /> : <Navigate to='/login'/>} />
+        <Route path='/problem' element={isLoggedIn ?<ProblemPage /> : <Navigate to='/login'/>} />
         <Route path='/forgot' element={<ForgotPasswordPage />} />
-        <Route path='/code/:id' element={<EditorPage />} />
+        <Route path='/code/:id'element={isLoggedIn ? <EditorPage /> :  <Navigate to='/login' />}/>
+        <Route path='/practice' element={<CodePlatform youtubeVideoId={'https://www.youtube.com/watch?v=KELqVT7hjeE&list=PLhb7SOmGNUc5AZurO-im4t_RDr-ymjz0d&index=3'} description={''} />} />
+        <Route path='/context' element={<ContextPage />} />
 
         <Route
           path='*'
@@ -73,25 +78,3 @@ const App: React.FC = () => {
 
 export default App;
 
-{
-  /* <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/home" />} />
-        
-        
-<Route path="/home" element={isLoggedIn ? <LandingHomePage /> : <Navigate to="/login" />} />
-<Route path="/" element={isLoggedIn ? <Navigate to="/home" /> : <LandingPage />} />
-<Route path="/signup" element={isLoggedIn ? <Navigate to="/home" /> : <SignupPage />} />
-<Route 
-  path="/login" 
-  element={
-    isLoggedIn 
-      ? isAdmin 
-        ? <Navigate to="/admin" />
-        : <Navigate to="/home" />
-      : <LoginPage />
-  } 
-/>
-<Route path="/profile" element={<ProfilePage />} />
-<Route path="/forgot" element={<ForgotPasswordPage />} />
-
-<Route path="*" element={<Navigate to={isLoggedIn ? "/home" : "/login"} />} /> */
-}

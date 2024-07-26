@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../redux/Store';
 import { problemlist } from '../../redux/actions/ProblemActions';
+import { fetchSolved } from '../../redux/actions/SubmissionAction';
 import { useNavigate } from 'react-router-dom';
 
 interface Problem {
@@ -15,14 +16,21 @@ interface Problem {
 
 const ProblemList: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
+  const [solvedProblems, setSolvedProblems] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
-  const [difficultyFilter, setDifficultyFilter] = useState<Problem['difficulty'] | 'All'>('All');
-  const [statusFilter, setStatusFilter] = useState<Problem['status'] | 'All'>('All');
+  const [difficultyFilter, setDifficultyFilter] = useState<
+    Problem['difficulty'] | 'All'
+  >('All');
+  const [statusFilter, setStatusFilter] = useState<Problem['status'] | 'All'>(
+    'All',
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
+  const user = useSelector((state: any) => state.user.user);
   const navigate = useNavigate();
 
+  // Fetch problem list
   const fetchProblemList = async () => {
     try {
       const response = await dispatch(problemlist()).unwrap();
@@ -31,18 +39,45 @@ const ProblemList: React.FC = () => {
       console.error('Error fetching problems:', error);
     }
   };
-
   useEffect(() => {
     fetchProblemList();
   }, []);
 
+  // Fetch solved problems
+  useEffect(() => {
+    const fetchSubmissionProblem = async () => {
+      try {
+        const response = await dispatch(
+          fetchSolved({
+            email: user.email,
+          }),
+        ).unwrap();
+
+        if (response) {
+          const solvedTitles: Set<string> = new Set(
+            response.map((item: { title: string }) => item.title),
+          );
+          setSolvedProblems(solvedTitles);
+        } else {
+          console.log('No submission found for this email');
+        }
+      } catch (error) {
+        console.error('Error fetching submission:', error);
+      }
+    };
+
+    fetchSubmissionProblem();
+  }, [dispatch, user.email]);
+
+  // Filter and paginate problems
   const filteredProblems = useMemo(() => {
     return problems
       .filter(problem => !problem.isBlocked)
       .filter(
         problem =>
           problem.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          (difficultyFilter === 'All' || problem.difficulty === difficultyFilter) &&
+          (difficultyFilter === 'All' ||
+            problem.difficulty === difficultyFilter) &&
           (statusFilter === 'All' || problem.status === statusFilter),
       );
   }, [problems, searchTerm, difficultyFilter, statusFilter]);
@@ -61,31 +96,6 @@ const ProblemList: React.FC = () => {
         return 'text-yellow-500';
       case 'Hard':
         return 'text-red-500';
-      default:
-        return '';
-    }
-  };
-
-  const getStatusBadge = (status: Problem['status']) => {
-    switch (status) {
-      case 'Solved':
-        return (
-          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
-            Solved
-          </span>
-        );
-      case 'Attempted':
-        return (
-          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800'>
-            Attempted
-          </span>
-        );
-      case 'Todo':
-        return (
-          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800'>
-            Todo
-          </span>
-        );
       default:
         return '';
     }
@@ -149,11 +159,17 @@ const ProblemList: React.FC = () => {
                 className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
               >
                 <td className='px-6 py-4 whitespace-nowrap'>
-                  {getStatusBadge(problem.status)}
+                  {solvedProblems.has(problem.title) && (
+                    <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
+                      Solved
+                    </span>
+                  )}
                 </td>
                 <td
                   className='px-6 py-4 whitespace-nowrap'
-                  onClick={() => navigate(`/code/${problem.id}`, { state: { problem } })}
+                  onClick={() =>
+                    navigate(`/code/${problem.id}`, { state: { problem } })
+                  }
                 >
                   <div className='text-sm font-medium text-gray-900 hover:text-indigo-600 cursor-pointer'>
                     {problem.title}

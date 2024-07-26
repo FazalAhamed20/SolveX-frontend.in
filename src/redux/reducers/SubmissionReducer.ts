@@ -1,7 +1,7 @@
 import { createSlice, ActionReducerMapBuilder } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 import { submissionReducerInitial, ErrorPayload } from '../../types/Helper';
-import { submitProblem } from '../actions/SubmissionAction';
+import { submitProblem} from '../actions/SubmissionAction';
 
 const initialState: submissionReducerInitial = {
   loading: false,

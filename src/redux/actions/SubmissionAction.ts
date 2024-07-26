@@ -5,12 +5,18 @@ import { Submission } from '../../types/userData';
 import { ErrorPayload } from '../../types/Helper';
 
 interface VerifyResponse {
+    [x: string]: any;
+    payload: any;
     success: any;
     data:string;
     message: string;
     status?: number;
     isSubmit?: boolean;
   }
+  interface ProblemData {
+    email: string;
+  }
+  
 
 
 export const submitProblem= createAsyncThunk<
@@ -61,6 +67,26 @@ export const fetchSubmission= createAsyncThunk<
        
 
       
+    });
+    console.log('data', data);
+
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    return rejectWithValue(handleErrors(error));
+  }
+});
+
+export const fetchSolved= createAsyncThunk<
+  VerifyResponse,
+  ProblemData,
+  { rejectValue: ErrorPayload }
+>('problem/problemBlock', async (problemData: ProblemData, { rejectWithValue }) => {
+  try {
+    console.log('problem',problemData);
+
+    const { data } = await SubmissionAxios.post<VerifyResponse>('/fetchSolved', {
+      email:problemData.email
     });
     console.log('data', data);
 
