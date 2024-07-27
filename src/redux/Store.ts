@@ -6,12 +6,14 @@ import AuthReducer from './reducers/AuthReducer';
 import AdminReducer from './reducers/AdminReducer';
 import ProblemReducer from './reducers/ProblemReducer';
 import SubmissionReducer from './reducers/SubmissionReducer';
+import PracticalReducer from './reducers/PracticalReducer';
 
 const rootReducer = combineReducers({
   user: AuthReducer,
   admin: AdminReducer,
   problem:ProblemReducer,
-  submission:SubmissionReducer
+  submission:SubmissionReducer,
+  practical:PracticalReducer
 });
 
 const persistConfig = {

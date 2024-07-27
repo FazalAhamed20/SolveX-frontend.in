@@ -1,47 +1,47 @@
 import { createSlice, ActionReducerMapBuilder } from '@reduxjs/toolkit';
-import { problemlist } from '../actions/ProblemActions';
+import { practicallist } from '../actions/PracticalAction';
 import { toast } from 'react-toastify';
-import { problemReducerInitial, ErrorPayload } from '../../types/Helper';
+import { practicalReducerInitial, ErrorPayload } from '../../types/Helper';
 
-const initialState: problemReducerInitial = {
+const initialState: practicalReducerInitial = {
   loading: false,
   err: false,
-  problem: [],
+  practical:[],
   message: '',
   success: false,
 };
 
-const Problemreducer = createSlice({
-  name: 'problem',
+const Practicalreducer = createSlice({
+  name: 'practical',
   initialState,
   reducers: {
     resetMessage: state => {
       state.message = '';
     },
   },
-  extraReducers: (builder: ActionReducerMapBuilder<problemReducerInitial>) => {
+  extraReducers: (builder: ActionReducerMapBuilder<practicalReducerInitial>) => {
     builder
-      .addCase(problemlist.pending, state => {
+      .addCase(practicallist.pending, state => {
         state.loading = true;
       })
-      .addCase(problemlist.fulfilled, (state, { payload }) => {
+      .addCase(practicallist.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.err = false;
-        state.problem = payload; 
+        state.practical = payload; 
         console.log("prob",payload)
         state.message = 'Problems fetched successfully';
         state.success = true;
       })
-      .addCase(problemlist.rejected, (state, { payload }) => {
+      .addCase(practicallist.rejected, (state, { payload }) => {
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = true;
         state.message = errorPayload.message;
         toast.error(errorPayload.message);
-        state.problem = [];
+        state.practical = [];
       });
   },
 });
 
-export const { resetMessage } = Problemreducer.actions;
-export default Problemreducer.reducer;
+export const { resetMessage } = Practicalreducer.actions;
+export default Practicalreducer.reducer;

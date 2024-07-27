@@ -15,8 +15,10 @@ const AdminDashboard = lazy(() => import('./pages/AdminHomePage'));
 const ProblemPage= lazy(() => import('./pages/ProblemPage'));
 const EditorPage= lazy(() => import('./pages/EditorPage'));
 const ContextPage=lazy(()=>import ('./pages/ContextPage'))
+const PracticeTablePage=lazy(()=>import ('./pages/PracticeTablePage'))
+const PracticePage=lazy(()=>import ('./pages/PracticePage'))
 
-import CodePlatform from './components/practice/Practice';
+
 
 const App: React.FC = () => {
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
@@ -64,7 +66,7 @@ const App: React.FC = () => {
         <Route path='/problem' element={isLoggedIn ?<ProblemPage /> : <Navigate to='/login'/>} />
         <Route path='/forgot' element={<ForgotPasswordPage />} />
         <Route path='/code/:id'element={isLoggedIn ? <EditorPage /> :  <Navigate to='/login' />}/>
-        <Route path='/practice' element={<CodePlatform youtubeVideoId={'https://www.youtube.com/watch?v=KELqVT7hjeE&list=PLhb7SOmGNUc5AZurO-im4t_RDr-ymjz0d&index=3'} description={''} />} />
+        <Route path='/practice/:title' element={<PracticeTablePage  />} />
         <Route path='/context' element={<ContextPage />} />
 
         <Route

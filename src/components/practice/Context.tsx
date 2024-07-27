@@ -1,15 +1,40 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaCode, FaDatabase, FaServer, FaLaptopCode, FaLightbulb, FaBookmark } from 'react-icons/fa';
+import { MdCode, MdDeveloperBoard, MdLaptopMac, MdWeb } from 'react-icons/md';
+import { GiArtificialIntelligence, GiRobotGolem, GiCircuitry } from 'react-icons/gi';
+import { AppDispatch } from '../../redux/Store';
+import { practicallist } from '../../redux/actions/PracticalAction';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+// Array of coding-related icons
+const codingIcons = [
+  <FaCode />,
+  <FaDatabase />,
+  <FaServer />,
+  <FaLaptopCode />,
+  <FaLightbulb />,
+  <FaBookmark />,
+  <MdCode />,
+  <MdDeveloperBoard />,
+  <MdLaptopMac />,
+  <MdWeb />,
+  <GiArtificialIntelligence />,
+  <GiRobotGolem />,
+  <GiCircuitry />,
+];
 
 interface PracticalCoding {
   id: string;
   title: string;
+
   description: string;
   icon: React.ReactNode;
   duration: number;
   students: number;
-  videoUrl: string;
+
+  isBlocked: boolean;  // Added isBlocked property
 }
 
 interface PracticalCodingCardProps {
@@ -17,6 +42,7 @@ interface PracticalCodingCardProps {
 }
 
 const PracticalCodingCard: React.FC<PracticalCodingCardProps> = ({ practicalCoding }) => {
+  const navigate = useNavigate();
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -61,6 +87,9 @@ const PracticalCodingCard: React.FC<PracticalCodingCardProps> = ({ practicalCodi
           whileHover={{ scale: 1.1, backgroundColor: '#38a169' }}
           whileTap={{ scale: 0.95 }}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-transform duration-300"
+          onClick={() =>
+            navigate(`/practice/${practicalCoding.title}`)
+          }
         >
           Watch Now
         </motion.button>
@@ -69,11 +98,31 @@ const PracticalCodingCard: React.FC<PracticalCodingCardProps> = ({ practicalCodi
   );
 };
 
-interface PracticalCodingListProps {
-  practicalCodings: PracticalCoding[];
-}
+const PracticalCodingList: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const [practicalCodings, setPracticalCodings] = useState<PracticalCoding[]>([]);
 
-const PracticalCodingList: React.FC<PracticalCodingListProps> = ({ practicalCodings }) => {
+  const fetchPracticeList = async () => {
+    try {
+      const response = await dispatch(practicallist()).unwrap();
+      console.log("res,.,.",response);
+      
+      const filteredCodings = (response as unknown as PracticalCoding[])
+        .filter(coding => !coding.isBlocked) 
+        .map((coding, index) => ({
+          ...coding,
+          icon: codingIcons[index % codingIcons.length], 
+        }));
+      setPracticalCodings(filteredCodings);
+    } catch (error) {
+      console.error('Error fetching practical codings:', error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchPracticeList();
+  }, []);
+
   return (
     <div className="container mx-auto py-12">
       <div className="banner mb-12">
@@ -104,65 +153,19 @@ const PracticalCodingList: React.FC<PracticalCodingListProps> = ({ practicalCodi
           </motion.div>
         </motion.div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {practicalCodings.map((practicalCoding) => (
-          <PracticalCodingCard key={practicalCoding.id} practicalCoding={practicalCoding} />
-        ))}
+      <div className="text-center mb-8">
+        {practicalCodings.length === 0 ? (
+          <p className="text-gray-700 text-lg">No practical coding sessions available at the moment.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {practicalCodings.map((practicalCoding) => (
+              <PracticalCodingCard key={practicalCoding.id} practicalCoding={practicalCoding} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-const dummyPracticalCodings: PracticalCoding[] = [
-  {
-    id: '1',
-    title: 'Frontend Development',
-    description: 'Learn the basics of HTML, CSS, and JavaScript.',
-    icon: <FaCode />,
-    duration: 20,
-    students: 500,
-    videoUrl: 'https://example.com/frontend-development.mp4',
-  },
-  {
-    id: '2',
-    title: 'Backend Development',
-    description: 'Understand server-side programming with Node.js.',
-    icon: <FaServer />,
-    duration: 25,
-    students: 800,
-    videoUrl: 'https://example.com/backend-development.mp4',
-  },
-  {
-    id: '3',
-    title: 'Database Management',
-    description: 'Get hands-on with SQL and NoSQL databases.',
-    icon: <FaDatabase />,
-    duration: 15,
-    students: 300,
-    videoUrl: 'https://example.com/database-management.mp4',
-  },
-  {
-    id: '4',
-    title: 'Full Stack Development',
-    description: 'Combine frontend and backend skills for full stack development.',
-    icon: <FaLaptopCode />,
-    duration: 30,
-    students: 600,
-    videoUrl: 'https://example.com/full-stack-development.mp4',
-  },
-  {
-    id: '5',
-    title: 'Advanced Programming',
-    description: 'Dive deep into advanced programming concepts.',
-    icon: <FaBookmark />,
-    duration: 35,
-    students: 900,
-    videoUrl: 'https://example.com/advanced-programming.mp4',
-  },
-];
-
-export default () => {
-  return (
-    <PracticalCodingList practicalCodings={dummyPracticalCodings} />
-  );
-};
+export default PracticalCodingList;

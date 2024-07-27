@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../redux/Store';
 import { problemlist } from '../../redux/actions/ProblemActions';
@@ -39,7 +39,7 @@ const ProblemList: React.FC = () => {
       console.error('Error fetching problems:', error);
     }
   };
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchProblemList();
   }, []);
 
@@ -168,7 +168,7 @@ const ProblemList: React.FC = () => {
                 <td
                   className='px-6 py-4 whitespace-nowrap'
                   onClick={() =>
-                    navigate(`/code/${problem.id}`, { state: { problem } })
+                    navigate(`/code/${problem.id}`,)
                   }
                 >
                   <div className='text-sm font-medium text-gray-900 hover:text-indigo-600 cursor-pointer'>

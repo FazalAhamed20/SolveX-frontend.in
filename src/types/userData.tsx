@@ -52,6 +52,20 @@ export type Problem={
 }
 
 
+export type Practice={
+  _id: string;
+  id:string;
+    title: string;
+    description: string;
+    subTitle:string;
+    videoUrl:string;
+    quickTips:string[];
+    isBlocked?:boolean,
+    
+
+}
+
+
 export type Submission={
   email?:String,
   code?:String,

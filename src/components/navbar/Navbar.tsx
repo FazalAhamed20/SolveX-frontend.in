@@ -5,11 +5,13 @@ import { RootState, AppDispatch } from '../../redux/Store';
 import { Logout } from '../../redux/actions/AuthActions';
 import { googleLogout } from '@react-oauth/google';
 import LogoutModal from '../../utils/modal/LogoutModal';
+import ClipLoader from 'react-spinners/ClipLoader'; // Import ClipLoader
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const user = useSelector((state: RootState) => state.user.user);
   const navigate = useNavigate();
@@ -24,11 +26,18 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await dispatch(Logout());
-    await googleLogout();
-    setIsDropdownOpen(false);
-    setShowModal(false);
-    navigate('/login', { replace: false });
+    setLoading(true); // Set loading to true at the start
+    try {
+      await dispatch(Logout());
+      await googleLogout();
+      setIsDropdownOpen(false);
+      setShowModal(false);
+      navigate('/login', { replace: false });
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setLoading(false); // Set loading to false when done
+    }
   };
 
   return (
@@ -69,7 +78,7 @@ const Navbar: React.FC = () => {
                 <a className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
                   Leaderboard
                 </a>
-                <div className='relative'>
+                <div className='relative z-30'>
                   <button
                     onClick={toggleDropdown}
                     className='bg-green-500 text-white h-10 w-10 flex items-center justify-center rounded-full text-sm font-medium focus:outline-none'
@@ -96,7 +105,7 @@ const Navbar: React.FC = () => {
                         Profile
                       </Link>
                       <a
-                        className='block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer'
+                        className='block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer '
                         onClick={() => setShowModal(true)}
                       >
                         Logout
@@ -217,6 +226,15 @@ const Navbar: React.FC = () => {
         onLogout={handleLogout}
         data={'Logout'}
       />
+      {loading && (
+        <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50'>
+          <ClipLoader
+            color='#ffffff'
+            loading={loading}
+            size={50}
+          />
+        </div>
+      )}
     </nav>
   );
 };

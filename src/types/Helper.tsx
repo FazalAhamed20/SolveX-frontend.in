@@ -21,6 +21,13 @@ export type problemReducerInitial = {
   message?: string;
   success?: boolean;
 };
+export type practicalReducerInitial = {
+  loading: boolean;
+  err: boolean | string;
+  practical:Practical [];
+  message?: string;
+  success?: boolean;
+};
 
 export interface ErrorPayload {
   message: string;
@@ -34,6 +41,14 @@ export interface Problem {
   difficulty: 'Easy' | 'Medium' | 'Hard';
   tags: string[];
   status: 'Solved' | 'Attempted' | 'Todo';
+}
+
+export interface Practical {
+  id: string;
+  title: string;
+  subtitle?:string;
+  videoUrl:string;
+  quickTips:string[];
 }
 
 
