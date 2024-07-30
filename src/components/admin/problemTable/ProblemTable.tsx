@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/Store';
-import { blockProblem } from '../../redux/actions/ProblemActions';
-import LogoutModal from '../../utils/modal/LogoutModal';
+import { AppDispatch } from '../../../redux/Store';
+import { blockProblem } from '../../../redux/actions/ProblemActions';
+import LogoutModal from '../../../utils/modal/LogoutModal';
 
 interface Problem {
   _id: string;

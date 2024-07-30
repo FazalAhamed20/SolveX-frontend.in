@@ -41,9 +41,9 @@ const UserProfile: React.FC = () => {
   const formattedToday = today.toISOString().split('T')[0];
 
   const [solvedProblems, setSolvedProblems] = useState({
-    easy: 10,
-    medium: 5,
-    hard: 3,
+    easy: 0,
+    medium: 0,
+    hard: 0,
   });
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -98,7 +98,7 @@ useEffect(() => {
           fetchSolved({ email: user.email })
         ).unwrap();
 
-        // Update solved problems count
+        
         const problemCount = { easy: 0, medium: 0, hard: 0 };
         const submissionDates = response.map((submission: { createdAt: string | number | Date; }) => {
           const date = new Date(submission.createdAt);

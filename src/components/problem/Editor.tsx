@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ProblemAxios, SubmissionAxios } from '../../config/AxiosInstance';
 import Editor from '@monaco-editor/react';
 import ChatBot from '../../utils/chatBot/ChatBot';
-import { fetchSubmission, submitProblem } from '../../redux/actions/SubmissionAction';
+import {
+  fetchSubmission,
+  submitProblem,
+} from '../../redux/actions/SubmissionAction';
 import { AppDispatch } from '../../redux/Store';
 import SuccessModal from '../../utils/modal/SuccessModal';
 import RunningModal from '../../utils/modal/RunModal';
@@ -14,6 +17,8 @@ interface TestCase {
   input: string;
   output: string;
 }
+
+
 
 const CodeEditor: React.FC = () => {
   const [code, setCode] = useState('');
@@ -30,10 +35,10 @@ const CodeEditor: React.FC = () => {
   const [submit, setSubmit] = useState<boolean>(false);
   const [loadingTestCases, setLoadingTestCases] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSolved, setIsSolved] = useState(false);
+  const [solved, setSolved] = useState<string | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
- 
- 
+
   const { id } = useParams<{ id: string }>();
 
   const problems = useSelector((state: any) => state.problem.problem);
@@ -52,19 +57,22 @@ const CodeEditor: React.FC = () => {
   useEffect(() => {
     const fetchSubmissionProblem = async () => {
       try {
-        const response = await dispatch(fetchSubmission({
-          email: user.email,
-          id: id
-        }));
-    
-        if (response.payload) {
-          console.log("Submission fetched:", response.payload);
-          setIsSolved(response.payload?.success);
+        const response = await dispatch(
+          fetchSubmission({
+            email: user.email,
+            id: id,
+          }),
+        );
+        let data = response.payload?.data;
+        if (data) {
+          console.log('Submission fetched:', data);
+          setSolved(data);
+          console.log('Solved', solved);
         } else {
-          console.log("No submission found for this email");
+          console.log('No submission found for this email');
         }
       } catch (error) {
-        console.error("Error fetching submission:", error);
+        console.error('Error fetching submission:', error);
       }
     };
 
@@ -160,6 +168,13 @@ const CodeEditor: React.FC = () => {
         testCases: raw,
         functionName: functionName,
         display: display,
+        id: problem.id,
+        code: problem.code,
+        email: user.email,
+        title: problem.title,
+        difficulty: problem.difficulty,
+        language: language,
+        submited: 'Attempted',
       });
 
       const results = submitResponse.data.results;
@@ -183,9 +198,10 @@ const CodeEditor: React.FC = () => {
         if (result) {
           const expectedOutput = JSON.parse(testCase.output);
           const actualOutput = result.output;
-          
-            return JSON.stringify(expectedOutput) === JSON.stringify(actualOutput);
-          
+
+          return (
+            JSON.stringify(expectedOutput) === JSON.stringify(actualOutput)
+          );
         }
         return false;
       });
@@ -195,7 +211,6 @@ const CodeEditor: React.FC = () => {
       setTestCaseOutputs(
         results.map((result: { output: any }) => result?.output || ''),
       );
-    
     } catch (error) {
       console.error('Error:', error);
       setError('An unexpected error occurred.');
@@ -208,20 +223,24 @@ const CodeEditor: React.FC = () => {
     setSubmit(true);
     try {
       if (testResults.every(result => result)) {
-        const response = await dispatch(submitProblem({
-          id: problem.id,
-          code: problem.code,
-          email: user.email,
-          title: problem.title,
-          difficuly: problem.difficulty,
-          language: language,
-          isSubmit: true
-        })).unwrap();
-  
-        console.log("ressss.....", response);
-        
+        const response = await dispatch(
+          submitProblem({
+            id: problem.id,
+            code: problem.code,
+            email: user.email,
+            title: problem.title,
+            difficuly: problem.difficulty,
+            language: language,
+            submited: 'Solved',
+          }),
+        ).unwrap();
+
+        console.log('ressss.....', response);
+
         if (response.success) {
-          setIsSolved(response.success);
+          console.log(typeof response?.submited);
+
+          setSolved(response?.submited);
           setIsModalOpen(true);
           setOutput('Code submitted successfully!');
           setError(null);
@@ -274,9 +293,15 @@ const CodeEditor: React.FC = () => {
     <div className='flex flex-col h-screen bg-gray-50 p-4'>
       {/* Message for small and medium screens */}
       <div className='md:hidden'>
-        <div className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4' role='alert'>
+        <div
+          className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4'
+          role='alert'
+        >
           <p className='font-bold'>Please open on a desktop</p>
-          <p>This code editor is optimized for larger screens. For the best experience, please use a desktop or laptop computer.</p>
+          <p>
+            This code editor is optimized for larger screens. For the best
+            experience, please use a desktop or laptop computer.
+          </p>
         </div>
       </div>
 
@@ -346,23 +371,23 @@ const CodeEditor: React.FC = () => {
                     <div className='text-center'>Loading test cases...</div>
                   ) : (
                     <>
-<div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
-  {testCases.map((testCase, index) => (
-    <button
-      key={index}
-      onClick={() => handleTestCaseClick(index)}
-      className={`p-1 rounded-md text-xs font-bold ${
-        testResults[index] === null
-          ? 'bg-gray-300 text-[#4B5563]'
-          : testResults[index]
-          ? 'bg-green-500 text-white'
-          : 'bg-red-500 text-white'
-      }`}
-    >
-      Case {index + 1}
-    </button>
-  ))}
-</div>
+                      <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+                        {testCases.map((testCase, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleTestCaseClick(index)}
+                            className={`p-1 rounded-md text-xs font-bold ${
+                              testResults[index] === null
+                                ? 'bg-gray-300 text-[#4B5563]'
+                                : testResults[index]
+                                ? 'bg-green-500 text-white'
+                                : 'bg-red-500 text-white'
+                            }`}
+                          >
+                            Case {index + 1}
+                          </button>
+                        ))}
+                      </div>
 
                       {selectedTestCase !== null && (
                         <div className='mt-4 p-4 bg-gray-100 rounded-md'>
@@ -380,7 +405,9 @@ const CodeEditor: React.FC = () => {
                           <p className='text-sm'>
                             <strong>Actual Output:</strong>
                             {testCaseOutputs[selectedTestCase]
-                              ? JSON.stringify(testCaseOutputs[selectedTestCase])
+                              ? JSON.stringify(
+                                  testCaseOutputs[selectedTestCase],
+                                )
                               : 'No output'}
                           </p>
                         </div>
@@ -393,7 +420,27 @@ const CodeEditor: React.FC = () => {
           </div>
           <div className='md:w-1/2 bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
             <h2 className='text-xl font-bold mb-2'>Problem Description</h2>
-            {isSolved && (
+            {solved === 'Attempted' && (
+              <div className='flex items-center text-yellow-600'>
+                <svg
+                  className='w-6 h-6 mr-1'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                  />
+                </svg>
+                <span className='font-semibold'>Attempted</span>
+              </div>
+            )}
+
+            {solved === 'Solved' && (
               <div className='flex items-center text-green-600'>
                 <svg
                   className='w-6 h-6 mr-1'

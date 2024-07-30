@@ -1,4 +1,4 @@
-import { AuthAxios } from '../../config/AxiosInstance';
+import AuthAxios from '../../config/AxiosInstance';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { handleErrors } from '../../helper/HandleErrors';
 import { Signin, Signup, Profile } from '../../types/userData';

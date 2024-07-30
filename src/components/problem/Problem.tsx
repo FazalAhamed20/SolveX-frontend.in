@@ -16,7 +16,9 @@ interface Problem {
 
 const ProblemList: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [solvedProblems, setSolvedProblems] = useState<Set<string>>(new Set());
+  const [solvedProblems, setSolvedProblems] = useState<Map<string, 'Solved' | 'Attempted'>>(
+    new Map()
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<
     Problem['difficulty'] | 'All'
@@ -30,7 +32,7 @@ const ProblemList: React.FC = () => {
   const user = useSelector((state: any) => state.user.user);
   const navigate = useNavigate();
 
-  // Fetch problem list
+
   const fetchProblemList = async () => {
     try {
       const response = await dispatch(problemlist()).unwrap();
@@ -43,21 +45,21 @@ const ProblemList: React.FC = () => {
     fetchProblemList();
   }, []);
 
-  // Fetch solved problems
+ 
   useEffect(() => {
     const fetchSubmissionProblem = async () => {
       try {
         const response = await dispatch(
           fetchSolved({
             email: user.email,
-          }),
+          })
         ).unwrap();
-
+  
         if (response) {
-          const solvedTitles: Set<string> = new Set(
-            response.map((item: { title: string }) => item.title),
+          const solvedMap: Map<string, 'Solved' | 'Attempted'> = new Map(
+            response.map((item: { title: string; submited: 'Solved' | 'Attempted' }) => [item.title, item.submited])
           );
-          setSolvedProblems(solvedTitles);
+          setSolvedProblems(solvedMap);
         } else {
           console.log('No submission found for this email');
         }
@@ -65,9 +67,10 @@ const ProblemList: React.FC = () => {
         console.error('Error fetching submission:', error);
       }
     };
-
+  
     fetchSubmissionProblem();
   }, [dispatch, user.email]);
+  
 
   // Filter and paginate problems
   const filteredProblems = useMemo(() => {
@@ -100,6 +103,7 @@ const ProblemList: React.FC = () => {
         return '';
     }
   };
+  console.log("solved",solvedProblems)
 
   return (
     <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8'>
@@ -160,16 +164,15 @@ const ProblemList: React.FC = () => {
               >
                 <td className='px-6 py-4 whitespace-nowrap'>
                   {solvedProblems.has(problem.title) && (
-                    <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
-                      Solved
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      ${solvedProblems.get(problem.title) === 'Solved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {solvedProblems.get(problem.title)}
                     </span>
                   )}
                 </td>
                 <td
                   className='px-6 py-4 whitespace-nowrap'
-                  onClick={() =>
-                    navigate(`/code/${problem.id}`,)
-                  }
+                  onClick={() => navigate(`/code/${problem.id}`)}
                 >
                   <div className='text-sm font-medium text-gray-900 hover:text-indigo-600 cursor-pointer'>
                     {problem.title}

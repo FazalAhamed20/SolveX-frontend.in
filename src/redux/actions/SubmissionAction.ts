@@ -8,10 +8,10 @@ interface VerifyResponse {
     [x: string]: any;
     payload: any;
     success: any;
-    data:string;
+    data:string | null;
     message: string;
     status?: number;
-    isSubmit?: boolean;
+    submited: string;
   }
   interface ProblemData {
     email: string;
@@ -34,7 +34,7 @@ export const submitProblem= createAsyncThunk<
         difficulty:submissionData.difficuly,
         id:submissionData.id,
         language:submissionData.language,
-        isSubmit:submissionData.isSubmit
+        submited:submissionData.submited
 
        
 

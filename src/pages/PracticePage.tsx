@@ -1,5 +1,5 @@
 import Navbar from "../components/navbar/Navbar"
-import CodePlatform from "../components/practice/Practice"
+import CodePlatform from "../components/practice/practice/Practice"
 
 const PracticePage = () => {
   return (

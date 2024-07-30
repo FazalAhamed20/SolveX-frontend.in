@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState,  useLayoutEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Logout } from '../../redux/actions/AuthActions';
+import { Logout } from '../../../redux/actions/AuthActions';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../../redux/Store';
+import { AppDispatch } from '../../../redux/Store';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { AuthAxios, PracticeAxios, ProblemAxios } from '../../config/AxiosInstance';
-import UserTable from './UserTable';
-import ProblemTable from './ProblemTable';
-import LogoutModal from '../../utils/modal/LogoutModal';
+import AuthAxios from '../../../config/AxiosInstance';
+import { PracticeAxios, ProblemAxios } from '../../../config/AxiosInstance';
+import UserTable from '../userTable/UserTable';
+import ProblemTable from '../problemTable/ProblemTable';
+import LogoutModal from '../../../utils/modal/LogoutModal';
 import { motion } from 'framer-motion';
 import { FaChartPie, FaUsers, FaCode, FaTrophy, FaCrown ,FaFlask} from 'react-icons/fa';
-import PracticalTable from './PracticalTable';
+import PracticalTable from '../pracicalTable/PracticalTable';
 
 
 const AdminDashboard: React.FC = () => {

@@ -1,4 +1,4 @@
-import AdminHome from '../components/admin/AdminHome';
+import AdminHome from '../components/admin/home/AdminHome';
 
 const AdminHomePage = () => {
   return (

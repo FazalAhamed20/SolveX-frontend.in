@@ -1,5 +1,5 @@
 import Footer from '../components/footer/Footer';
-import LandingHome from '../components/home/LandingHome';
+import LandingHome from '../components/home/userHome/LandingHome';
 import Navbar from '../components/navbar/Navbar';
 
 function LandingHomePage() {

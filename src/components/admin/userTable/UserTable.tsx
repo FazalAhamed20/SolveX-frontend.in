@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/Store';
-import { blockUser } from '../../redux/actions/AdminActions';
-import LogoutModal from '../../utils/modal/LogoutModal';
+import { AppDispatch } from '../../../redux/Store';
+import { blockUser } from '../../../redux/actions/AdminActions';
+import LogoutModal from '../../../utils/modal/LogoutModal';
 
 interface User {
   _id: string;

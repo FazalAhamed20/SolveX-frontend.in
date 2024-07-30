@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { userLoginValidation } from '../../utils/validation/UserLogin';
+import { userLoginValidation } from '../../../utils/validation/UserLogin';
 import { GoogleLogin } from '@react-oauth/google';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/Store';
+import { AppDispatch } from '../../../redux/Store';
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { SignIn, GoogleAuth } from '../../redux/actions/AuthActions';
+import { SignIn, GoogleAuth } from '../../../redux/actions/AuthActions';
 import { jwtDecode } from 'jwt-decode';
 import { useLogin } from 'react-facebook';
 import axios from 'axios';
-import ForgotPasswordForm from './ForgotPassword';
+import ForgotPasswordForm from '../forgotPassword/ForgotPassword';
 import { Link } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 
@@ -155,18 +155,24 @@ const Login: React.FC = () => {
                       </div>
                     </div>
                     <button
-  type='submit'
-  disabled={isLoading}
-  className={`w-full px-8 py-3 mt-3 text-sm leading-5 text-white ${
-    isLoading ? 'bg-green-500' : 'bg-green-700 hover:bg-green-800'
-  } rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50`}
->
-{isLoading ? (
-  <ClipLoader color="#ffffff" loading={isLoading} size={20} />
-) : (
-  'Sign In'
-)}
-</button>
+                      type='submit'
+                      disabled={isLoading}
+                      className={`w-full px-8 py-3 mt-3 text-sm leading-5 text-white ${
+                        isLoading
+                          ? 'bg-green-500'
+                          : 'bg-green-700 hover:bg-green-800'
+                      } rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50`}
+                    >
+                      {isLoading ? (
+                        <ClipLoader
+                          color='#ffffff'
+                          loading={isLoading}
+                          size={20}
+                        />
+                      ) : (
+                        'Sign In'
+                      )}
+                    </button>
                   </Form>
                 </Formik>
                 <div className='self-center mt-4 text-sm leading-5 text-neutral-300'>

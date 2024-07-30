@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { FaCode, FaDatabase, FaServer, FaLaptopCode, FaLightbulb, FaBookmark } from 'react-icons/fa';
 import { MdCode, MdDeveloperBoard, MdLaptopMac, MdWeb } from 'react-icons/md';
 import { GiArtificialIntelligence, GiRobotGolem, GiCircuitry } from 'react-icons/gi';
-import { AppDispatch } from '../../redux/Store';
-import { practicallist } from '../../redux/actions/PracticalAction';
+import { AppDispatch } from '../../../redux/Store';
+import { practicallist } from '../../../redux/actions/PracticalAction';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -88,7 +88,7 @@ const PracticalCodingCard: React.FC<PracticalCodingCardProps> = ({ practicalCodi
           whileTap={{ scale: 0.95 }}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-transform duration-300"
           onClick={() =>
-            navigate(`/practice/${practicalCoding.title}`)
+            navigate(`/practice/${practicalCoding.id}`)
           }
         >
           Watch Now

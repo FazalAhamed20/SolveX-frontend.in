@@ -15,7 +15,6 @@ const AdminDashboard = lazy(() => import('./pages/AdminHomePage'));
 const ProblemPage= lazy(() => import('./pages/ProblemPage'));
 const EditorPage= lazy(() => import('./pages/EditorPage'));
 const ContextPage=lazy(()=>import ('./pages/ContextPage'))
-const PracticeTablePage=lazy(()=>import ('./pages/PracticeTablePage'))
 const PracticePage=lazy(()=>import ('./pages/PracticePage'))
 
 
@@ -66,7 +65,7 @@ const App: React.FC = () => {
         <Route path='/problem' element={isLoggedIn ?<ProblemPage /> : <Navigate to='/login'/>} />
         <Route path='/forgot' element={<ForgotPasswordPage />} />
         <Route path='/code/:id'element={isLoggedIn ? <EditorPage /> :  <Navigate to='/login' />}/>
-        <Route path='/practice/:title' element={<PracticeTablePage  />} />
+        <Route path='/practice/:id' element={<PracticePage  />} />
         <Route path='/context' element={<ContextPage />} />
 
         <Route

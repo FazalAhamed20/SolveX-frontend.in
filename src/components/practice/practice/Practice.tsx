@@ -1,39 +1,72 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { motion } from 'framer-motion';
 import { FaPlay, FaLightbulb, FaCode } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { PracticeAxios, SubmissionAxios } from '../../config/AxiosInstance';
+import { PracticeAxios, SubmissionAxios } from '../../../config/AxiosInstance';
+import RunningModal from '../../../utils/modal/RunModal';
 
 const CodePlatform: React.FC = () => {
   const practicals = useSelector((state: any) => state.practical.practical);
+  console.log('parctical', practicals);
   const { id } = useParams<{ id: string }>();
   const practical = practicals.find((p: any) => p.id === id);
-
   const [code, setCode] = useState<string>('// Start coding here');
   const [isEditorExpanded, setIsEditorExpanded] = useState(false);
-  const [output, setOutput] = useState<string>('');
+  const [output, setOutput] = useState([]);
+  const [input, setInput] = useState([]);
+  const [raw, setRaw] = useState([]);
+  const [isCorrect, setIsCorrect] = useState<Boolean>();
+  const [message, setMessage] = useState<String>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       setCode(value);
     }
   };
+  const fetchPractice = async () => {
+    try {
+      const response = await PracticeAxios.get(
+        `/fetchPractice/?language=${practical.language}`,
+      );
+      const data = await response.data;
 
-  const handleRunCode =async () => {
-    console.log('....',code);
+      console.log('..........', response.data);
+      setCode(data.solutionTemplate || '');
 
-    const response=await SubmissionAxios.post('/practicalrun',{
-      code:code,
-      
-    })
+      setInput(data.input);
+      setRaw(data.output);
+    } catch (error) {
+      console.error('Error fetching practice problems:', error);
+    }
+  };
+  useLayoutEffect(() => {
+    fetchPractice();
+  }, []);
 
-    console.log("./......",response)
+  const handleRunCode = async () => {
+    setLoading(true);
+    try {
+      console.log('....', code);
 
-    
-    
-    setOutput(response.data?.output );
+      const response = await SubmissionAxios.post('/practicalrun', {
+        code: code,
+        input: input,
+        output: raw[0],
+      });
+
+      console.log('./......', response);
+      setIsCorrect(response.data?.isCorrect);
+      setMessage(response.data?.message);
+
+      setOutput(response.data?.output);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const popUpVariants = {
@@ -76,7 +109,6 @@ const CodePlatform: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Code Editor Section */}
           <motion.div
             layout
             variants={popUpVariants}
@@ -103,7 +135,7 @@ const CodePlatform: React.FC = () => {
             <motion.div layout>
               <Editor
                 height={isEditorExpanded ? '50vh' : '30vh'}
-                defaultLanguage='javascript'
+                defaultLanguage={practical.language}
                 theme='vs-light'
                 value={code}
                 onChange={handleEditorChange}
@@ -126,9 +158,7 @@ const CodePlatform: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Second row: Description, Output, and Quick Tips */}
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-          {/* Description Section */}
           <motion.div
             variants={popUpVariants}
             initial='hidden'
@@ -140,11 +170,26 @@ const CodePlatform: React.FC = () => {
               <FaLightbulb className='mr-2 text-white' />
               <h2 className='text-lg font-semibold text-white'>Description</h2>
             </div>
-            <div className='p-4 h-40 overflow-auto'>
-              <p className='text-gray-700'>{practical.description}</p>
+            <div className='p-4 h-60 overflow-auto'>
+              <p className='text-gray-700 mb-4'>{practical.description}</p>
+
+              <h3 className='font-semibold text-green-600 mt-4 mb-2'>Input:</h3>
+              <pre className='bg-gray-100 p-2 rounded-lg text-gray-700'>
+                {`arr: ${JSON.stringify(input[0])}
+index: ${input[1]}
+value: ${input[2]}`}
+              </pre>
+
+              <h3 className='font-semibold text-green-600 mt-4 mb-2'>
+                Expected Output:
+              </h3>
+              <pre className='bg-gray-100 p-2 rounded-lg text-gray-700'>
+                {JSON.stringify(raw[0])}
+              </pre>
             </div>
           </motion.div>
 
+          {/* Output Section */}
           {/* Output Section */}
           <motion.div
             variants={popUpVariants}
@@ -158,6 +203,15 @@ const CodePlatform: React.FC = () => {
               <h2 className='text-lg font-semibold text-white'>Output</h2>
             </div>
             <div className='p-4 h-40 overflow-auto'>
+              {message && (
+                <div
+                  className={`mb-2 font-semibold ${
+                    isCorrect ? 'text-green-500' : 'text-red-500'
+                  }`}
+                >
+                  {message}
+                </div>
+              )}
               <pre className='bg-gray-100 p-4 rounded-lg text-gray-700 h-full overflow-auto'>
                 {output}
               </pre>
@@ -191,6 +245,7 @@ const CodePlatform: React.FC = () => {
               ))}
             </ul>
           </motion.div>
+          <RunningModal isOpen={loading} />
         </div>
       </motion.div>
     </div>

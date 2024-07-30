@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/Store';
-import { blockPractical } from '../../redux/actions/PracticalAction';
-import LogoutModal from '../../utils/modal/LogoutModal';
+import { AppDispatch } from '../../../redux/Store';
+import { blockPractical } from '../../../redux/actions/PracticalAction';
+import LogoutModal from '../../../utils/modal/LogoutModal';
 
 interface Practical {
   _id: string;
@@ -49,12 +49,13 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
           const newBlockedStatus = !practicalToBlock.isBlocked;
           const response = await dispatch(
             blockPractical({
-                ...practicalToBlock,
-                isBlocked: newBlockedStatus,
-                id: '',
-                subTitle: '',
-                videoUrl: '',
-                quickTips: []
+              ...practicalToBlock,
+              isBlocked: newBlockedStatus,
+              id: '',
+              subTitle: '',
+              videoUrl: '',
+              quickTips: [],
+              language: ''
             }),
           );
 

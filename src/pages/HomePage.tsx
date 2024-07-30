@@ -1,5 +1,5 @@
 import Navbar from '../components/navbar/Navbar';
-import Home from '../components/home/Home';
+import Home from '../components/home/home/Home';
 import Footer from '../components/footer/Footer';
 
 const LandingPage = () => {

@@ -7,20 +7,78 @@ import axios, {
 } from 'axios';
 import { getGlobalDispatch } from '../redux/dispatchStore';
 import { Logout } from '../redux/actions/AuthActions';
+import { toast } from 'react-toastify';
 
 const authbaseUrl = import.meta.env.VITE_AUTHENTICATION_SERVICE as string;
-const problemUrl=import.meta.env.VITE_PROBLEM_SERVICE as string;
-const practiceUrl=import.meta.env.VITE_PRACTICE_SERVICE as string;
-const submissionUrl=import.meta.env.VITE_SUBMISSION_SERVICE as string;
-export const AuthAxios: AxiosInstance = axios.create({
-  baseURL: authbaseUrl,
-  withCredentials: true,
-});
+const problemUrl = import.meta.env.VITE_PROBLEM_SERVICE as string;
+const practiceUrl = import.meta.env.VITE_PRACTICE_SERVICE as string;
+const submissionUrl = import.meta.env.VITE_SUBMISSION_SERVICE as string;
 
-AuthAxios.interceptors.request.use((request: InternalAxiosRequestConfig) => {
-  console.log('request', request);
-  return request;
-});
+const createAxiosInstance = (baseURL: string): AxiosInstance => {
+  const instance = axios.create({
+    baseURL,
+    withCredentials: true,
+  });
+
+  instance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
+    console.log('request', request);
+    return request;
+  });
+
+  instance.interceptors.response.use(
+    (response: AxiosResponse) => {
+      console.log('response from config', response);
+      if (response.data.data?.isBlocked) {
+        handleLogout();
+        toast.error("User Blocked")
+      }
+      return response;
+    },
+    async (error: AxiosError) => {
+      if (!error.config) {
+        return Promise.reject(error);
+      }
+
+      const originalRequest = error.config as InternalAxiosRequestConfig & {
+        _retry?: boolean;
+      };
+
+      if (error.response?.status === 403) {
+        console.log('Forbidden (403) error:', error.response);
+        
+        const dispatch = getGlobalDispatch();
+        if (dispatch) {
+          dispatch(Logout()); 
+        }
+        return Promise.reject(error);
+      }
+
+      if (error.response?.status === 401) {
+        console.log('Unauthorized (401) error:', error.response);
+        try {
+          const newAccessToken = await refreshAccessToken();
+          console.log('New access token:', newAccessToken);
+          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+          return instance(originalRequest);
+        } catch (refreshError) {
+          console.error('Error refreshing token:', refreshError);
+          handleLogout();
+          return Promise.reject(refreshError);
+        }
+      }
+
+      return Promise.reject(error);
+    },
+  );
+
+  return instance;
+};
+
+const AuthAxios = createAxiosInstance(authbaseUrl);
+const AdminAxios = createAxiosInstance(authbaseUrl);
+const ProblemAxios = createAxiosInstance(problemUrl);
+const PracticeAxios = createAxiosInstance(practiceUrl);
+const SubmissionAxios = createAxiosInstance(submissionUrl);
 
 const getEmailFromPersistedData = () => {
   try {
@@ -62,65 +120,14 @@ const refreshAccessToken = async () => {
   }
 };
 
-AuthAxios.interceptors.response.use(
-  (response: AxiosResponse) => {
-    console.log('response', response);
-    if (response.data.data?.isBlocked) {
-      const dispatch = getGlobalDispatch();
-      if (dispatch) {
-        dispatch(Logout());
-      }
-      handleLogout();
-    }
-    return response;
-  },
-  async (error: AxiosError) => {
-    if (!error.config) {
-      return Promise.reject(error);
-    }
-
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
-    if (error.response?.status === 401) {
-      console.log('res', error.response?.status);
-      try {
-        const newAccessToken = await refreshAccessToken();
-        console.log('.......', newAccessToken);
-        console.log('....', originalRequest);
-        return AuthAxios(originalRequest);
-      } catch (refreshError) {
-        console.error('Error refreshing token:', refreshError);
-        handleLogout();
-        return Promise.reject(refreshError);
-      }
-    }
-    return Promise.reject(error);
-  },
-);
 export function handleLogout(): void {
+  const dispatch = getGlobalDispatch();
+  if (dispatch) {
+    dispatch(Logout());
+  }
   localStorage.clear();
   window.location.href = '/login';
 }
 
-export const AdminAxios: AxiosInstance = axios.create({
-  baseURL: authbaseUrl,
-  withCredentials: true,
-});
-
 export default AuthAxios;
-
-export const ProblemAxios: AxiosInstance = axios.create({
-  baseURL:  problemUrl,
-  withCredentials: true,
-});
-
-export const PracticeAxios: AxiosInstance = axios.create({
-  baseURL:  practiceUrl,
-  withCredentials: true,
-});
-
-export const SubmissionAxios: AxiosInstance = axios.create({
-  baseURL:  submissionUrl,
-  withCredentials: true,
-});
+export { AdminAxios, ProblemAxios, PracticeAxios, SubmissionAxios };

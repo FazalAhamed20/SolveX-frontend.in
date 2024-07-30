@@ -33,6 +33,8 @@ export interface ErrorPayload {
   message: string;
   status?: number;
   success?: boolean;
+  data?:string;
+  
 }
 
 export interface Problem {
@@ -49,6 +51,7 @@ export interface Practical {
   subtitle?:string;
   videoUrl:string;
   quickTips:string[];
+  language:string
 }
 
 

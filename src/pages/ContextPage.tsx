@@ -1,5 +1,5 @@
 import Navbar from "../components/navbar/Navbar"
-import CourseCard from "../components/practice/Context"
+import CourseCard from "../components/practice/practicals/Context"
 
 const ContextPage = () => {
   return (

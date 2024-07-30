@@ -60,6 +60,7 @@ export type Practice={
     subTitle:string;
     videoUrl:string;
     quickTips:string[];
+    language:string
     isBlocked?:boolean,
     
 
@@ -73,7 +74,7 @@ export type Submission={
   title?:string;
   difficuly?:String;
   language?:String;
-  isSubmit?:Boolean
+  submited?:String
 
 }
 
