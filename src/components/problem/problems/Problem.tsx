@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect, useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '../../redux/Store';
-import { problemlist } from '../../redux/actions/ProblemActions';
-import { fetchSolved } from '../../redux/actions/SubmissionAction';
+import { AppDispatch } from '../../../redux/Store';
+import { problemlist } from '../../../redux/actions/ProblemActions';
+import { fetchSolved } from '../../../redux/actions/SubmissionAction';
 import { useNavigate } from 'react-router-dom';
 
 interface Problem {

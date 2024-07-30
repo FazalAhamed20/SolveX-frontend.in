@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { ForgotPasswordValidation } from '../../utils/validation/ForgotPassword';
-import { checkMail, Verify } from '../../redux/actions/AuthActions';
-import { AppDispatch, RootState } from '../../redux/Store';
-import OtpPasswordModal from '../../utils/modal/OtpPasswordModal';
+import { ForgotPasswordValidation } from '../../../utils/validation/ForgotPassword';
+import { checkMail, Verify } from '../../../redux/actions/AuthActions';
+import { AppDispatch, RootState } from '../../../redux/Store';
+import OtpPasswordModal from '../../../utils/modal/OtpPasswordModal';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 

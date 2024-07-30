@@ -1,4 +1,4 @@
-import CodeEditor from "../components/problem/Editor"
+import CodeEditor from "../components/problem/editor/CodeEditor"
 import Navbar from "../components/navbar/Navbar"
 
 

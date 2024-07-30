@@ -1,4 +1,4 @@
-import ProblemList from "../components/problem/Problem"
+import ProblemList from "../components/problem/problems/Problem"
 import Navbar from '../components/navbar/Navbar';
 
 

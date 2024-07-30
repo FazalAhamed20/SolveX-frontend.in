@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { ProblemAxios, SubmissionAxios } from '../../config/AxiosInstance';
+import { ProblemAxios, SubmissionAxios } from '../../../config/AxiosInstance';
 import Editor from '@monaco-editor/react';
-import ChatBot from '../../utils/chatBot/ChatBot';
 import {
   fetchSubmission,
   submitProblem,
-} from '../../redux/actions/SubmissionAction';
-import { AppDispatch } from '../../redux/Store';
-import SuccessModal from '../../utils/modal/SuccessModal';
-import RunningModal from '../../utils/modal/RunModal';
+} from '../../../redux/actions/SubmissionAction';
+import { AppDispatch } from '../../../redux/Store';
+import SuccessModal from '../../../utils/modal/SuccessModal';
+import RunningModal from '../../../utils/modal/RunModal';
+import TestCases from './TestCases';
+import ProblemDescription from './ProblemDescription';
 
 interface TestCase {
   description: string;
@@ -18,9 +19,7 @@ interface TestCase {
   output: string;
 }
 
-
-
-const CodeEditor: React.FC = () => {
+const CodeEditorMain: React.FC = () => {
   const [code, setCode] = useState('');
   const [output, setOutput] = useState<string>('');
   const [testCaseOutputs, setTestCaseOutputs] = useState<any[][]>([]);
@@ -36,7 +35,6 @@ const CodeEditor: React.FC = () => {
   const [loadingTestCases, setLoadingTestCases] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [solved, setSolved] = useState<string | null>(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { id } = useParams<{ id: string }>();
@@ -270,25 +268,6 @@ const CodeEditor: React.FC = () => {
     setSelectedTestCase(index);
   };
 
-  const formatDescription = (description: string, tags: string[]) => {
-    let formattedDescription = description
-      .split('.')
-      .map((sentence, index) =>
-        index > 0 ? `<br/><br/>${sentence.trim()}` : sentence.trim(),
-      )
-      .join('. ');
-
-    tags.forEach(tag => {
-      const tagRegex = new RegExp(`\\b${tag}\\b`, 'gi');
-      formattedDescription = formattedDescription.replace(
-        tagRegex,
-        `<span class="text-blue-500 font-bold">${tag}</span>`,
-      );
-    });
-
-    return formattedDescription;
-  };
-
   return (
     <div className='flex flex-col h-screen bg-gray-50 p-4'>
       {/* Message for small and medium screens */}
@@ -364,141 +343,21 @@ const CodeEditor: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className='h-48 md:h-64'>
-                <div className='bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-bold mb-2'>Test Cases</h2>
-                  {loadingTestCases ? (
-                    <div className='text-center'>Loading test cases...</div>
-                  ) : (
-                    <>
-                      <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
-                        {testCases.map((testCase, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleTestCaseClick(index)}
-                            className={`p-1 rounded-md text-xs font-bold ${
-                              testResults[index] === null
-                                ? 'bg-gray-300 text-[#4B5563]'
-                                : testResults[index]
-                                ? 'bg-green-500 text-white'
-                                : 'bg-red-500 text-white'
-                            }`}
-                          >
-                            Case {index + 1}
-                          </button>
-                        ))}
-                      </div>
-
-                      {selectedTestCase !== null && (
-                        <div className='mt-4 p-4 bg-gray-100 rounded-md'>
-                          <h3 className='font-bold mb-2'>
-                            Case {selectedTestCase + 1}
-                          </h3>
-                          <p className='text-sm'>
-                            <strong>Input:</strong>{' '}
-                            {testCases[selectedTestCase].input}
-                          </p>
-                          <p className='text-sm'>
-                            <strong>Expected Output:</strong>{' '}
-                            {testCases[selectedTestCase].output}
-                          </p>
-                          <p className='text-sm'>
-                            <strong>Actual Output:</strong>
-                            {testCaseOutputs[selectedTestCase]
-                              ? JSON.stringify(
-                                  testCaseOutputs[selectedTestCase],
-                                )
-                              : 'No output'}
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+              <TestCases
+                testCases={testCases}
+                testResults={testResults}
+                testCaseOutputs={testCaseOutputs}
+                loadingTestCases={loadingTestCases}
+                handleTestCaseClick={handleTestCaseClick}
+                selectedTestCase={selectedTestCase}
+              />
             </div>
           </div>
-          <div className='md:w-1/2 bg-white p-4 border border-gray-300 rounded-lg shadow-md'>
-            <h2 className='text-xl font-bold mb-2'>Problem Description</h2>
-            {solved === 'Attempted' && (
-              <div className='flex items-center text-yellow-600'>
-                <svg
-                  className='w-6 h-6 mr-1'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                  />
-                </svg>
-                <span className='font-semibold'>Attempted</span>
-              </div>
-            )}
-
-            {solved === 'Solved' && (
-              <div className='flex items-center text-green-600'>
-                <svg
-                  className='w-6 h-6 mr-1'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                  xmlns='http://www.w3.org/2000/svg'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                  />
-                </svg>
-                <span className='font-semibold'>Solved</span>
-              </div>
-            )}
-            <div className='flex justify-between items-center mb-4'>
-              <h3 className='text-lg font-semibold'>{problem?.title}</h3>
-              <p className='text-md'>
-                <span
-                  className={`font-medium px-2 py-1 rounded-md ${
-                    problem?.difficulty === 'Easy'
-                      ? 'bg-green-200 text-green-800'
-                      : problem?.difficulty === 'Medium'
-                      ? 'bg-yellow-200 text-yellow-800'
-                      : 'bg-red-200 text-red-800'
-                  }`}
-                >
-                  {problem?.difficulty}
-                </span>
-              </p>
-            </div>
-            <p
-              dangerouslySetInnerHTML={{
-                __html: formatDescription(
-                  problem?.description || '',
-                  problem?.tags || [],
-                ),
-              }}
-            />
-            <h3 className='text-lg font-semibold mt-4'>Examples</h3>
-            {testCases.slice(0, 3).map((testCase, index) => (
-              <div key={index} className='mt-2'>
-                <p>
-                  <strong>Example {index + 1}:</strong>
-                </p>
-                <p>
-                  <strong>Input:</strong> {testCase.input}
-                </p>
-                <p>
-                  <strong>Output:</strong> {testCase.output}
-                </p>
-              </div>
-            ))}
-            <ChatBot />
-          </div>
+          <ProblemDescription
+            problem={problem}
+            solved={solved}
+            testCases={testCases}
+          />
         </div>
         <RunningModal isOpen={loading} />
       </div>
@@ -506,4 +365,4 @@ const CodeEditor: React.FC = () => {
   );
 };
 
-export default CodeEditor;
+export default CodeEditorMain;

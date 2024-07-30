@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaTwitter, FaEdit, FaCode, FaCalendarAlt, FaTrophy, FaChartLine } from 'react-icons/fa';
+import { BiBookContent } from 'react-icons/bi';
+import { AiOutlineFire } from 'react-icons/ai';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import './UserProfile.css';
@@ -201,10 +203,10 @@ useEffect(() => {
             </a>
           </div>
           <button
-            className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300'
+            className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300 flex items-center'
             onClick={openModal}
           >
-            Edit Profile
+            <FaEdit className="mr-2" /> Edit Profile
           </button>
         </div>
       </div>
@@ -215,8 +217,8 @@ useEffect(() => {
           {/* Solved Problems Card */}
           <div className='flex-1 md:mr-2'>
             <div className='p-6 bg-white shadow-md rounded-md mb-4'>
-              <h3 className='text-xl font-semibold mb-4'>
-                Solved Problems by Difficulty
+              <h3 className='text-xl font-semibold mb-4 flex items-center'>
+                <FaCode className="mr-2" /> Solved Problems by Difficulty
               </h3>
               <div className='flex flex-col space-y-4'>
                 <div className='flex items-center'>
@@ -262,28 +264,28 @@ useEffect(() => {
           {/* Submission Activity Card */}
           <div className='flex-1 md:ml-2'>
             <div className='p-6 bg-white shadow-md rounded-md mb-4'>
-              <h3 className='text-xl font-semibold mb-4'>
-                Submission Activity
+              <h3 className='text-xl font-semibold mb-4 flex items-center'>
+                <FaTrophy className="mr-2" /> Submission Activity
               </h3>
               {/* First Row of Submission Activity */}
               <div className='flex mb-4'>
                 <div className='w-1/2 pr-2'>
-                  <div className='text-gray-600'>Submissions Today:</div>
+                  <div className='text-gray-600 flex items-center'><FaCalendarAlt className="mr-1" /> Submissions Today:</div>
                   <div className='font-bold'> {todaySubmissions.length}</div>
                 </div>
                 <div className='w-1/2 pl-2'>
-                  <div className='text-gray-600'>Total Submissions:</div>
+                  <div className='text-gray-600 flex items-center'><FaChartLine className="mr-1" /> Total Submissions:</div>
                   <div className='font-bold'>{totalSubmissions}</div>
                 </div>
               </div>
               {/* Second Row of Submission Activity */}
               <div className='flex'>
                 <div className='w-1/2 pr-2'>
-                  <div className='text-gray-600'>Average Submissions:</div>
+                  <div className='text-gray-600 flex items-center'><FaChartLine className="mr-1" /> Average Submissions:</div>
                   <div className='font-bold'>{averageSubmissions.toFixed(2)}</div>
                 </div>
                 <div className='w-1/2 pl-2'>
-                  <div className='text-gray-600'>Best Streak:</div>
+                  <div className='text-gray-600 flex items-center'><AiOutlineFire className="mr-1" /> Best Streak:</div>
                   <div className='font-bold'>{bestStreak} days</div>
                 </div>
               </div>
@@ -293,7 +295,9 @@ useEffect(() => {
 
         {/* Calendar Heatmap Card */}
         <div className='p-6 bg-white shadow-md rounded-md'>
-          <h3 className='text-xl font-semibold mb-4'>Calendar Heatmap</h3>
+          <h3 className='text-xl font-semibold mb-4 flex items-center'>
+            <FaCalendarAlt className="mr-2" /> Calendar Heatmap
+          </h3>
           <div className='calendar-heatmap-wrapper'>
             <CalendarHeatmap
               startDate={startDate}
