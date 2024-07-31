@@ -71,7 +71,6 @@ const Authreducer = createSlice({
         state.loading = false;
         state.user = null;
         state.isAdmin = false;
-
         state.isUser = false;
       })
       .addCase(Logout.rejected, (state, { payload }) => {

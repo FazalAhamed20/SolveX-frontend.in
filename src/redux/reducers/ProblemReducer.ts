@@ -27,8 +27,8 @@ const Problemreducer = createSlice({
       .addCase(problemlist.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.err = false;
-        state.problem = payload; 
-        console.log("prob",payload)
+        state.problem = payload;
+        console.log('prob', payload);
         state.message = 'Problems fetched successfully';
         state.success = true;
       })

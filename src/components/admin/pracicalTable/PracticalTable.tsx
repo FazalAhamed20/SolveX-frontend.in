@@ -17,11 +17,16 @@ interface Props {
 }
 
 const PracticalTable: React.FC<Props> = ({ practicals }) => {
-  const [filteredPracticals, setFilteredPracticals] = useState<Practical[]>(practicals);
+  const [filteredPracticals, setFilteredPracticals] =
+    useState<Practical[]>(practicals);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [practicalIdToBlock, setPracticalIdToBlock] = useState<string | null>(null);
-  const [practicalToBlock, setPracticalToBlock] = useState<Practical | null>(null);
+  const [practicalIdToBlock, setPracticalIdToBlock] = useState<string | null>(
+    null,
+  );
+  const [practicalToBlock, setPracticalToBlock] = useState<Practical | null>(
+    null,
+  );
   const itemsPerPage = 5;
 
   const dispatch: AppDispatch = useDispatch();
@@ -55,12 +60,13 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
               subTitle: '',
               videoUrl: '',
               quickTips: [],
-              language: ''
+              language: '',
             }),
           );
 
           if (blockPractical.fulfilled.match(response)) {
-            const updatedPractical = response.payload.data as unknown as Practical;
+            const updatedPractical = response.payload
+              .data as unknown as Practical;
 
             setFilteredPracticals(prevPracticals =>
               prevPracticals.map(practical =>
@@ -70,9 +76,15 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
               ),
             );
 
-            console.log('Filtered Practicals after update:', filteredPracticals);
+            console.log(
+              'Filtered Practicals after update:',
+              filteredPracticals,
+            );
           } else {
-            console.error('Failed to block/unblock practical:', response.payload);
+            console.error(
+              'Failed to block/unblock practical:',
+              response.payload,
+            );
           }
         } catch (error) {
           console.error('Failed to block/unblock practical:', error);
@@ -137,7 +149,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                 Description
               </th>
-             
+
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                 Actions
               </th>
@@ -154,7 +166,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
                     {practical.description}
                   </div>
                 </td>
-                
+
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <button
                     onClick={() => handleButtonClick(practical)}

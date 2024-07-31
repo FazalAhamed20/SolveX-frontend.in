@@ -1,5 +1,4 @@
 export interface TestCase {
-    input: string;
-    output: string;
-  }
-  
+  input: string;
+  output: string;
+}

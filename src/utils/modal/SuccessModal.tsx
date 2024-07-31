@@ -8,19 +8,25 @@ interface SuccessModalProps {
 }
 
 const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
-  const [windowDimension, setWindowDimension] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [windowDimension, setWindowDimension] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const detectSize = () => {
-      setWindowDimension({ width: window.innerWidth, height: window.innerHeight });
-    }
+      setWindowDimension({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
 
     window.addEventListener('resize', detectSize);
 
     return () => {
       window.removeEventListener('resize', detectSize);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -46,35 +52,35 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: 'spring', damping: 15, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative overflow-hidden"
+              onClick={e => e.stopPropagation()}
+              className='bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative overflow-hidden'
             >
-              <div className="text-center">
+              <div className='text-center'>
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-                  className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100"
+                  className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100'
                 >
                   <svg
-                    className="h-6 w-6 text-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                    className='h-6 w-6 text-green-600'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                    xmlns='http://www.w3.org/2000/svg'
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
+                      d='M5 13l4 4L19 7'
                     ></path>
                   </svg>
                 </motion.div>
@@ -82,7 +88,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="mt-2 text-xl font-medium text-gray-900"
+                  className='mt-2 text-xl font-medium text-gray-900'
                 >
                   Submission Successful!
                 </motion.h3>
@@ -90,7 +96,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="mt-2 text-gray-500"
+                  className='mt-2 text-gray-500'
                 >
                   Your code has been submitted successfully. Great job!
                 </motion.p>
@@ -99,11 +105,11 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-5"
+                className='mt-5'
               >
                 <button
                   onClick={onClose}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm"
+                  className='w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm'
                 >
                   Close
                 </button>

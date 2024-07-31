@@ -178,19 +178,23 @@ const Signup: React.FC = () => {
                       component='div'
                       className='text-red-500 mb-3'
                     />
-                   <button
-  type='submit'
-  disabled={loading}
-  className={`w-full px-8 py-3 mt-3 text-sm leading-5 text-white ${
-    isLoading ? 'bg-green-500' : 'bg-green-700'
-  } rounded`}
->
-  {loading ? (
-    <ClipLoader color="#ffffff" loading={loading} size={20} />
-  ) : (
-    'Sign up'
-  )}
-</button>
+                    <button
+                      type='submit'
+                      disabled={loading}
+                      className={`w-full px-8 py-3 mt-3 text-sm leading-5 text-white ${
+                        isLoading ? 'bg-green-500' : 'bg-green-700'
+                      } rounded`}
+                    >
+                      {loading ? (
+                        <ClipLoader
+                          color='#ffffff'
+                          loading={loading}
+                          size={20}
+                        />
+                      ) : (
+                        'Sign up'
+                      )}
+                    </button>
                   </Form>
                 </Formik>
                 <div className='flex items-center justify-between mt-3 flex-wrap'>

@@ -1,14 +1,16 @@
-import Navbar from "../components/navbar/Navbar"
-import CourseCard from "../components/practice/practicals/Context"
+import Navbar from '../components/navbar/Navbar';
+import PracticalCodingList from '../components/practice/practicals/PracticalCodingList';
+
+
+ 
 
 const ContextPage = () => {
   return (
     <div>
-        <Navbar/>
-        <CourseCard />
-      
+      <Navbar />
+     <PracticalCodingList/>
     </div>
-  )
-}
+  );
+};
 
-export default ContextPage
+export default ContextPage;

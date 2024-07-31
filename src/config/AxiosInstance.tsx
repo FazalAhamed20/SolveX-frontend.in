@@ -30,7 +30,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
       console.log('response from config', response);
       if (response.data.data?.isBlocked) {
         handleLogout();
-        toast.error("User Blocked")
+        toast.error('User Blocked');
       }
       return response;
     },
@@ -45,10 +45,10 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
       if (error.response?.status === 403) {
         console.log('Forbidden (403) error:', error.response);
-        
+
         const dispatch = getGlobalDispatch();
         if (dispatch) {
-          dispatch(Logout()); 
+          dispatch(Logout());
         }
         return Promise.reject(error);
       }

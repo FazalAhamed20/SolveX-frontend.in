@@ -1,14 +1,17 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { motion } from 'framer-motion';
-import { FaPlay, FaLightbulb, FaCode } from 'react-icons/fa';
+import { FaPlay, FaLightbulb, FaCode, FaCheckCircle } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PracticeAxios, SubmissionAxios } from '../../../config/AxiosInstance';
 import RunningModal from '../../../utils/modal/RunModal';
+import { AppDispatch } from '../../../redux/Store';
+import { fetchPracticalSubmit } from '../../../redux/actions/SubmissionAction';
 
 const CodePlatform: React.FC = () => {
   const practicals = useSelector((state: any) => state.practical.practical);
+  const user = useSelector((state: any) => state.user.user);
   console.log('parctical', practicals);
   const { id } = useParams<{ id: string }>();
   const practical = practicals.find((p: any) => p.id === id);
@@ -17,15 +20,19 @@ const CodePlatform: React.FC = () => {
   const [output, setOutput] = useState([]);
   const [input, setInput] = useState([]);
   const [raw, setRaw] = useState([]);
-  const [isCorrect, setIsCorrect] = useState<Boolean>();
+  const [isCorrect, setIsCorrect] = useState<Boolean>(false);
   const [message, setMessage] = useState<String>('');
   const [loading, setLoading] = useState<boolean>(false);
+  console.log("practical....",practical);
+
+  const dispatch: AppDispatch = useDispatch();
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       setCode(value);
     }
   };
+
   const fetchPractice = async () => {
     try {
       const response = await PracticeAxios.get(
@@ -42,9 +49,35 @@ const CodePlatform: React.FC = () => {
       console.error('Error fetching practice problems:', error);
     }
   };
+
   useLayoutEffect(() => {
     fetchPractice();
+    fetchPracticalSubmission()
   }, []);
+ 
+    const fetchPracticalSubmission = async () => {
+      try {
+        const response = await dispatch(
+          fetchPracticalSubmit({
+            email: user.email,
+            id: id,
+          }),
+        );
+        const submissionStatus = response.payload?.data;
+        if (typeof submissionStatus === 'boolean') {
+          setIsCorrect(submissionStatus);
+          console.log('Submission fetched:', submissionStatus);
+        } else {
+          console.log('No submission found for this email or submission status is not boolean');
+        }
+      } catch (error) {
+        console.error('Error fetching submission:', error);
+      }
+    };
+
+  
+
+ 
 
   const handleRunCode = async () => {
     setLoading(true);
@@ -55,6 +88,10 @@ const CodePlatform: React.FC = () => {
         code: code,
         input: input,
         output: raw[0],
+        id: practical.id,
+        language: practical.language,
+        title: practical.title,
+        email: user.email
       });
 
       console.log('./......', response);
@@ -190,7 +227,6 @@ value: ${input[2]}`}
           </motion.div>
 
           {/* Output Section */}
-          {/* Output Section */}
           <motion.div
             variants={popUpVariants}
             initial='hidden'
@@ -212,13 +248,19 @@ value: ${input[2]}`}
                   {message}
                 </div>
               )}
+              {isCorrect && (
+                <div className='flex items-center justify-end text-green-500'>
+                  <FaCheckCircle className='mr-2' />
+                  <span className='font-semibold'>Completed</span>
+                </div>
+              )}
               <pre className='bg-gray-100 p-4 rounded-lg text-gray-700 h-full overflow-auto'>
                 {output}
               </pre>
             </div>
           </motion.div>
 
-          {/* Quick Tips */}
+          {/* Quick Tips Section */}
           <motion.div
             variants={popUpVariants}
             initial='hidden'
@@ -245,11 +287,14 @@ value: ${input[2]}`}
               ))}
             </ul>
           </motion.div>
-          <RunningModal isOpen={loading} />
         </div>
       </motion.div>
+
+      {loading && <RunningModal isOpen={false} />}
     </div>
   );
 };
 
 export default CodePlatform;
+
+

@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-import { FaGithub, FaLinkedin, FaTwitter, FaEdit, FaCode, FaCalendarAlt, FaTrophy, FaChartLine } from 'react-icons/fa';
+import {
+  FaGithub,
+  FaLinkedin,
+  FaTwitter,
+  FaEdit,
+  FaCode,
+  FaCalendarAlt,
+  FaTrophy,
+  FaChartLine,
+} from 'react-icons/fa';
 import { BiBookContent } from 'react-icons/bi';
 import { AiOutlineFire } from 'react-icons/ai';
 import CalendarHeatmap from 'react-calendar-heatmap';
@@ -14,18 +23,17 @@ import { AppDispatch } from '../../redux/Store';
 import { updateProfile } from '../../redux/actions/AuthActions';
 import { fetchSolved } from '../../redux/actions/SubmissionAction';
 
-
 Modal.setAppElement('#root');
 
 const UserProfile: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
   console.log('user', user);
- const [submissionData, setSubmissionData] = useState([]);
- const [todaySubmissions, setTodaySubmissions] = useState([]);
- const [totalSubmissions, setTotalSubmissions] = useState(0);
- const [averageSubmissions, setAverageSubmissions] = useState(0);
- const [bestStreak, setBestStreak] = useState(0);
+  const [submissionData, setSubmissionData] = useState([]);
+  const [todaySubmissions, setTodaySubmissions] = useState([]);
+  const [totalSubmissions, setTotalSubmissions] = useState(0);
+  const [averageSubmissions, setAverageSubmissions] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
   const [profile, setProfile] = useState({
     username: user.username,
     role: user.role,
@@ -39,7 +47,11 @@ const UserProfile: React.FC = () => {
 
   const today = new Date();
   const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-  const endDate = new Date(today.getFullYear(), today.getMonth() + 7, today.getDate());
+  const endDate = new Date(
+    today.getFullYear(),
+    today.getMonth() + 7,
+    today.getDate(),
+  );
   const formattedToday = today.toISOString().split('T')[0];
 
   const [solvedProblems, setSolvedProblems] = useState({
@@ -93,24 +105,25 @@ const UserProfile: React.FC = () => {
       }
     }
   };
-useEffect(() => {
+  useEffect(() => {
     const fetchSubmissionProblem = async () => {
       try {
         const response = await dispatch(
-          fetchSolved({ email: user.email })
+          fetchSolved({ email: user.email }),
         ).unwrap();
 
-        
         const problemCount = { easy: 0, medium: 0, hard: 0 };
-        const submissionDates = response.map((submission: { createdAt: string | number | Date; }) => {
-          const date = new Date(submission.createdAt);
-          return {
-            date: date.toISOString().split('T')[0],
-            count: 1,
-          };
-        });
+        const submissionDates = response.map(
+          (submission: { createdAt: string | number | Date }) => {
+            const date = new Date(submission.createdAt);
+            return {
+              date: date.toISOString().split('T')[0],
+              count: 1,
+            };
+          },
+        );
 
-        response.forEach((submission: { difficulty: string; }) => {
+        response.forEach((submission: { difficulty: string }) => {
           if (submission.difficulty === 'Easy') {
             problemCount.easy += 1;
           } else if (submission.difficulty === 'Medium') {
@@ -123,25 +136,41 @@ useEffect(() => {
         setSolvedProblems(problemCount);
         setSubmissionData(submissionDates);
 
-        const todaysSubmissions = response.filter((submission: { createdAt: string | number | Date; }) => {
-          const submissionDate = new Date(submission.createdAt).toISOString().split('T')[0];
-          return submissionDate === formattedToday;
-        });
+        const todaysSubmissions = response.filter(
+          (submission: { createdAt: string | number | Date }) => {
+            const submissionDate = new Date(submission.createdAt)
+              .toISOString()
+              .split('T')[0];
+            return submissionDate === formattedToday;
+          },
+        );
 
         setTodaySubmissions(todaysSubmissions);
         setTotalSubmissions(response.length);
 
-        const uniqueDates = [...new Set(submissionDates.map((sub: { date: any; }) => sub.date))];
+        const uniqueDates = [
+          ...new Set(submissionDates.map((sub: { date: any }) => sub.date)),
+        ];
         const avgSubmissions = response.length / uniqueDates.length;
         setAverageSubmissions(avgSubmissions);
 
         // Calculate best streak
         let currentStreak = 0;
         let maxStreak = 0;
-        submissionDates.sort((a: { date: string | number | Date; }, b: { date: string | number | Date; }) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        submissionDates.sort(
+          (
+            a: { date: string | number | Date },
+            b: { date: string | number | Date },
+          ) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
 
         for (let i = 0; i < submissionDates.length; i++) {
-          if (i === 0 || new Date(submissionDates[i].date).getTime() === new Date(submissionDates[i - 1].date).getTime() + 24 * 60 * 60 * 1000) {
+          if (
+            i === 0 ||
+            new Date(submissionDates[i].date).getTime() ===
+              new Date(submissionDates[i - 1].date).getTime() +
+                24 * 60 * 60 * 1000
+          ) {
             currentStreak++;
           } else {
             currentStreak = 1;
@@ -206,7 +235,7 @@ useEffect(() => {
             className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-300 flex items-center'
             onClick={openModal}
           >
-            <FaEdit className="mr-2" /> Edit Profile
+            <FaEdit className='mr-2' /> Edit Profile
           </button>
         </div>
       </div>
@@ -218,7 +247,7 @@ useEffect(() => {
           <div className='flex-1 md:mr-2'>
             <div className='p-6 bg-white shadow-md rounded-md mb-4'>
               <h3 className='text-xl font-semibold mb-4 flex items-center'>
-                <FaCode className="mr-2" /> Solved Problems by Difficulty
+                <FaCode className='mr-2' /> Solved Problems by Difficulty
               </h3>
               <div className='flex flex-col space-y-4'>
                 <div className='flex items-center'>
@@ -265,27 +294,37 @@ useEffect(() => {
           <div className='flex-1 md:ml-2'>
             <div className='p-6 bg-white shadow-md rounded-md mb-4'>
               <h3 className='text-xl font-semibold mb-4 flex items-center'>
-                <FaTrophy className="mr-2" /> Submission Activity
+                <FaTrophy className='mr-2' /> Submission Activity
               </h3>
               {/* First Row of Submission Activity */}
               <div className='flex mb-4'>
                 <div className='w-1/2 pr-2'>
-                  <div className='text-gray-600 flex items-center'><FaCalendarAlt className="mr-1" /> Submissions Today:</div>
+                  <div className='text-gray-600 flex items-center'>
+                    <FaCalendarAlt className='mr-1' /> Submissions Today:
+                  </div>
                   <div className='font-bold'> {todaySubmissions.length}</div>
                 </div>
                 <div className='w-1/2 pl-2'>
-                  <div className='text-gray-600 flex items-center'><FaChartLine className="mr-1" /> Total Submissions:</div>
+                  <div className='text-gray-600 flex items-center'>
+                    <FaChartLine className='mr-1' /> Total Submissions:
+                  </div>
                   <div className='font-bold'>{totalSubmissions}</div>
                 </div>
               </div>
               {/* Second Row of Submission Activity */}
               <div className='flex'>
                 <div className='w-1/2 pr-2'>
-                  <div className='text-gray-600 flex items-center'><FaChartLine className="mr-1" /> Average Submissions:</div>
-                  <div className='font-bold'>{averageSubmissions.toFixed(2)}</div>
+                  <div className='text-gray-600 flex items-center'>
+                    <FaChartLine className='mr-1' /> Average Submissions:
+                  </div>
+                  <div className='font-bold'>
+                    {averageSubmissions.toFixed(2)}
+                  </div>
                 </div>
                 <div className='w-1/2 pl-2'>
-                  <div className='text-gray-600 flex items-center'><AiOutlineFire className="mr-1" /> Best Streak:</div>
+                  <div className='text-gray-600 flex items-center'>
+                    <AiOutlineFire className='mr-1' /> Best Streak:
+                  </div>
                   <div className='font-bold'>{bestStreak} days</div>
                 </div>
               </div>
@@ -296,7 +335,7 @@ useEffect(() => {
         {/* Calendar Heatmap Card */}
         <div className='p-6 bg-white shadow-md rounded-md'>
           <h3 className='text-xl font-semibold mb-4 flex items-center'>
-            <FaCalendarAlt className="mr-2" /> Calendar Heatmap
+            <FaCalendarAlt className='mr-2' /> Calendar Heatmap
           </h3>
           <div className='calendar-heatmap-wrapper'>
             <CalendarHeatmap

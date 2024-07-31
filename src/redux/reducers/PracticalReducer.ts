@@ -6,7 +6,7 @@ import { practicalReducerInitial, ErrorPayload } from '../../types/Helper';
 const initialState: practicalReducerInitial = {
   loading: false,
   err: false,
-  practical:[],
+  practical: [],
   message: '',
   success: false,
 };
@@ -19,7 +19,9 @@ const Practicalreducer = createSlice({
       state.message = '';
     },
   },
-  extraReducers: (builder: ActionReducerMapBuilder<practicalReducerInitial>) => {
+  extraReducers: (
+    builder: ActionReducerMapBuilder<practicalReducerInitial>,
+  ) => {
     builder
       .addCase(practicallist.pending, state => {
         state.loading = true;
@@ -27,8 +29,8 @@ const Practicalreducer = createSlice({
       .addCase(practicallist.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.err = false;
-        state.practical = payload; 
-        console.log("prob",payload)
+        state.practical = payload;
+        console.log('prob', payload);
         state.message = 'Problems fetched successfully';
         state.success = true;
       })

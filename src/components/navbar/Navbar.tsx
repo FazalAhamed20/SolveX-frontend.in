@@ -67,17 +67,24 @@ const Navbar: React.FC = () => {
                 >
                   Home
                 </Link>
-                <Link to='/problem'
-                className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
+                <Link
+                  to='/problem'
+                  className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
+                >
                   Problem
                 </Link>
-                <Link to='/context'
-                className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
+                <Link
+                  to='/context'
+                  className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
+                >
                   Practice
                 </Link>
-                <a className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'>
+                 <Link
+                  to='/leaderboard'
+                  className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
+                >
                   Leaderboard
-                </a>
+                </Link>
                 <div className='relative z-30'>
                   <button
                     onClick={toggleDropdown}
@@ -163,14 +170,18 @@ const Navbar: React.FC = () => {
               >
                 Home
               </Link>
-              <Link to='/problem'
-                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
-                  Problem
-                </Link>
-                <Link to='/context'
-                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
-                  Practice
-                </Link>
+              <Link
+                to='/problem'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
+              >
+                Problem
+              </Link>
+              <Link
+                to='/context'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
+              >
+                Practice
+              </Link>
               <a className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
                 Leaderboard
               </a>
@@ -228,11 +239,7 @@ const Navbar: React.FC = () => {
       />
       {loading && (
         <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50'>
-          <ClipLoader
-            color='#ffffff'
-            loading={loading}
-            size={50}
-          />
+          <ClipLoader color='#ffffff' loading={loading} size={50} />
         </div>
       )}
     </nav>

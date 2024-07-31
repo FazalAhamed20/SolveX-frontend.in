@@ -6,14 +6,13 @@ import { ErrorPayload } from '../../types/Helper';
 
 interface VerifyResponse {
   success: any;
-  data:[];
+  data: [];
   message: string;
   status?: number;
   isBlocked?: boolean;
 }
 
-
-export const blockProblem= createAsyncThunk<
+export const blockProblem = createAsyncThunk<
   VerifyResponse,
   Problem,
   { rejectValue: ErrorPayload }
@@ -22,8 +21,8 @@ export const blockProblem= createAsyncThunk<
     console.log(problemData);
 
     const { data } = await ProblemAxios.post<VerifyResponse>('/blockproblem', {
-      _id:problemData._id,
-      isBlocked:problemData.isBlocked
+      _id: problemData._id,
+      isBlocked: problemData.isBlocked,
     });
     console.log('data', data);
 
@@ -34,17 +33,13 @@ export const blockProblem= createAsyncThunk<
   }
 });
 
-export const problemlist= createAsyncThunk<
+export const problemlist = createAsyncThunk<
   Problem[],
   void,
   { rejectValue: ErrorPayload }
 >('problem/problemlist', async (_, { rejectWithValue }) => {
   try {
-   
-
-    const { data } = await ProblemAxios.get<Problem[]>('/problemlist', {
-     
-    });
+    const { data } = await ProblemAxios.get<Problem[]>('/problemlist', {});
     console.log('data', data);
 
     return data;
@@ -53,6 +48,3 @@ export const problemlist= createAsyncThunk<
     return rejectWithValue(handleErrors(error));
   }
 });
-
-
-

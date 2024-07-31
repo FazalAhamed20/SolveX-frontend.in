@@ -17,14 +17,14 @@ export type adminReducerInitial = {
 export type problemReducerInitial = {
   loading: boolean;
   err: boolean | string;
-  problem:Problem [];
+  problem: Problem[];
   message?: string;
   success?: boolean;
 };
 export type practicalReducerInitial = {
   loading: boolean;
   err: boolean | string;
-  practical:Practical [];
+  practical: Practical[];
   message?: string;
   success?: boolean;
 };
@@ -33,8 +33,7 @@ export interface ErrorPayload {
   message: string;
   status?: number;
   success?: boolean;
-  data?:string;
-  
+  data?: string;
 }
 
 export interface Problem {
@@ -48,17 +47,16 @@ export interface Problem {
 export interface Practical {
   id: string;
   title: string;
-  subtitle?:string;
-  videoUrl:string;
-  quickTips:string[];
-  language:string
+  subtitle?: string;
+  videoUrl: string;
+  quickTips: string[];
+  language: string;
 }
-
 
 export type submissionReducerInitial = {
   loading: boolean;
   err: boolean | string;
-  data:null | any;
+  data: null | any;
   message?: string;
   success?: boolean;
 };

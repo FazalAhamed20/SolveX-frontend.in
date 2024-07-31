@@ -16,9 +16,9 @@ interface Problem {
 
 const ProblemList: React.FC = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [solvedProblems, setSolvedProblems] = useState<Map<string, 'Solved' | 'Attempted'>>(
-    new Map()
-  );
+  const [solvedProblems, setSolvedProblems] = useState<
+    Map<string, 'Solved' | 'Attempted'>
+  >(new Map());
   const [searchTerm, setSearchTerm] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<
     Problem['difficulty'] | 'All'
@@ -32,7 +32,6 @@ const ProblemList: React.FC = () => {
   const user = useSelector((state: any) => state.user.user);
   const navigate = useNavigate();
 
-
   const fetchProblemList = async () => {
     try {
       const response = await dispatch(problemlist()).unwrap();
@@ -41,23 +40,27 @@ const ProblemList: React.FC = () => {
       console.error('Error fetching problems:', error);
     }
   };
-  useLayoutEffect(() => {
+  useEffect(() => {
     fetchProblemList();
   }, []);
 
- 
   useEffect(() => {
     const fetchSubmissionProblem = async () => {
       try {
         const response = await dispatch(
           fetchSolved({
             email: user.email,
-          })
+          }),
         ).unwrap();
-  
+
         if (response) {
           const solvedMap: Map<string, 'Solved' | 'Attempted'> = new Map(
-            response.map((item: { title: string; submited: 'Solved' | 'Attempted' }) => [item.title, item.submited])
+            response.map(
+              (item: { title: string; submited: 'Solved' | 'Attempted' }) => [
+                item.title,
+                item.submited,
+              ],
+            ),
           );
           setSolvedProblems(solvedMap);
         } else {
@@ -67,12 +70,11 @@ const ProblemList: React.FC = () => {
         console.error('Error fetching submission:', error);
       }
     };
-  
+
     fetchSubmissionProblem();
   }, [dispatch, user.email]);
-  
 
-  // Filter and paginate problems
+  
   const filteredProblems = useMemo(() => {
     return problems
       .filter(problem => !problem.isBlocked)
@@ -103,7 +105,7 @@ const ProblemList: React.FC = () => {
         return '';
     }
   };
-  console.log("solved",solvedProblems)
+  console.log('solved', solvedProblems);
 
   return (
     <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8'>
@@ -164,8 +166,14 @@ const ProblemList: React.FC = () => {
               >
                 <td className='px-6 py-4 whitespace-nowrap'>
                   {solvedProblems.has(problem.title) && (
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                      ${solvedProblems.get(problem.title) === 'Solved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      ${
+                        solvedProblems.get(problem.title) === 'Solved'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
                       {solvedProblems.get(problem.title)}
                     </span>
                   )}

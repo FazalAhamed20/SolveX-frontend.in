@@ -1,19 +1,33 @@
-import React, { useState,  useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Logout } from '../../../redux/actions/AuthActions';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../../redux/Store';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import AuthAxios from '../../../config/AxiosInstance';
 import { PracticeAxios, ProblemAxios } from '../../../config/AxiosInstance';
 import UserTable from '../userTable/UserTable';
 import ProblemTable from '../problemTable/ProblemTable';
 import LogoutModal from '../../../utils/modal/LogoutModal';
 import { motion } from 'framer-motion';
-import { FaChartPie, FaUsers, FaCode, FaTrophy, FaCrown ,FaFlask} from 'react-icons/fa';
+import {
+  FaChartPie,
+  FaUsers,
+  FaCode,
+  FaTrophy,
+  FaCrown,
+  FaFlask,
+} from 'react-icons/fa';
 import PracticalTable from '../pracicalTable/PracticalTable';
-
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -160,14 +174,18 @@ const AdminDashboard: React.FC = () => {
         >
           {activeSection === 'dashboard' && (
             <motion.div variants={itemVariants}>
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>Overview</h2>
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                Overview
+              </h2>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <motion.div
                   className='bg-white shadow-lg rounded-lg p-6'
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h3 className='text-lg font-bold mb-4 text-gray-700'>Problem Difficulty</h3>
+                  <h3 className='text-lg font-bold mb-4 text-gray-700'>
+                    Problem Difficulty
+                  </h3>
                   <ResponsiveContainer width='100%' height={300}>
                     <PieChart>
                       <Pie
@@ -183,7 +201,11 @@ const AdminDashboard: React.FC = () => {
                         {problemDifficultyData.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={['#3498db', '#2ecc71', '#f1c40f', '#e74c3c'][index % 4]}
+                            fill={
+                              ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c'][
+                                index % 4
+                              ]
+                            }
                           />
                         ))}
                       </Pie>
@@ -195,7 +217,9 @@ const AdminDashboard: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h3 className='text-lg font-bold mb-4 text-gray-700'>User Activity</h3>
+                  <h3 className='text-lg font-bold mb-4 text-gray-700'>
+                    User Activity
+                  </h3>
                   <ResponsiveContainer width='100%' height={300}>
                     <BarChart data={userData}>
                       <XAxis dataKey='name' />
@@ -214,36 +238,55 @@ const AdminDashboard: React.FC = () => {
 
           {activeSection === 'users' && (
             <motion.div variants={itemVariants}>
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>User Management</h2>
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                User Management
+              </h2>
               <UserTable users={users} />
             </motion.div>
           )}
 
           {activeSection === 'problems' && (
             <motion.div variants={itemVariants}>
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>Problem Management</h2>
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                Problem Management
+              </h2>
               <ProblemTable problems={problems} />
             </motion.div>
           )}
 
-{activeSection === 'practice' && (
-            <motion.div variants={itemVariants} className='bg-white shadow-lg rounded-lg p-6'>
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>Practice</h2>
+          {activeSection === 'practice' && (
+            <motion.div
+              variants={itemVariants}
+              className='bg-white shadow-lg rounded-lg p-6'
+            >
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                Practice
+              </h2>
               <PracticalTable practicals={practice} />
             </motion.div>
           )}
 
           {activeSection === 'leaderboard' && (
-            <motion.div variants={itemVariants} className='bg-white shadow-lg rounded-lg p-6'>
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>Leaderboard</h2>
+            <motion.div
+              variants={itemVariants}
+              className='bg-white shadow-lg rounded-lg p-6'
+            >
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                Leaderboard
+              </h2>
               {/* Implement leaderboard component here */}
               <p>Leaderboard data goes here</p>
             </motion.div>
           )}
 
           {activeSection === 'subscription' && (
-            <motion.div variants={itemVariants} className='bg-white shadow-lg rounded-lg p-6'>
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>Subscription Management</h2>
+            <motion.div
+              variants={itemVariants}
+              className='bg-white shadow-lg rounded-lg p-6'
+            >
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                Subscription Management
+              </h2>
               {/* Implement subscription management component here */}
               <p>Subscription management data goes here</p>
             </motion.div>

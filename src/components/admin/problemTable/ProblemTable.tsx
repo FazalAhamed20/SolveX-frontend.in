@@ -10,7 +10,6 @@ interface Problem {
   description: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   isBlocked: boolean;
-  
 }
 
 interface Props {
@@ -56,7 +55,7 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
               code: '',
               javascript: true,
               id: '',
-              status: 'Solved'
+              status: 'Solved',
             }),
           );
 
@@ -153,10 +152,10 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
                   <div className='text-sm text-gray-900'>{problem.title}</div>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap'>
-  <div className='text-sm text-gray-900 truncate max-w-xs'>
-    {problem.description}
-  </div>
-</td>
+                  <div className='text-sm text-gray-900 truncate max-w-xs'>
+                    {problem.description}
+                  </div>
+                </td>
 
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <div

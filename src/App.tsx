@@ -12,12 +12,11 @@ const LandingHomePage = lazy(() => import('./pages/LandingHomePage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminHomePage'));
-const ProblemPage= lazy(() => import('./pages/ProblemPage'));
-const EditorPage= lazy(() => import('./pages/EditorPage'));
-const ContextPage=lazy(()=>import ('./pages/ContextPage'))
-const PracticePage=lazy(()=>import ('./pages/PracticePage'))
-
-
+const ProblemPage = lazy(() => import('./pages/ProblemPage'));
+const EditorPage = lazy(() => import('./pages/EditorPage'));
+const ContextPage = lazy(() => import('./pages/ContextPage'));
+const PracticePage = lazy(() => import('./pages/PracticePage'));
+const LeaderBoardPage=lazy(()=>import('./pages/LeaderBoardPage'))
 
 const App: React.FC = () => {
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
@@ -61,12 +60,22 @@ const App: React.FC = () => {
             )
           }
         />
-        <Route path='/profile' element={isLoggedIn ?<ProfilePage /> : <Navigate to='/login'/>} />
-        <Route path='/problem' element={isLoggedIn ?<ProblemPage /> : <Navigate to='/login'/>} />
+        <Route
+          path='/profile'
+          element={isLoggedIn ? <ProfilePage /> : <Navigate to='/login' />}
+        />
+        <Route
+          path='/problem'
+          element={isLoggedIn ? <ProblemPage /> : <Navigate to='/login' />}
+        />
         <Route path='/forgot' element={<ForgotPasswordPage />} />
-        <Route path='/code/:id'element={isLoggedIn ? <EditorPage /> :  <Navigate to='/login' />}/>
-        <Route path='/practice/:id' element={<PracticePage  />} />
+        <Route
+          path='/code/:id'
+          element={isLoggedIn ? <EditorPage /> : <Navigate to='/login' />}
+        />
+        <Route path='/practice/:id' element={<PracticePage />} />
         <Route path='/context' element={<ContextPage />} />
+        <Route path='/leaderboard' element={<LeaderBoardPage />} />
 
         <Route
           path='*'
@@ -78,4 +87,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-

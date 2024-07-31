@@ -36,45 +36,40 @@ export type Profile = {
   profileImage?: string;
 };
 
-
-export type Problem={
+export type Problem = {
   _id: string;
-  id:string;
-    title: string;
-    description: string;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
-    tags: string[];
-    code:string,
-    javascript:true,
-    isBlocked?:boolean,
-    status: 'Solved' | 'Attempted' | 'Todo';
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  tags: string[];
+  code: string;
+  javascript: true;
+  isBlocked?: boolean;
+  status: 'Solved' | 'Attempted' | 'Todo';
+};
 
-}
-
-
-export type Practice={
+export type Practice = {
   _id: string;
-  id:string;
-    title: string;
-    description: string;
-    subTitle:string;
-    videoUrl:string;
-    quickTips:string[];
-    language:string
-    isBlocked?:boolean,
-    
+  id: string;
+  title: string;
+  description: string;
+  subTitle: string;
+  videoUrl: string;
+  quickTips: string[];
+  language: string;
+  isBlocked?: boolean;
+};
 
-}
+export type Submission = {
+  email?: String;
+  code?: String;
+  id?: String;
+  title?: string;
+  difficuly?: String;
+  language?: String;
+  submited?: String;
+};
 
 
-export type Submission={
-  email?:String,
-  code?:String,
-  id?:String;
-  title?:string;
-  difficuly?:String;
-  language?:String;
-  submited?:String
-
-}
 
