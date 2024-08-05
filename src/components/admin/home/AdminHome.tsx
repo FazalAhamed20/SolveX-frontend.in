@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import AuthAxios from '../../../config/AxiosInstance';
+import AuthAxios, { ClanAxios } from '../../../config/AxiosInstance';
 import { PracticeAxios, ProblemAxios } from '../../../config/AxiosInstance';
 import UserTable from '../userTable/UserTable';
 import ProblemTable from '../problemTable/ProblemTable';
@@ -26,8 +26,10 @@ import {
   FaTrophy,
   FaCrown,
   FaFlask,
+  FaFortAwesome,
 } from 'react-icons/fa';
 import PracticalTable from '../pracicalTable/PracticalTable';
+import ClanTable from '../clanTable/ClanTable';
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,6 +37,7 @@ const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [problems, setProblemData] = useState<any[]>([]);
   const [practice, setPracticeData] = useState<any[]>([]);
+  const [clans, setClanData] = useState<any[]>([]);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showModal, setShowModal] = useState(false);
 
@@ -42,6 +45,7 @@ const AdminDashboard: React.FC = () => {
     fetchUserData();
     fetchProblemData();
     fetchPracticalData();
+    fetchClanData();
   }, []);
 
   const fetchUserData = async () => {
@@ -68,7 +72,18 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await PracticeAxios.get('/practice');
       const data = response.data;
+      console.log("response practical",data)
       setPracticeData(data);
+    } catch (error) {
+      console.error('Error fetching practicals data:', error);
+    }
+  };
+  const fetchClanData = async () => {
+    try {
+      const response = await ClanAxios.get('/fetch-all-clans');
+      const data = response.data;
+      console.log("response clan",data)
+      setClanData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
     }
@@ -106,6 +121,7 @@ const AdminDashboard: React.FC = () => {
     { name: 'practice', icon: FaFlask },
     { name: 'leaderboard', icon: FaTrophy },
     { name: 'subscription', icon: FaCrown },
+    { name: 'clans', icon: FaFortAwesome },
   ];
 
   const containerVariants = {
@@ -257,12 +273,23 @@ const AdminDashboard: React.FC = () => {
           {activeSection === 'practice' && (
             <motion.div
               variants={itemVariants}
-              className='bg-white shadow-lg rounded-lg p-6'
             >
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
                 Practice
               </h2>
               <PracticalTable practicals={practice} />
+            </motion.div>
+          )}
+          {activeSection === 'clans' && (
+            <motion.div
+              variants={itemVariants}
+            >
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
+                Clans
+                
+              </h2>
+             
+              <ClanTable clans={clans} />
             </motion.div>
           )}
 
@@ -274,7 +301,7 @@ const AdminDashboard: React.FC = () => {
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
                 Leaderboard
               </h2>
-              {/* Implement leaderboard component here */}
+             
               <p>Leaderboard data goes here</p>
             </motion.div>
           )}

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { FaTrophy, FaMedal, FaAward, FaStar, FaCode, FaCoins } from 'react-icons/fa';
+import {
+  FaTrophy,
+  FaMedal,
+  FaAward,
+  FaStar,
+  FaCode,
+  FaCoins,
+} from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../redux/Store';
 import { fetchAllSubmission } from '../../../redux/actions/SubmissionAction';
@@ -16,13 +23,13 @@ interface User {
 const getRankIcon = (rank: number) => {
   switch (rank) {
     case 1:
-      return <FaTrophy className="text-yellow-500" />;
+      return <FaTrophy className='text-yellow-500' />;
     case 2:
-      return <FaMedal className="text-gray-400" />;
+      return <FaMedal className='text-gray-400' />;
     case 3:
-      return <FaAward className="text-orange-500" />;
+      return <FaAward className='text-orange-500' />;
     default:
-      return <FaStar className="text-blue-500" />;
+      return <FaStar className='text-blue-500' />;
   }
 };
 
@@ -31,19 +38,18 @@ const LeaderBoardTable: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
-  
+
   const fetchAllSubmissions = async () => {
     try {
-      const response = await dispatch(fetchAllSubmission() as any); // Type assertion for dispatch
-      const fetchedData = response.payload; // Assuming response.payload contains the array of user data
+      const response = await dispatch(fetchAllSubmission() as any);
+      const fetchedData = response.payload;
 
-      // Process the fetched data
       const sortedUsers = fetchedData
+        .sort((a: any, b: any) => b.totalPoints - a.totalPoints)
         .map((user: any, index: number) => ({
           ...user,
-          rank: index + 1, // Default rank based on index before sorting
-        }))
-        .sort((a: User, b: User) => b.totalPoints - a.totalPoints);
+          rank: index + 1,
+        }));
 
       setUsers(sortedUsers);
     } catch (error) {
@@ -67,37 +73,40 @@ const LeaderBoardTable: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="bg-white shadow-xl rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white">
+    <div className='container mx-auto p-6'>
+      <div className='bg-white shadow-xl rounded-lg overflow-hidden'>
+        <div className='overflow-x-auto'>
+          <table className='w-full'>
+            <thead className='bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white'>
               <tr>
-                <th className="py-3 px-4 text-left">Rank</th>
-                <th className="py-3 px-4 text-left">Name</th>
-                <th className="py-3 px-4 text-left">Solved Problems</th>
-                <th className="py-3 px-4 text-left">Points</th>
+                <th className='py-3 px-4 text-left'>Rank</th>
+                <th className='py-3 px-4 text-left'>Name</th>
+                <th className='py-3 px-4 text-left'>Solved Problems</th>
+                <th className='py-3 px-4 text-left'>Points</th>
               </tr>
             </thead>
             <tbody>
-              {currentUsers.map((user) => (
-                <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
-                  <td className="py-3 px-4">
-                    <div className="flex items-center">
-                      <span className="mr-2">{getRankIcon(user.rank)}</span>
-                      <span className="font-semibold">{user.rank}</span>
+              {currentUsers.map(user => (
+                <tr
+                  key={user.id}
+                  className='border-b border-gray-200 hover:bg-gray-100 transition duration-200'
+                >
+                  <td className='py-3 px-4'>
+                    <div className='flex items-center'>
+                      <span className='mr-2'>{getRankIcon(user.rank)}</span>
+                      <span className='font-semibold'>{user.rank}</span>
                     </div>
                   </td>
-                  <td className="py-3 px-4 font-medium">{user.username}</td>
-                  <td className="py-3 px-4">
-                    <span className="bg-green-100 text-green-800 py-1 px-2 rounded-full text-sm flex items-center w-min">
-                      <FaCode className="mr-1" />
+                  <td className='py-3 px-4 font-medium'>{user.username}</td>
+                  <td className='py-3 px-4'>
+                    <span className='bg-green-100 text-green-800 py-1 px-2 rounded-full text-sm flex items-center w-min'>
+                      <FaCode className='mr-1' />
                       {user.totalProblems}
                     </span>
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="bg-purple-100 text-purple-800 py-1 px-2 rounded-full text-sm flex items-center w-min">
-                      <FaCoins className="mr-1" />
+                  <td className='py-3 px-4'>
+                    <span className='bg-purple-100 text-purple-800 py-1 px-2 rounded-full text-sm flex items-center w-min'>
+                      <FaCoins className='mr-1' />
                       {user.totalPoints}
                     </span>
                   </td>
@@ -106,17 +115,22 @@ const LeaderBoardTable: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="bg-gray-100 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div className='bg-gray-100 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6'>
+          <div className='hidden sm:flex-1 sm:flex sm:items-center sm:justify-between'>
             <div>
-              <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to <span className="font-medium">{indexOfLastItem}</span> of{' '}
-                <span className="font-medium">{users.length}</span> results
+              <p className='text-sm text-gray-700'>
+                Showing{' '}
+                <span className='font-medium'>{indexOfFirstItem + 1}</span> to{' '}
+                <span className='font-medium'>{indexOfLastItem}</span> of{' '}
+                <span className='font-medium'>{users.length}</span> results
               </p>
             </div>
             <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                {pageNumbers.map((number) => (
+              <nav
+                className='relative z-0 inline-flex rounded-md shadow-sm -space-x-px'
+                aria-label='Pagination'
+              >
+                {pageNumbers.map(number => (
                   <button
                     key={number}
                     onClick={() => setCurrentPage(number)}

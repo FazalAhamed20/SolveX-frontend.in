@@ -36,7 +36,7 @@ const CodePlatform: React.FC = () => {
   const fetchPractice = async () => {
     try {
       const response = await PracticeAxios.get(
-        `/fetchPractice/?language=${practical.language}`,
+        `/fetchPractice/${practical.id}?language=${practical.language}`,
       );
       const data = await response.data;
 

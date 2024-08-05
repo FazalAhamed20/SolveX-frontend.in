@@ -10,7 +10,6 @@ import {
   FaTrophy,
   FaChartLine,
 } from 'react-icons/fa';
-import { BiBookContent } from 'react-icons/bi';
 import { AiOutlineFire } from 'react-icons/ai';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -46,7 +45,7 @@ const UserProfile: React.FC = () => {
   });
 
   const today = new Date();
-  const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   const endDate = new Date(
     today.getFullYear(),
     today.getMonth() + 7,

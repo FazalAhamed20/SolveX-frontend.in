@@ -72,4 +72,22 @@ export type Submission = {
 };
 
 
+export type ClanMember = {
+  id?: any;
+  name: string;
+  role: string;
+  avatar?: string;
+};
+
+export type Clan = {
+  clanId?:string;
+  id?: number ;
+  name?: string;
+  description?: string;
+  members?: ClanMember[];
+  trophies?: number; 
+  userId?:string
+};
+
+
 

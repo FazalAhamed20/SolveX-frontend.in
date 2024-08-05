@@ -8,11 +8,14 @@ import axios, {
 import { getGlobalDispatch } from '../redux/dispatchStore';
 import { Logout } from '../redux/actions/AuthActions';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const authbaseUrl = import.meta.env.VITE_AUTHENTICATION_SERVICE as string;
 const problemUrl = import.meta.env.VITE_PROBLEM_SERVICE as string;
 const practiceUrl = import.meta.env.VITE_PRACTICE_SERVICE as string;
 const submissionUrl = import.meta.env.VITE_SUBMISSION_SERVICE as string;
+const clanUrl = import.meta.env.VITE_CLAN_SERVICE as string;
+// const user = useSelector((state: any) => state.user.user);
 
 const createAxiosInstance = (baseURL: string): AxiosInstance => {
   const instance = axios.create({
@@ -29,8 +32,10 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
     (response: AxiosResponse) => {
       console.log('response from config', response);
       if (response.data.data?.isBlocked) {
-        handleLogout();
-        toast.error('User Blocked');
+        console.log("response data",response.data._id);
+        
+        // handleLogout();
+        // toast.error('User Blocked');
       }
       return response;
     },
@@ -79,6 +84,7 @@ const AdminAxios = createAxiosInstance(authbaseUrl);
 const ProblemAxios = createAxiosInstance(problemUrl);
 const PracticeAxios = createAxiosInstance(practiceUrl);
 const SubmissionAxios = createAxiosInstance(submissionUrl);
+const ClanAxios = createAxiosInstance(clanUrl);
 
 const getEmailFromPersistedData = () => {
   try {
@@ -130,4 +136,4 @@ export function handleLogout(): void {
 }
 
 export default AuthAxios;
-export { AdminAxios, ProblemAxios, PracticeAxios, SubmissionAxios };
+export { AdminAxios, ProblemAxios, PracticeAxios, SubmissionAxios,ClanAxios };

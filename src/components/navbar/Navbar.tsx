@@ -85,6 +85,12 @@ const Navbar: React.FC = () => {
                 >
                   Leaderboard
                 </Link>
+                <Link
+                  to='/clan'
+                  className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
+                >
+                  Clan
+                </Link>
                 <div className='relative z-30'>
                   <button
                     onClick={toggleDropdown}
@@ -182,9 +188,18 @@ const Navbar: React.FC = () => {
               >
                 Practice
               </Link>
-              <a className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'>
-                Leaderboard
-              </a>
+              <Link
+                to='/leaderboard'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
+              >
+                 Leaderboard
+              </Link>
+              <Link
+                to='/clan'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
+              >
+                Clan
+              </Link>
               <div className='relative'>
                 <button
                   onClick={toggleDropdown}

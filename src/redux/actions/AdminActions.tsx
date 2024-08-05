@@ -23,6 +23,7 @@ export const blockUser = createAsyncThunk<
     const { data } = await AdminAxios.post<VerifyResponse>('/blockuser', {
       email: userData.email,
       isBlocked: userData.isBlocked,
+      
     });
     console.log('data', data);
 

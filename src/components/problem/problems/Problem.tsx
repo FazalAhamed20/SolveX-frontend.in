@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useMemo, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../redux/Store';
 import { problemlist } from '../../../redux/actions/ProblemActions';
@@ -23,9 +23,7 @@ const ProblemList: React.FC = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<
     Problem['difficulty'] | 'All'
   >('All');
-  const [statusFilter, setStatusFilter] = useState<Problem['status'] | 'All'>(
-    'All',
-  );
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
@@ -82,10 +80,9 @@ const ProblemList: React.FC = () => {
         problem =>
           problem.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
           (difficultyFilter === 'All' ||
-            problem.difficulty === difficultyFilter) &&
-          (statusFilter === 'All' || problem.status === statusFilter),
+            problem.difficulty === difficultyFilter)
       );
-  }, [problems, searchTerm, difficultyFilter, statusFilter]);
+  }, [problems, searchTerm, difficultyFilter]);
 
   const pageCount = Math.ceil(filteredProblems.length / problemsPerPage);
   const paginatedProblems = filteredProblems.slice(
@@ -127,17 +124,7 @@ const ProblemList: React.FC = () => {
           <option value='Medium'>Medium</option>
           <option value='Hard'>Hard</option>
         </select>
-        <select
-          className='p-2 border rounded'
-          onChange={e =>
-            setStatusFilter(e.target.value as Problem['status'] | 'All')
-          }
-        >
-          <option value='All'>All Statuses</option>
-          <option value='Solved'>Solved</option>
-          <option value='Attempted'>Attempted</option>
-          <option value='Todo'>Todo</option>
-        </select>
+     
       </div>
 
       <div className='overflow-x-auto bg-white shadow-md rounded-lg'>
