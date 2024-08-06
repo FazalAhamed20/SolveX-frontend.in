@@ -29,6 +29,39 @@ export type practicalReducerInitial = {
   success?: boolean;
 };
 
+export type clanReducerInitial = {
+  loading: boolean;
+  err: boolean | string;
+  clan: Clan[];
+  message?: string;
+  success?: boolean;
+};
+export type paymentReducerInitial = {
+  loading: boolean;
+  err: boolean | string;
+  payment: [];
+  message?: string;
+  success?: boolean;
+};
+
+export interface Clan  {
+  clanId?:string;
+  id?: number ;
+  name?: string;
+  description?: string;
+  members?: ClanMember[];
+  trophies?: number; 
+  userId?:string
+};
+
+export interface ClanMember {
+  id?: any;
+  name: string;
+  role: string;
+  avatar?: string;
+};
+
+
 export interface ErrorPayload {
   message: string;
   status?: number;

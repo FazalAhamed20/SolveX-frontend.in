@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    setLoading(true); // Set loading to true at the start
+    setLoading(true); 
     try {
       await dispatch(Logout());
       await googleLogout();
@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      setLoading(false); // Set loading to false when done
+      setLoading(false); 
     }
   };
 
@@ -90,6 +90,12 @@ const Navbar: React.FC = () => {
                   className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
                 >
                   Clan
+                </Link>
+                <Link
+                  to='/subscription'
+                  className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
+                >
+                  Subscription
                 </Link>
                 <div className='relative z-30'>
                   <button
@@ -199,6 +205,12 @@ const Navbar: React.FC = () => {
                 className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
               >
                 Clan
+              </Link>
+              <Link
+                to='/subscription'
+                className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
+              >
+                Subscription
               </Link>
               <div className='relative'>
                 <button

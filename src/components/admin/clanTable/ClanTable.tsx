@@ -37,6 +37,7 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
   };
 
   const toggleBlockClan = async (clanId: string | null) => {
+    console.log("calnID",clanId,filteredClans)
     if (clanId) {
       const clanToToggle = filteredClans.find(clan => clan._id === clanId);
 
@@ -51,7 +52,7 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
           );
 
           if (blockClan.fulfilled.match(response)) {
-            const updatedClan = response.payload as unknown as Clan;
+            const updatedClan = response.payload.data as unknown as Clan;
 
             setFilteredClans(prevClans =>
               prevClans.map(clan =>

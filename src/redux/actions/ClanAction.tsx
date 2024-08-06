@@ -4,7 +4,7 @@ import { handleErrors } from '../../helper/HandleErrors';
 import { Clan } from '../../types/userData';
 import { ErrorPayload } from '../../types/Helper';
 import { toast } from 'react-toastify';
-import { MdSignalCellularNodata } from 'react-icons/md';
+
 
 interface VerifyResponse {
   success: any;

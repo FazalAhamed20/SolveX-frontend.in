@@ -70,6 +70,16 @@ export type Submission = {
   language?: String;
   submited?: String;
 };
+export type Subscription = {
+  _id?:any;
+  tier: any;
+  name?: String;
+  monthlyPrice?: number;
+  yearlyPrice?: number;
+  features?: string[];
+  title:string
+  
+};
 
 
 export type ClanMember = {

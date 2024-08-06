@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import AuthAxios, { ClanAxios } from '../../../config/AxiosInstance';
+import AuthAxios, { ClanAxios, PaymentAxios } from '../../../config/AxiosInstance';
 import { PracticeAxios, ProblemAxios } from '../../../config/AxiosInstance';
 import UserTable from '../userTable/UserTable';
 import ProblemTable from '../problemTable/ProblemTable';
@@ -28,13 +28,15 @@ import {
   FaFlask,
   FaFortAwesome,
 } from 'react-icons/fa';
-import PracticalTable from '../pracicalTable/PracticalTable';
+import PracticalTable from '../practicalTable/PracticalTable';
 import ClanTable from '../clanTable/ClanTable';
+import SubscriptionTable from '../subscriptionTable/SubscriptionTable';
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [users, setUsers] = useState<any[]>([]);
+  const [subscription,setSubscription]=useState<any[]>([])
   const [problems, setProblemData] = useState<any[]>([]);
   const [practice, setPracticeData] = useState<any[]>([]);
   const [clans, setClanData] = useState<any[]>([]);
@@ -46,6 +48,7 @@ const AdminDashboard: React.FC = () => {
     fetchProblemData();
     fetchPracticalData();
     fetchClanData();
+    fetchSubscriptionData()
   }, []);
 
   const fetchUserData = async () => {
@@ -53,6 +56,16 @@ const AdminDashboard: React.FC = () => {
       const response = await AuthAxios.get('/user');
       const data = response.data.data;
       setUsers(data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  const fetchSubscriptionData = async () => {
+    try {
+      const response = await PaymentAxios.get('/subscription');
+      const data = response.data.data;
+      setSubscription(data);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -296,26 +309,26 @@ const AdminDashboard: React.FC = () => {
           {activeSection === 'leaderboard' && (
             <motion.div
               variants={itemVariants}
-              className='bg-white shadow-lg rounded-lg p-6'
+             
             >
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
                 Leaderboard
               </h2>
              
-              <p>Leaderboard data goes here</p>
+              
             </motion.div>
           )}
 
           {activeSection === 'subscription' && (
             <motion.div
               variants={itemVariants}
-              className='bg-white shadow-lg rounded-lg p-6'
+              
             >
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
-                Subscription Management
+                Subscription 
               </h2>
-              {/* Implement subscription management component here */}
-              <p>Subscription management data goes here</p>
+              
+              <SubscriptionTable subscriptions={subscription} />
             </motion.div>
           )}
         </motion.div>

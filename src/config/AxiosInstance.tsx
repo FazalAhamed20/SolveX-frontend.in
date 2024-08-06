@@ -15,6 +15,7 @@ const problemUrl = import.meta.env.VITE_PROBLEM_SERVICE as string;
 const practiceUrl = import.meta.env.VITE_PRACTICE_SERVICE as string;
 const submissionUrl = import.meta.env.VITE_SUBMISSION_SERVICE as string;
 const clanUrl = import.meta.env.VITE_CLAN_SERVICE as string;
+const paymentUrl = import.meta.env.VITE_PAYMENT_SERVICE as string;
 // const user = useSelector((state: any) => state.user.user);
 
 const createAxiosInstance = (baseURL: string): AxiosInstance => {
@@ -85,6 +86,7 @@ const ProblemAxios = createAxiosInstance(problemUrl);
 const PracticeAxios = createAxiosInstance(practiceUrl);
 const SubmissionAxios = createAxiosInstance(submissionUrl);
 const ClanAxios = createAxiosInstance(clanUrl);
+const PaymentAxios = createAxiosInstance(paymentUrl);
 
 const getEmailFromPersistedData = () => {
   try {
@@ -136,4 +138,4 @@ export function handleLogout(): void {
 }
 
 export default AuthAxios;
-export { AdminAxios, ProblemAxios, PracticeAxios, SubmissionAxios,ClanAxios };
+export { AdminAxios, ProblemAxios, PracticeAxios, SubmissionAxios,ClanAxios,PaymentAxios};

@@ -6,12 +6,16 @@ import AuthReducer from './reducers/AuthReducer';
 import AdminReducer from './reducers/AdminReducer';
 import ProblemReducer from './reducers/ProblemReducer';
 import PracticalReducer from './reducers/PracticalReducer';
+import ClanReducer from './reducers/ClanReducer';
+import PaymentReducer from './reducers/PaymentReducer';
 
 const rootReducer = combineReducers({
   user: AuthReducer,
   admin: AdminReducer,
   problem: ProblemReducer,
   practical: PracticalReducer,
+  clan:ClanReducer,
+  payment:PaymentReducer
 });
 
 const persistConfig = {

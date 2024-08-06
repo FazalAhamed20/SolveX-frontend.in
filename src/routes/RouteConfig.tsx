@@ -17,6 +17,8 @@ const ContextPage = lazy(() => import('../pages/ContextPage'));
 const PracticePage = lazy(() => import('../pages/PracticePage'));
 const LeaderBoardPage = lazy(() => import('../pages/LeaderBoardPage'));
 const ClanPage=lazy(()=>import('../pages/ClanPage'))
+const SubscriptionPage=lazy(()=>import('../pages/SubscriptionPage'))
+const PaymentPage=lazy(()=>import('../pages/PaymentPage'))
 
 const RouteConfig: React.FC = () => {
   return (
@@ -31,6 +33,8 @@ const RouteConfig: React.FC = () => {
       <Route path='/code/:id' element={<PrivateRoute element={<EditorPage />} />} />
       <Route path='/clan' element={<PrivateRoute element={<ClanPage />} />} />
       <Route path='/clans/:clanName/clan/:clanId' element={<PrivateRoute element={<MemberTablePage />} />} />
+      <Route path='/subscription' element={<PrivateRoute element={<SubscriptionPage />} />} />
+      <Route path='/payment/:amount/:subscriptionId/:interval' element={<PrivateRoute element={<PaymentPage />} />} />
 
       {/* Public Routes */}
       <Route path='/' element={<PublicRoute element={<LandingPage />} />} />
