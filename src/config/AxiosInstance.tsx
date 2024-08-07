@@ -33,8 +33,8 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
     (response: AxiosResponse) => {
       console.log('response from config', response);
       if (response.data.data?.isBlocked) {
-        console.log("response data",response.data._id);
-        
+        console.log('response data', response.data._id);
+
         // handleLogout();
         // toast.error('User Blocked');
       }
@@ -138,4 +138,11 @@ export function handleLogout(): void {
 }
 
 export default AuthAxios;
-export { AdminAxios, ProblemAxios, PracticeAxios, SubmissionAxios,ClanAxios,PaymentAxios};
+export {
+  AdminAxios,
+  ProblemAxios,
+  PracticeAxios,
+  SubmissionAxios,
+  ClanAxios,
+  PaymentAxios,
+};

@@ -1,17 +1,38 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaCode, FaDatabase, FaServer, FaLaptopCode, FaLightbulb, FaBookmark } from 'react-icons/fa';
+import {
+  FaCode,
+  FaDatabase,
+  FaServer,
+  FaLaptopCode,
+  FaLightbulb,
+  FaBookmark,
+} from 'react-icons/fa';
 import { MdCode, MdDeveloperBoard, MdLaptopMac, MdWeb } from 'react-icons/md';
-import { GiArtificialIntelligence, GiRobotGolem, GiCircuitry } from 'react-icons/gi';
+import {
+  GiArtificialIntelligence,
+  GiRobotGolem,
+  GiCircuitry,
+} from 'react-icons/gi';
 import { AppDispatch } from '../../../redux/Store';
 import { practicallist } from '../../../redux/actions/PracticalAction';
 import { useDispatch } from 'react-redux';
 import PracticalCodingCard from './PracticalCodingCard';
 
 const codingIcons = [
-  <FaCode />, <FaDatabase />, <FaServer />, <FaLaptopCode />, <FaLightbulb />, <FaBookmark />,
-  <MdCode />, <MdDeveloperBoard />, <MdLaptopMac />, <MdWeb />,
-  <GiArtificialIntelligence />, <GiRobotGolem />, <GiCircuitry />,
+  <FaCode />,
+  <FaDatabase />,
+  <FaServer />,
+  <FaLaptopCode />,
+  <FaLightbulb />,
+  <FaBookmark />,
+  <MdCode />,
+  <MdDeveloperBoard />,
+  <MdLaptopMac />,
+  <MdWeb />,
+  <GiArtificialIntelligence />,
+  <GiRobotGolem />,
+  <GiCircuitry />,
 ];
 
 interface PracticalCoding {
@@ -22,11 +43,14 @@ interface PracticalCoding {
   duration: number;
   students: number;
   isBlocked: boolean;
+  isPremium: boolean;
 }
 
 const PracticalCodingList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const [practicalCodings, setPracticalCodings] = useState<PracticalCoding[]>([]);
+  const [practicalCodings, setPracticalCodings] = useState<PracticalCoding[]>(
+    [],
+  );
 
   const fetchPracticeList = async () => {
     try {

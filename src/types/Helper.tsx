@@ -44,23 +44,22 @@ export type paymentReducerInitial = {
   success?: boolean;
 };
 
-export interface Clan  {
-  clanId?:string;
-  id?: number ;
+export interface Clan {
+  clanId?: string;
+  id?: number;
   name?: string;
   description?: string;
   members?: ClanMember[];
-  trophies?: number; 
-  userId?:string
-};
+  trophies?: number;
+  userId?: string;
+}
 
 export interface ClanMember {
   id?: any;
   name: string;
   role: string;
   avatar?: string;
-};
-
+}
 
 export interface ErrorPayload {
   message: string;

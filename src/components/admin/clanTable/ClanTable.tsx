@@ -30,14 +30,14 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
   }, [clans]);
 
   const handleButtonClick = (clan: Clan) => {
-    console.log("clan",clan)
+    console.log('clan', clan);
     setClanIdToBlock(clan._id);
     setClanToBlock(clan);
     setShowModal(true);
   };
 
   const toggleBlockClan = async (clanId: string | null) => {
-    console.log("calnID",clanId,filteredClans)
+    console.log('calnID', clanId, filteredClans);
     if (clanId) {
       const clanToToggle = filteredClans.find(clan => clan._id === clanId);
 

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../redux/Store';
-import { blockProblem } from '../../../redux/actions/ProblemActions';
+import {
+  blockProblem,
+  updatePremiumStatus,
+} from '../../../redux/actions/ProblemActions';
 import LogoutModal from '../../../utils/modal/LogoutModal';
 
 interface Problem {
@@ -10,6 +13,7 @@ interface Problem {
   description: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   isBlocked: boolean;
+  isPremium: boolean;
 }
 
 interface Props {
@@ -20,8 +24,11 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
   const [filteredProblems, setFilteredProblems] = useState<Problem[]>(problems);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [problemIdToBlock, setProblemIdToBlock] = useState<string | null>(null);
-  const [problemToBlock, setProblemToBlock] = useState<Problem | null>(null);
+  const [problemIdToUpdate, setProblemIdToUpdate] = useState<string | null>(
+    null,
+  );
+  const [problemToUpdate, setProblemToUpdate] = useState<Problem | null>(null);
+  const [modalAction, setModalAction] = useState<'block' | 'premium'>('block');
   const itemsPerPage = 5;
 
   const dispatch: AppDispatch = useDispatch();
@@ -30,11 +37,10 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
     setFilteredProblems(problems);
   }, [problems]);
 
-  const handleButtonClick = (problem: Problem) => {
-    console.log('handle', problem);
-
-    setProblemIdToBlock(problem._id);
-    setProblemToBlock(problem);
+  const handleButtonClick = (problem: Problem, action: 'block' | 'premium') => {
+    setProblemIdToUpdate(problem._id);
+    setProblemToUpdate(problem);
+    setModalAction(action);
     setShowModal(true);
   };
 
@@ -78,8 +84,60 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
           console.error('Failed to block/unblock problem:', error);
         } finally {
           setShowModal(false);
-          setProblemIdToBlock(null);
-          setProblemToBlock(null);
+          setProblemIdToUpdate(null);
+          setProblemToUpdate(null);
+        }
+      } else {
+        console.error('Problem not found');
+      }
+    }
+  };
+
+  const togglePremiumStatus = async (problemId: string | null) => {
+    if (problemId) {
+      const problemToToggle = filteredProblems.find(
+        problem => problem._id === problemId,
+      );
+
+      if (problemToToggle) {
+        try {
+          const newPremiumStatus = !problemToToggle.isPremium;
+          const response = await dispatch(
+            updatePremiumStatus({
+              ...problemToToggle,
+              isPremium: newPremiumStatus,
+              id: '',
+              tags: [],
+              code: '',
+              javascript: true,
+              status: 'Solved',
+            }),
+          );
+
+          if (updatePremiumStatus.fulfilled.match(response)) {
+            const updatedProblem = response.payload.data as unknown as Problem;
+
+            setFilteredProblems(prevProblems =>
+              prevProblems.map(problem =>
+                problem._id === updatedProblem._id
+                  ? { ...problem, isPremium: updatedProblem.isPremium }
+                  : problem,
+              ),
+            );
+
+            console.log(
+              'Filtered Problems after premium update:',
+              filteredProblems,
+            );
+          } else {
+            console.error('Failed to update premium status:', response.payload);
+          }
+        } catch (error) {
+          console.error('Failed to update premium status:', error);
+        } finally {
+          setShowModal(false);
+          setProblemIdToUpdate(null);
+          setProblemToUpdate(null);
         }
       } else {
         console.error('Problem not found');
@@ -105,8 +163,12 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
     setCurrentPage(prevPage => prevPage - 1);
   };
 
-  const handleLogout = () => {
-    toggleBlockProblem(problemIdToBlock);
+  const handleConfirmation = () => {
+    if (modalAction === 'block') {
+      toggleBlockProblem(problemIdToUpdate);
+    } else {
+      togglePremiumStatus(problemIdToUpdate);
+    }
   };
 
   const paginatedProblems = filteredProblems.slice(
@@ -141,6 +203,9 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
                 Difficulty
               </th>
               <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                Premium
+              </th>
+              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                 Actions
               </th>
             </tr>
@@ -156,7 +221,6 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
                     {problem.description}
                   </div>
                 </td>
-
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <div
                     className={`text-sm ${
@@ -170,10 +234,21 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
                     {problem.difficulty}
                   </div>
                 </td>
-
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <button
-                    onClick={() => handleButtonClick(problem)}
+                    onClick={() => handleButtonClick(problem, 'premium')}
+                    className={`px-2 py-1 text-xs rounded ${
+                      problem.isPremium
+                        ? 'bg-purple-500 text-white'
+                        : 'bg-gray-300 text-gray-700'
+                    }`}
+                  >
+                    {problem.isPremium ? 'Premium' : 'Free'}
+                  </button>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <button
+                    onClick={() => handleButtonClick(problem, 'block')}
                     className={`px-2 py-1 text-xs rounded ${
                       problem.isBlocked
                         ? 'bg-red-500 text-white'
@@ -210,8 +285,16 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
       <LogoutModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onLogout={handleLogout}
-        data={problemToBlock?.isBlocked ? 'Unblock' : 'Block'}
+        onLogout={handleConfirmation}
+        data={
+          modalAction === 'block'
+            ? problemToUpdate?.isBlocked
+              ? 'Unblock'
+              : 'Block'
+            : problemToUpdate?.isPremium
+            ? 'Make Free'
+            : 'Make Premium'
+        }
       />
     </div>
   );

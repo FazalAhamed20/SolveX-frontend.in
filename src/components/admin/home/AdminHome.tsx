@@ -13,7 +13,10 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import AuthAxios, { ClanAxios, PaymentAxios } from '../../../config/AxiosInstance';
+import AuthAxios, {
+  ClanAxios,
+  PaymentAxios,
+} from '../../../config/AxiosInstance';
 import { PracticeAxios, ProblemAxios } from '../../../config/AxiosInstance';
 import UserTable from '../userTable/UserTable';
 import ProblemTable from '../problemTable/ProblemTable';
@@ -36,7 +39,7 @@ const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [users, setUsers] = useState<any[]>([]);
-  const [subscription,setSubscription]=useState<any[]>([])
+  const [subscription, setSubscription] = useState<any[]>([]);
   const [problems, setProblemData] = useState<any[]>([]);
   const [practice, setPracticeData] = useState<any[]>([]);
   const [clans, setClanData] = useState<any[]>([]);
@@ -48,7 +51,7 @@ const AdminDashboard: React.FC = () => {
     fetchProblemData();
     fetchPracticalData();
     fetchClanData();
-    fetchSubscriptionData()
+    fetchSubscriptionData();
   }, []);
 
   const fetchUserData = async () => {
@@ -85,7 +88,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await PracticeAxios.get('/practice');
       const data = response.data;
-      console.log("response practical",data)
+      console.log('response practical', data);
       setPracticeData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -95,7 +98,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await ClanAxios.get('/fetch-all-clans');
       const data = response.data;
-      console.log("response clan",data)
+      console.log('response clan', data);
       setClanData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -284,9 +287,7 @@ const AdminDashboard: React.FC = () => {
           )}
 
           {activeSection === 'practice' && (
-            <motion.div
-              variants={itemVariants}
-            >
+            <motion.div variants={itemVariants}>
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
                 Practice
               </h2>
@@ -294,40 +295,27 @@ const AdminDashboard: React.FC = () => {
             </motion.div>
           )}
           {activeSection === 'clans' && (
-            <motion.div
-              variants={itemVariants}
-            >
-              <h2 className='text-2xl font-bold mb-6 text-gray-800'>
-                Clans
-                
-              </h2>
-             
+            <motion.div variants={itemVariants}>
+              <h2 className='text-2xl font-bold mb-6 text-gray-800'>Clans</h2>
+
               <ClanTable clans={clans} />
             </motion.div>
           )}
 
           {activeSection === 'leaderboard' && (
-            <motion.div
-              variants={itemVariants}
-             
-            >
+            <motion.div variants={itemVariants}>
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
                 Leaderboard
               </h2>
-             
-              
             </motion.div>
           )}
 
           {activeSection === 'subscription' && (
-            <motion.div
-              variants={itemVariants}
-              
-            >
+            <motion.div variants={itemVariants}>
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
-                Subscription 
+                Subscription
               </h2>
-              
+
               <SubscriptionTable subscriptions={subscription} />
             </motion.div>
           )}

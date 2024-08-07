@@ -47,6 +47,7 @@ export type Problem = {
   javascript: true;
   isBlocked?: boolean;
   status: 'Solved' | 'Attempted' | 'Todo';
+  isPremium: boolean;
 };
 
 export type Practice = {
@@ -71,16 +72,22 @@ export type Submission = {
   submited?: String;
 };
 export type Subscription = {
-  _id?:any;
+  _id?: any;
   tier: any;
   name?: String;
   monthlyPrice?: number;
   yearlyPrice?: number;
   features?: string[];
-  title:string
-  
+  title: string;
 };
 
+export type Payment = {
+  amount: any;
+  interval: any;
+  subscriptionId: any;
+  payment_method_id: any;
+  userId: any;
+};
 
 export type ClanMember = {
   id?: any;
@@ -90,14 +97,11 @@ export type ClanMember = {
 };
 
 export type Clan = {
-  clanId?:string;
-  id?: number ;
+  clanId?: string;
+  id?: number;
   name?: string;
   description?: string;
   members?: ClanMember[];
-  trophies?: number; 
-  userId?:string
+  trophies?: number;
+  userId?: string;
 };
-
-
-

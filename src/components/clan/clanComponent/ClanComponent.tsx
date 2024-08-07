@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ClanGridView from './ClanGridView';
 import ClanTableView from './ClanTableView';
+import { checkSubscription } from '../../../redux/actions/PaymentAction';
+import SubscriptionModal from '../../../utils/modal/SubscriptionBannerModel';
 
 interface ClanMember {
   id: number;
@@ -46,8 +48,9 @@ const ClanComponent: React.FC = () => {
   const [filteredClans, setFilteredClans] = useState<Clan[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showMyClans, setShowMyClans] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-
+  const closeModal = () => setIsModalOpen(false);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -117,6 +120,19 @@ const ClanComponent: React.FC = () => {
     }
     setShowClanModal(false);
   };
+  const handleCreate = async () => {
+    const response = await dispatch(
+      checkSubscription({
+        userId: user._id,
+      }),
+    );
+    if (response.payload?.success) {
+      console.log('response', response.payload?.success);
+      setShowCreateModal(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
 
   return (
     <div className='container mx-auto p-4 sm:p-8 bg-gray-100 min-h-screen'>
@@ -164,7 +180,7 @@ const ClanComponent: React.FC = () => {
             {viewMode === 'grid' ? 'Table' : 'Grid'}
           </button>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={handleCreate}
             className='flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300'
           >
             <FaPlus className='mr-2' /> Create
@@ -243,11 +259,19 @@ const ClanComponent: React.FC = () => {
                 <ul className='space-y-2'>
                   {selectedClan.members.map(member => (
                     <li key={member.id} className='flex items-center'>
-                      <img
-                        src={member.avatar}
-                        alt={member.name}
-                        className='w-10 h-10 rounded-full mr-3'
-                      />
+                      {member.avatar ? (
+                        <img
+                          src={member.avatar}
+                          alt={member.name}
+                          className='w-10 h-10 rounded-full mr-3'
+                        />
+                      ) : (
+                        <div className='w-10 h-10 rounded-full mr-3 bg-gray-300 flex items-center justify-center'>
+                          <span className='text-gray-600 font-medium'>
+                            {member.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                       <div>
                         <p className='font-medium text-gray-800'>
                           {member.name}
@@ -284,6 +308,7 @@ const ClanComponent: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <SubscriptionModal isOpen={isModalOpen} onClose={closeModal} />
 
       <CreateClanModal
         isOpen={showCreateModal}

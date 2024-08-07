@@ -169,7 +169,7 @@ const CodeEditorMain: React.FC = () => {
         id: problem.id,
         code: problem.code,
         email: user.email,
-        _id:user._id,
+        _id: user._id,
         title: problem.title,
         difficulty: problem.difficulty,
         language: language,
@@ -177,7 +177,7 @@ const CodeEditorMain: React.FC = () => {
       });
 
       const results = submitResponse.data.results;
-      console.log("result",results)
+      console.log('result', results);
 
       const hasError = results.some((result: any) => result.error);
       if (hasError) {

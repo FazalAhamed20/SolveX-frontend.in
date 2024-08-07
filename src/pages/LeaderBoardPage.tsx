@@ -1,14 +1,13 @@
-import LeaderBoardTable from "../components/leaderboard/leaderboard/LeaderboardTable"
-import Navbar from "../components/navbar/Navbar"
+import LeaderBoardTable from '../components/leaderboard/leaderboard/LeaderboardTable';
+import Navbar from '../components/navbar/Navbar';
 
 function LeaderBoardPage() {
   return (
     <div>
-        <Navbar/>
-        <LeaderBoardTable/>
-      
+      <Navbar />
+      <LeaderBoardTable />
     </div>
-  )
+  );
 }
 
-export default LeaderBoardPage
+export default LeaderBoardPage;

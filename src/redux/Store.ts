@@ -14,8 +14,8 @@ const rootReducer = combineReducers({
   admin: AdminReducer,
   problem: ProblemReducer,
   practical: PracticalReducer,
-  clan:ClanReducer,
-  payment:PaymentReducer
+  clan: ClanReducer,
+  payment: PaymentReducer,
 });
 
 const persistConfig = {

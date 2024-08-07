@@ -1,14 +1,13 @@
-import Navbar from "../components/navbar/Navbar"
-import SubscriptionComponent from "../components/subscription/subscription/Subscription"
+import Navbar from '../components/navbar/Navbar';
+import SubscriptionComponent from '../components/subscription/subscription/Subscription';
 
 function SubscriptionPage() {
   return (
     <div>
-        <Navbar/>
-        <SubscriptionComponent/>
-      
+      <Navbar />
+      <SubscriptionComponent />
     </div>
-  )
+  );
 }
 
-export default SubscriptionPage
+export default SubscriptionPage;

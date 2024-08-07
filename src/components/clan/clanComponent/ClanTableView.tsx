@@ -54,26 +54,25 @@ const ClanTableView: React.FC<ClanTableViewProps> = ({
               <td className='py-3 px-4 text-center'>{clan.members.length}</td>
               <td className='py-3 px-4 text-center'>{clan.trophies}</td>
               <td className='py-3 px-4 text-center'>
-              {clan.isBlocked ? (
-              <button
-                className='px-2 py-2 rounded-lg bg-red-500 text-white cursor-not-allowed'
-                disabled
-              >
-                Suspended
-              </button>
-            ) : (
-
-                <button
-                  onClick={() => onClanClick(clan)}
-                  className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                    isUserMember(clan)
-                      ? 'bg-green-600 text-white'
-                      : 'bg-white text-green-600 border border-green-600'
-                  }`}
-                >
-                  {isUserMember(clan) ? 'Enter' : 'Join'}
-                </button>
-            )}
+                {clan.isBlocked ? (
+                  <button
+                    className='px-2 py-2 rounded-lg bg-red-500 text-white cursor-not-allowed'
+                    disabled
+                  >
+                    Suspended
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onClanClick(clan)}
+                    className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+                      isUserMember(clan)
+                        ? 'bg-green-600 text-white'
+                        : 'bg-white text-green-600 border border-green-600'
+                    }`}
+                  >
+                    {isUserMember(clan) ? 'Enter' : 'Join'}
+                  </button>
+                )}
               </td>
             </tr>
           ))}

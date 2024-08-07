@@ -50,66 +50,41 @@ export const fetchSubmission = createAsyncThunk<
   VerifyResponse,
   Submission,
   { rejectValue: ErrorPayload }
->('submission/fetchSubmission', async (fetch: Submission, { rejectWithValue }) => {
-  try {
-    console.log('data', fetch);
+>(
+  'submission/fetchSubmission',
+  async (fetch: Submission, { rejectWithValue }) => {
+    try {
+      console.log('data', fetch);
 
-    const { data } = await SubmissionAxios.post<VerifyResponse>(
-      '/fetchSubmission',
-      {
-        email: fetch.email,
-        id: fetch.id,
-      },
-    );
-    console.log('data', data);
+      const { data } = await SubmissionAxios.post<VerifyResponse>(
+        '/fetchSubmission',
+        {
+          email: fetch.email,
+          id: fetch.id,
+        },
+      );
+      console.log('data', data);
 
-    return data;
-  } catch (error: any) {
-    console.log(error);
-    return rejectWithValue(handleErrors(error));
-  }
-});
+      return data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);
 
 export const fetchSolved = createAsyncThunk<
   VerifyResponse,
   ProblemData,
   { rejectValue: ErrorPayload }
->(
-  'submission/fetch',
-  async (problemData: ProblemData, { rejectWithValue }) => {
-    try {
-      console.log('problem', problemData);
-
-      const { data } = await SubmissionAxios.post<VerifyResponse>(
-        '/fetchSolved',
-        {
-          email: problemData.email,
-        },
-      );
-      console.log('data', data);
-
-      return data;
-    } catch (error: any) {
-      console.log(error);
-      return rejectWithValue(handleErrors(error));
-    }
-  },
-);
-
-
-export const fetchPracticalSubmit = createAsyncThunk<
-  VerifyResponse,
-  Submission,
-  { rejectValue: ErrorPayload }
->('submission/fetchPracticalSubmit', async (fetch: Submission, { rejectWithValue }) => {
+>('submission/fetch', async (problemData: ProblemData, { rejectWithValue }) => {
   try {
-    console.log('data', fetch);
+    console.log('problem', problemData);
 
     const { data } = await SubmissionAxios.post<VerifyResponse>(
-      '/fetchpractical',
+      '/fetchSolved',
       {
-        email: fetch.email,
-        id: fetch.id,
+        email: problemData.email,
       },
     );
     console.log('data', data);
@@ -121,21 +96,21 @@ export const fetchPracticalSubmit = createAsyncThunk<
   }
 });
 
-
-export const fetchSolvedPracticals = createAsyncThunk<
+export const fetchPracticalSubmit = createAsyncThunk<
   VerifyResponse,
-  ProblemData,
+  Submission,
   { rejectValue: ErrorPayload }
 >(
-  'submission/fetch',
-  async (problemData: ProblemData, { rejectWithValue }) => {
+  'submission/fetchPracticalSubmit',
+  async (fetch: Submission, { rejectWithValue }) => {
     try {
-      console.log('problem', problemData);
+      console.log('data', fetch);
 
       const { data } = await SubmissionAxios.post<VerifyResponse>(
-        '/fetchsolved-practicals',
+        '/fetchpractical',
         {
-          email: problemData.email,
+          email: fetch.email,
+          id: fetch.id,
         },
       );
       console.log('data', data);
@@ -147,6 +122,29 @@ export const fetchSolvedPracticals = createAsyncThunk<
     }
   },
 );
+
+export const fetchSolvedPracticals = createAsyncThunk<
+  VerifyResponse,
+  ProblemData,
+  { rejectValue: ErrorPayload }
+>('submission/fetch', async (problemData: ProblemData, { rejectWithValue }) => {
+  try {
+    console.log('problem', problemData);
+
+    const { data } = await SubmissionAxios.post<VerifyResponse>(
+      '/fetchsolved-practicals',
+      {
+        email: problemData.email,
+      },
+    );
+    console.log('data', data);
+
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    return rejectWithValue(handleErrors(error));
+  }
+});
 
 export const fetchAllSubmission = createAsyncThunk<
   Submission[],
@@ -154,7 +152,10 @@ export const fetchAllSubmission = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('submission/submissionlist', async (_, { rejectWithValue }) => {
   try {
-    const { data } = await SubmissionAxios.get<Submission[]>('/submissionlist', {});
+    const { data } = await SubmissionAxios.get<Submission[]>(
+      '/submissionlist',
+      {},
+    );
     console.log('data', data);
 
     return data;

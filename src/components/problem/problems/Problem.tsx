@@ -1,11 +1,15 @@
-import React, { useState, useMemo, useEffect} from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../redux/Store';
 import { problemlist } from '../../../redux/actions/ProblemActions';
 import { fetchSolved } from '../../../redux/actions/SubmissionAction';
 import { useNavigate } from 'react-router-dom';
+import SubscriptionModal from '../../../utils/modal/SubscriptionBannerModel';
+import { FaLock } from 'react-icons/fa';
+import { checkSubscription } from '../../../redux/actions/PaymentAction';
 
 interface Problem {
+  isPremium: any;
   id: string;
   title: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
@@ -23,13 +27,14 @@ const ProblemList: React.FC = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<
     Problem['difficulty'] | 'All'
   >('All');
- 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
   const navigate = useNavigate();
-
+  const closeModal = () => setIsModalOpen(false);
   const fetchProblemList = async () => {
     try {
       const response = await dispatch(problemlist()).unwrap();
@@ -72,7 +77,6 @@ const ProblemList: React.FC = () => {
     fetchSubmissionProblem();
   }, [dispatch, user.email]);
 
-  
   const filteredProblems = useMemo(() => {
     return problems
       .filter(problem => !problem.isBlocked)
@@ -80,7 +84,7 @@ const ProblemList: React.FC = () => {
         problem =>
           problem.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
           (difficultyFilter === 'All' ||
-            problem.difficulty === difficultyFilter)
+            problem.difficulty === difficultyFilter),
       );
   }, [problems, searchTerm, difficultyFilter]);
 
@@ -104,6 +108,29 @@ const ProblemList: React.FC = () => {
   };
   console.log('solved', solvedProblems);
 
+  const handleProblem = async (problem: Problem) => {
+    if (problem.isPremium) {
+      try {
+        const response = await dispatch(
+          checkSubscription({
+            userId: user._id,
+          }),
+        ).unwrap();
+
+        if (response.success) {
+          navigate(`/code/${problem.id}`);
+        } else {
+          setIsModalOpen(true);
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        setIsModalOpen(true);
+      }
+    } else {
+      navigate(`/code/${problem.id}`);
+    }
+  };
+
   return (
     <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-8'>
       <div className='mb-4 flex flex-col sm:flex-row gap-4'>
@@ -124,7 +151,6 @@ const ProblemList: React.FC = () => {
           <option value='Medium'>Medium</option>
           <option value='Hard'>Hard</option>
         </select>
-     
       </div>
 
       <div className='overflow-x-auto bg-white shadow-md rounded-lg'>
@@ -149,7 +175,9 @@ const ProblemList: React.FC = () => {
             {paginatedProblems.map((problem, index) => (
               <tr
                 key={problem.id}
-                className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+                className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} 
+                            cursor-pointer`}
+                onClick={() => handleProblem(problem)}
               >
                 <td className='px-6 py-4 whitespace-nowrap'>
                   {solvedProblems.has(problem.title) && (
@@ -165,12 +193,24 @@ const ProblemList: React.FC = () => {
                     </span>
                   )}
                 </td>
-                <td
-                  className='px-6 py-4 whitespace-nowrap'
-                  onClick={() => navigate(`/code/${problem.id}`)}
-                >
-                  <div className='text-sm font-medium text-gray-900 hover:text-indigo-600 cursor-pointer'>
-                    {problem.title}
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <div className='text-sm font-medium text-gray-900 hover:text-indigo-600 relative'>
+                    {problem.isPremium ? (
+                      <>
+                        <div className='absolute inset-0 bg-gray-200 opacity-50 blur-[2px]'></div>
+                        <div className='absolute inset-0 flex items-center justify-center'>
+                          <div className='flex items-center bg-purple-100 px-3 py-1 rounded-full z-10'>
+                            <FaLock className='text-purple-600 mr-2' />
+                            <span className='text-purple-800 font-semibold'>
+                              Premium
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    ) : null}
+                    <span className={problem.isPremium ? 'opacity-20' : ''}>
+                      {problem.title}
+                    </span>
                   </div>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap'>
@@ -218,6 +258,7 @@ const ProblemList: React.FC = () => {
         >
           Next
         </button>
+        <SubscriptionModal isOpen={isModalOpen} onClose={closeModal} />
       </div>
     </div>
   );

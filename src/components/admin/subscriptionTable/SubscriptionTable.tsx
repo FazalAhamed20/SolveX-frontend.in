@@ -47,7 +47,10 @@ const SubscriptionTable: React.FC<Props> = ({ subscriptions }) => {
   };
 
   const handleAddSuccess = (newSubscription: any) => {
-    setFilteredSubscriptions(prevSubscriptions => [...prevSubscriptions, newSubscription]);
+    setFilteredSubscriptions(prevSubscriptions => [
+      ...prevSubscriptions,
+      newSubscription,
+    ]);
   };
 
   const handleSearch = (query: string) => {
@@ -202,7 +205,6 @@ const SubscriptionTable: React.FC<Props> = ({ subscriptions }) => {
         isOpen={showAddModal}
         onClose={handleCloseAddModal}
         onAddSuccess={handleAddSuccess}
-        
       />
     </div>
   );

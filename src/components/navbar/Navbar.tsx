@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    setLoading(true); 
+    setLoading(true);
     try {
       await dispatch(Logout());
       await googleLogout();
@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -79,7 +79,7 @@ const Navbar: React.FC = () => {
                 >
                   Practice
                 </Link>
-                 <Link
+                <Link
                   to='/leaderboard'
                   className='text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium'
                 >
@@ -198,7 +198,7 @@ const Navbar: React.FC = () => {
                 to='/leaderboard'
                 className='text-gray-700 hover:bg-gray-200 block px-3 py-2 rounded-md text-base font-medium'
               >
-                 Leaderboard
+                Leaderboard
               </Link>
               <Link
                 to='/clan'

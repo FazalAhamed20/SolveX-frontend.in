@@ -23,7 +23,7 @@ const CodePlatform: React.FC = () => {
   const [isCorrect, setIsCorrect] = useState<Boolean>(false);
   const [message, setMessage] = useState<String>('');
   const [loading, setLoading] = useState<boolean>(false);
-  console.log("practical....",practical);
+  console.log('practical....', practical);
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -52,32 +52,30 @@ const CodePlatform: React.FC = () => {
 
   useLayoutEffect(() => {
     fetchPractice();
-    fetchPracticalSubmission()
+    fetchPracticalSubmission();
   }, []);
- 
-    const fetchPracticalSubmission = async () => {
-      try {
-        const response = await dispatch(
-          fetchPracticalSubmit({
-            email: user.email,
-            id: id,
-          }),
+
+  const fetchPracticalSubmission = async () => {
+    try {
+      const response = await dispatch(
+        fetchPracticalSubmit({
+          email: user.email,
+          id: id,
+        }),
+      );
+      const submissionStatus = response.payload?.data;
+      if (typeof submissionStatus === 'boolean') {
+        setIsCorrect(submissionStatus);
+        console.log('Submission fetched:', submissionStatus);
+      } else {
+        console.log(
+          'No submission found for this email or submission status is not boolean',
         );
-        const submissionStatus = response.payload?.data;
-        if (typeof submissionStatus === 'boolean') {
-          setIsCorrect(submissionStatus);
-          console.log('Submission fetched:', submissionStatus);
-        } else {
-          console.log('No submission found for this email or submission status is not boolean');
-        }
-      } catch (error) {
-        console.error('Error fetching submission:', error);
       }
-    };
-
-  
-
- 
+    } catch (error) {
+      console.error('Error fetching submission:', error);
+    }
+  };
 
   const handleRunCode = async () => {
     setLoading(true);
@@ -91,7 +89,7 @@ const CodePlatform: React.FC = () => {
         id: practical.id,
         language: practical.language,
         title: practical.title,
-        email: user.email
+        email: user.email,
       });
 
       console.log('./......', response);
@@ -296,5 +294,3 @@ value: ${input[2]}`}
 };
 
 export default CodePlatform;
-
-

@@ -48,3 +48,30 @@ export const problemlist = createAsyncThunk<
     return rejectWithValue(handleErrors(error));
   }
 });
+
+export const updatePremiumStatus = createAsyncThunk<
+  VerifyResponse,
+  Problem,
+  { rejectValue: ErrorPayload }
+>(
+  'problem/premiumStatus',
+  async (problemData: Problem, { rejectWithValue }) => {
+    try {
+      console.log(problemData);
+
+      const { data } = await ProblemAxios.post<VerifyResponse>(
+        '/blockProblem',
+        {
+          _id: problemData._id,
+          isPremium: problemData.isPremium,
+        },
+      );
+      console.log('data', data);
+
+      return data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);

@@ -77,15 +77,15 @@ const MemberTable: React.FC = () => {
         if (response.payload && Array.isArray(response.payload)) {
           // Sort members by the number of solved problems in descending order
           const sortedMembers = (response.payload as Member[]).sort(
-            (a, b) => b.solvedProblems - a.solvedProblems
+            (a, b) => b.solvedProblems - a.solvedProblems,
           );
-  
+
           // Assign ranks based on the sorted order
           const membersWithRank = sortedMembers.map((member, index) => ({
             ...member,
             rank: index + 1, // rank starts from 1
           }));
-  
+
           setMembers(membersWithRank);
         } else {
           console.error('Failed to fetch members:', response);
@@ -94,7 +94,6 @@ const MemberTable: React.FC = () => {
     };
     fetchAllMember();
   }, [dispatch, clanId, clanName]);
-  
 
   useEffect(() => {
     console.log('user', user._id);
@@ -135,7 +134,7 @@ const MemberTable: React.FC = () => {
   const getActionIcon = (member: Member) => {
     if (member.role === 'leader') {
       return (
-        <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full">
+        <span className='px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full'>
           Leader
         </span>
       );
@@ -153,7 +152,6 @@ const MemberTable: React.FC = () => {
     }
     return null;
   };
-  
 
   const onAddMember = async (username: string, _id: number) => {
     const response = await dispatch(
@@ -252,22 +250,22 @@ const MemberTable: React.FC = () => {
                 transition={{ duration: 0.3 }}
                 className='hover:bg-green-50 transition-colors duration-150 ease-in-out'
               >
-              <td className='px-6 py-4 whitespace-nowrap'>
-  <div className='flex items-center'>
-    <FaTrophy
-      className={`mr-2 ${
-        member.rank <= 3 ? 'text-green-600' : 'text-green-400'
-      }`}
-    />
-    <span
-      className={`font-semibold ${
-        member.rank <= 3 ? 'text-green-600' : 'text-green-500'
-      }`}
-    >
-      {member.rank}
-    </span>
-  </div>
-</td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <div className='flex items-center'>
+                    <FaTrophy
+                      className={`mr-2 ${
+                        member.rank <= 3 ? 'text-green-600' : 'text-green-400'
+                      }`}
+                    />
+                    <span
+                      className={`font-semibold ${
+                        member.rank <= 3 ? 'text-green-600' : 'text-green-500'
+                      }`}
+                    >
+                      {member.rank}
+                    </span>
+                  </div>
+                </td>
 
                 <td className='px-6 py-4 whitespace-nowrap font-medium text-green-700'>
                   {member.name}
@@ -297,8 +295,8 @@ const MemberTable: React.FC = () => {
                   </div>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap'>
-  {getActionIcon(member)}
-</td>
+                  {getActionIcon(member)}
+                </td>
               </motion.tr>
             ))}
           </tbody>

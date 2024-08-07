@@ -11,11 +11,11 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ element }) => {
   const isAdmin = useSelector((state: any) => state.user.isAdmin);
 
   if (isAdmin) {
-    return <Navigate to="/admin" />;
+    return <Navigate to='/admin' />;
   }
 
   if (isLoggedIn) {
-    return <Navigate to="/home" />;
+    return <Navigate to='/home' />;
   }
 
   return element;
