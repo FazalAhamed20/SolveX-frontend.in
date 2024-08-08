@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../redux/Store';
 import { updateProfile } from '../../redux/actions/AuthActions';
@@ -10,7 +10,9 @@ import ProfileCard from './ProfileCard';
 import SolvedProblemsCard from './SolvedProblemsCard';
 import SubmissionActivityCard from './SubmissionActivityCard';
 import CalendarHeatmapCard from './CalenderHeatmapCard';
-
+import UserSubscriptionPlan from './SubscriptionPlanCard';
+import './UserProfile.css'
+import { checkSubscription } from '../../redux/actions/PaymentAction';
 const UserProfile: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
@@ -30,7 +32,34 @@ const UserProfile: React.FC = () => {
     profileImage: user.profileImage || '',
     email: user?.email,
   });
+  // const subscriptionPlan = {
+  //   name: 'Pro Plan',
+  //   price: '19.99',
+  //   features: [
+  //     'Unlimited problem solving',
+  //     'Advanced analytics',
+  //     'Priority support',
+  //   ],
+  //   isCurrent: true, 
+  // };
 
+  interface SubscriptionType {
+    _id: string;
+    id: string;
+    amount: number;
+    paymentMethodId: string;
+    startDate: string;
+    endDate: string;
+    subscriptionAmount: number;
+    subscriptionInterval: string;
+    subscriptionTier: string;
+    subscriptionTile: string;
+    isBlocked: boolean;
+    createdAt: string;
+    updatedAt: string;
+    userId: string;
+    isCurrent:true
+  }
   const today = new Date();
   const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   const endDate = new Date(
@@ -39,6 +68,7 @@ const UserProfile: React.FC = () => {
     today.getDate(),
   );
   const formattedToday = today.toISOString().split('T')[0];
+  const [subscription, setSubscription] = useState<SubscriptionType | null>(null);
 
   const [solvedProblems, setSolvedProblems] = useState({
     easy: 0,
@@ -184,11 +214,31 @@ const UserProfile: React.FC = () => {
       closeModal();
     }
   };
+  useLayoutEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const response = await dispatch(checkSubscription({ userId: user._id }));
+        const subscriptionData = response.payload?.data;
+
+        if (subscriptionData) {
+          setSubscription(subscriptionData as unknown as SubscriptionType);
+        } else {
+          setSubscription(null);
+        }
+      } catch (error) {
+        console.error('Error fetching subscription:', error);
+      }
+    };
+
+    fetchSubscription();
+  }, [dispatch, user._id]);
+  console.log("subs",subscription)
 
   return (
     <div className='min-h-screen bg-gray-100 flex flex-col md:flex-row'>
-      <div className='md:w-1/3 min-h-full'>
+       <div className='md:w-1/3 min-h-full flex flex-col'>
         <ProfileCard user={user} openModal={openModal} />
+        <UserSubscriptionPlan plan={subscription} />
       </div>
       <div className='md:w-2/3 flex flex-col mx-4 my-4'>
         <div className='flex flex-col md:flex-row mb-4'>
@@ -209,6 +259,7 @@ const UserProfile: React.FC = () => {
           endDate={endDate}
           submissionData={submissionData}
         />
+         
       </div>
       <EditProfileModal
         modalIsOpen={modalIsOpen}

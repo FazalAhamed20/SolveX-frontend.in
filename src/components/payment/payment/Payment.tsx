@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import React, { useEffect, useState } from 'react';
 import {
-  Elements,
   CardElement,
   useStripe,
   useElements,
@@ -18,10 +16,9 @@ import SuccessModal from '../../../utils/modal/PaymentModal';
 import { AppDispatch, RootState } from '../../../redux/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPayment } from '../../../redux/actions/PaymentAction';
+import LoadingModal from '../../../utils/modal/PaymentProcessModal';
 
-const stripePromise = loadStripe(
-  'pk_test_51Pknjl00u5cGnC9nG0VJtpHPYIEgvXb7PC34c1BOA0jOQ02oWWy9UJvxoJRIoHtyf9zOOVUCjilAj9g3NevmgC9j004QaaYwPt',
-);
+
 
 const PaymentForm: React.FC = () => {
   const stripe = useStripe();
@@ -29,14 +26,30 @@ const PaymentForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const { amount, subscriptionId, interval } = useParams<{
     amount: string;
     subscriptionId: string;
     interval: string;
   }>();
-  console.log(amount, subscriptionId, interval);
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (loading) {
+        event.preventDefault();
+        event.returnValue = 'Your payment is processing. Are you sure you want to leave?';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [loading]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -52,36 +65,45 @@ const PaymentForm: React.FC = () => {
       return;
     }
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-    });
-
-    if (error) {
-      setErrorMessage('encountered an error');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await dispatch(
-        createPayment({
-          amount,
-          interval,
-          subscriptionId,
-          payment_method_id: paymentMethod?.id,
-          userId: user._id,
-        }),
-      );
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name,
+          email,
+        },
+      });
 
-      const data = response.payload;
+      if (error) {
+        setErrorMessage('Error creating payment method: ' + error.message);
+        setLoading(false);
+        return;
+      }
 
-      console.log('response data', data);
+      try {
+        const response = await dispatch(
+          createPayment({
+            amount,
+            interval,
+            subscriptionId,
+            payment_method_id: paymentMethod?.id,
+            userId: user._id,
+          }),
+        );
 
-      if (data?.success) {
-        setIsModalOpen(true);
-      } else {
-        setErrorMessage('Payment failed. Please try again.');
+        const data = response.payload;
+
+        console.log('response data', data);
+
+        if (data?.success) {
+          setIsModalOpen(true);
+        } else {
+          setErrorMessage('Payment failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('An error occurred:', error);
+        setErrorMessage('An error occurred during payment. Please try again.');
       }
     } catch (error) {
       console.error('An error occurred:', error);
@@ -90,6 +112,7 @@ const PaymentForm: React.FC = () => {
 
     setLoading(false);
   };
+
   return (
     <div className='max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-xl'>
       <div className='grid md:grid-cols-2 gap-8'>
@@ -171,6 +194,17 @@ const PaymentForm: React.FC = () => {
               <span>Priority support</span>
             </li>
           </motion.ul>
+          <motion.div
+            className='mt-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg'
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <p className='text-sm text-green-700'>
+              <strong>Money-back guarantee:</strong> Try Pro risk-free for 30
+              days. If you're not satisfied, we'll refund your payment.
+            </p>
+          </motion.div>
         </div>
         <div>
           <motion.div
@@ -181,6 +215,38 @@ const PaymentForm: React.FC = () => {
           >
             <h3 className='text-xl font-semibold mb-4'>Payment Details</h3>
             <form onSubmit={handleSubmit}>
+              <div className='mb-4'>
+                <label
+                  htmlFor='name'
+                  className='block text-sm font-medium text-gray-700 mb-2'
+                >
+                  Name
+                </label>
+                <input
+                  type='text'
+                  id='name'
+                  className='border border-gray-300 rounded-md p-2 w-full'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className='mb-4'>
+                <label
+                  htmlFor='email'
+                  className='block text-sm font-medium text-gray-700 mb-2'
+                >
+                  Email
+                </label>
+                <input
+                  type='email'
+                  id='email'
+                  className='border border-gray-300 rounded-md p-2 w-full'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
               <div className='mb-4'>
                 <label
                   htmlFor='card-element'
@@ -239,23 +305,19 @@ const PaymentForm: React.FC = () => {
                 )}
               </button>
             </form>
+            {errorMessage && (
+              <div className='mt-4 bg-red-100 border-l-4 border-red-500 p-4 rounded-r-lg'>
+                <p className='text-sm text-red-700'>{errorMessage}</p>
+              </div>
+            )}
             <p className='mt-4 text-center text-sm text-gray-500'>
               <LockClosedIcon className='inline-block h-4 w-4 mr-1' />
               Secure payment powered by Stripe
             </p>
           </motion.div>
-          <motion.div
-            className='mt-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg'
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            <p className='text-sm text-green-700'>
-              <strong>Money-back guarantee:</strong> Try Pro risk-free for 30
-              days. If you're not satisfied, we'll refund your payment.
-            </p>
-          </motion.div>
+          
         </div>
+        <LoadingModal isOpen={loading} onClose={() => setLoading(false)} />
         <SuccessModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -266,12 +328,6 @@ const PaymentForm: React.FC = () => {
   );
 };
 
-const PaymentPage: React.FC = () => (
-  <div className='min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center'>
-    <Elements stripe={stripePromise}>
-      <PaymentForm />
-    </Elements>
-  </div>
-);
 
-export default PaymentPage;
+
+export default PaymentForm;

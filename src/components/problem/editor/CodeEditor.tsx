@@ -92,6 +92,7 @@ const CodeEditorMain: React.FC = () => {
       setFunctionName(data.driver);
       setDisplay(data.display);
       setRaw(data.input);
+      console.log("raw",raw)
 
       if (
         !Array.isArray(data.input) ||
@@ -147,6 +148,7 @@ const CodeEditorMain: React.FC = () => {
       setLoadingTestCases(false);
     }
   };
+  
 
   useEffect(() => {
     const savedCode = localStorage.getItem('code');
@@ -154,6 +156,8 @@ const CodeEditorMain: React.FC = () => {
       setCode(savedCode);
     }
     fetchTestCases();
+    console.log("i rendered_________________________");
+    
   }, [id, problem, language]);
 
   const handleRun = async () => {
@@ -174,6 +178,7 @@ const CodeEditorMain: React.FC = () => {
         difficulty: problem.difficulty,
         language: language,
         submited: 'Attempted',
+        
       });
 
       const results = submitResponse.data.results;
@@ -198,6 +203,7 @@ const CodeEditorMain: React.FC = () => {
         if (result) {
           const expectedOutput = JSON.parse(testCase.output);
           const actualOutput = result.output;
+          console.log(JSON.stringify(expectedOutput),(actualOutput))
 
           return (
             JSON.stringify(expectedOutput) === JSON.stringify(actualOutput)
@@ -263,7 +269,7 @@ const CodeEditorMain: React.FC = () => {
   ) => {
     setLanguage(event.target.value);
     setCode('');
-    fetchTestCases();
+ 
   };
 
   const handleTestCaseClick = (index: number) => {
