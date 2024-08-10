@@ -21,6 +21,7 @@ const UserTable: React.FC<Props> = ({ users }) => {
   const [showModal, setShowModal] = useState(false);
   const [userIdToBlock, setUserIdToBlock] = useState<string | null>(null);
   const [userToBlock, setUserToBlock] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const dispatch: AppDispatch = useDispatch();
@@ -36,6 +37,7 @@ const UserTable: React.FC<Props> = ({ users }) => {
   };
 
   const toggleBlockUser = async (userId: string | null) => {
+    setIsLoading(true);
     if (userId) {
       const userToBlock = filteredUsers.find(user => user._id === userId);
 
@@ -67,6 +69,7 @@ const UserTable: React.FC<Props> = ({ users }) => {
           setShowModal(false);
           setUserIdToBlock(null);
           setUserToBlock(null);
+          setIsLoading(false);
         }
       } else {
         console.error('User not found');
@@ -179,6 +182,7 @@ const UserTable: React.FC<Props> = ({ users }) => {
         onClose={() => setShowModal(false)}
         onLogout={handleLogout}
         data={userToBlock?.isBlocked ? 'Unblock' : 'Block'}
+        isLoading={isLoading}
       />
     </div>
   );

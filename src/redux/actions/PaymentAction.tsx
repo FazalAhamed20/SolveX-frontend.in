@@ -114,3 +114,24 @@ export const checkSubscription = createAsyncThunk<
     return rejectWithValue(handleErrors(error));
   }
 });
+
+export const blockSubscription = createAsyncThunk<
+  VerifyResponse,
+  Subscription,
+  { rejectValue: ErrorPayload }
+>('payment/subscriptionBlock', async (SubscriptionData: Subscription, { rejectWithValue }) => {
+  try {
+    console.log(SubscriptionData);
+
+    const { data } = await PaymentAxios.post<VerifyResponse>('/blocksubscription', {
+      _id: SubscriptionData._id,
+      isBlocked: SubscriptionData.isBlocked,
+    });
+    console.log('data', data);
+
+    return data;
+  } catch (error: any) {
+    console.log(error);
+    return rejectWithValue(handleErrors(error));
+  }
+});

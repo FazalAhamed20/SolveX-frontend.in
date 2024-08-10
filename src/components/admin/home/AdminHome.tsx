@@ -34,6 +34,7 @@ import {
 import PracticalTable from '../practicalTable/PracticalTable';
 import ClanTable from '../clanTable/ClanTable';
 import SubscriptionTable from '../subscriptionTable/SubscriptionTable';
+import LeaderBoardTable from '../leaderboardTable/LeaderBoardTable';
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,6 +46,7 @@ const AdminDashboard: React.FC = () => {
   const [clans, setClanData] = useState<any[]>([]);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useLayoutEffect(() => {
     fetchUserData();
@@ -106,7 +108,9 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    setIsLoading(true);
     await dispatch(Logout());
+    setIsLoading(false);
     navigate('/login', { replace: true });
   };
 
@@ -307,6 +311,7 @@ const AdminDashboard: React.FC = () => {
               <h2 className='text-2xl font-bold mb-6 text-gray-800'>
                 Leaderboard
               </h2>
+              <LeaderBoardTable/>
             </motion.div>
           )}
 
@@ -327,6 +332,7 @@ const AdminDashboard: React.FC = () => {
         onClose={() => setShowModal(false)}
         onLogout={handleLogout}
         data={'Logout'}
+        isLoading={isLoading}
       />
     </div>
   );

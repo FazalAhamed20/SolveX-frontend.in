@@ -1,4 +1,16 @@
+import { useState } from "react";
+import AboutUsModal from "../../utils/modal/AboutUsModal";
+import ContactModal from "../../utils/modal/ContactUsModal";
+
 const Footer = () => {
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  const openAboutModal = () => setIsAboutModalOpen(true);
+  const closeAboutModal = () => setIsAboutModalOpen(false);
+
+  const openContactModal = () => setIsContactModalOpen(true);
+  const closeContactModal = () => setIsContactModalOpen(false);
   return (
     <footer className='bg-gray-900 text-white py-10'>
       <div className='container mx-auto px-5 md:px-20'>
@@ -67,6 +79,7 @@ const Footer = () => {
                 <a
                   href='#'
                   className='text-neutral-400 hover:text-white transition-colors'
+                  onClick={openAboutModal}
                 >
                   About
                 </a>
@@ -75,6 +88,7 @@ const Footer = () => {
                 <a
                   href='#'
                   className='text-neutral-400 hover:text-white transition-colors'
+                 
                 >
                   Features
                 </a>
@@ -83,6 +97,7 @@ const Footer = () => {
                 <a
                   href='#'
                   className='text-neutral-400 hover:text-white transition-colors'
+                  onClick={openContactModal}
                 >
                   Contact
                 </a>
@@ -103,6 +118,8 @@ const Footer = () => {
         <div className='mt-10 text-center text-neutral-400'>
           &copy; 2023 SolveX. All rights reserved.
         </div>
+        <AboutUsModal isOpen={isAboutModalOpen} onClose={closeAboutModal} />
+        <ContactModal isOpen={isContactModalOpen} onClose={closeContactModal} />
       </div>
     </footer>
   );

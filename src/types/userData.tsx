@@ -72,6 +72,7 @@ export type Submission = {
   submited?: String;
 };
 export type Subscription = {
+  isBlocked: any;
   _id?: any;
   tier: any;
   name?: String;

@@ -13,6 +13,8 @@
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@chakra-ui/react": "^2.8.2",
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
     "@heroicons/react": "^1.0.6",
     "@material-tailwind/react": "^2.1.9",
     "@monaco-editor/react": "^4.6.0",
@@ -26,6 +28,7 @@
     "formik": "^2.4.6",
     "framer-motion": "^11.3.21",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.426.0",
     "monaco-editor": "^0.50.0",
     "react": "^18.3.1",
     "react-calendar-heatmap": "^1.9.0",

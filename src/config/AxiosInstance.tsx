@@ -8,7 +8,10 @@ import axios, {
 import { getGlobalDispatch } from '../redux/dispatchStore';
 import { Logout } from '../redux/actions/AuthActions';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+interface ErrorResponse {
+  message: string;
+ 
+}
 
 const authbaseUrl = import.meta.env.VITE_AUTHENTICATION_SERVICE as string;
 const problemUrl = import.meta.env.VITE_PROBLEM_SERVICE as string;
@@ -32,15 +35,11 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
   instance.interceptors.response.use(
     (response: AxiosResponse) => {
       console.log('response from config', response);
-      if (response.data.data?.isBlocked) {
-        console.log('response data', response.data._id);
-
-        // handleLogout();
-        // toast.error('User Blocked');
-      }
+      
       return response;
     },
-    async (error: AxiosError) => {
+    async (error: AxiosError<ErrorResponse>) => {
+     
       if (!error.config) {
         return Promise.reject(error);
       }
@@ -51,12 +50,13 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
       if (error.response?.status === 403) {
         console.log('Forbidden (403) error:', error.response);
-
-        const dispatch = getGlobalDispatch();
-        if (dispatch) {
-          dispatch(Logout());
+        
+       console.log(error.response.data)
+        if (error.response.data && error.response.data.message === 'User is blocked') {
+         handleLogout();
+          toast.error('Your account has been blocked. Please contact support.');
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
       }
 
       if (error.response?.status === 401) {
@@ -135,6 +135,7 @@ export function handleLogout(): void {
   }
   localStorage.clear();
   window.location.href = '/login';
+  
 }
 
 export default AuthAxios;

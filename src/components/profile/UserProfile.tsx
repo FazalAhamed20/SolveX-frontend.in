@@ -32,16 +32,6 @@ const UserProfile: React.FC = () => {
     profileImage: user.profileImage || '',
     email: user?.email,
   });
-  // const subscriptionPlan = {
-  //   name: 'Pro Plan',
-  //   price: '19.99',
-  //   features: [
-  //     'Unlimited problem solving',
-  //     'Advanced analytics',
-  //     'Priority support',
-  //   ],
-  //   isCurrent: true, 
-  // };
 
   interface SubscriptionType {
     _id: string;
@@ -127,6 +117,7 @@ const UserProfile: React.FC = () => {
         const response = await dispatch(
           fetchSolved({ email: user.email }),
         ).unwrap();
+        console.log("response",response)
 
         const problemCount = { easy: 0, medium: 0, hard: 0 };
         const submissionDates = response.map(
@@ -138,17 +129,18 @@ const UserProfile: React.FC = () => {
             };
           },
         );
-
-        response.forEach((submission: { difficulty: string }) => {
-          if (submission.difficulty === 'Easy') {
-            problemCount.easy += 1;
-          } else if (submission.difficulty === 'Medium') {
-            problemCount.medium += 1;
-          } else if (submission.difficulty === 'Hard') {
-            problemCount.hard += 1;
+        response.forEach((submission: { difficulty: string; submited: string }) => {
+          if (submission.submited === 'Solved') {
+            if (submission.difficulty === 'Easy') {
+              problemCount.easy += 1;
+            } else if (submission.difficulty === 'Medium') {
+              problemCount.medium += 1;
+            } else if (submission.difficulty === 'Hard') {
+              problemCount.hard += 1;
+            }
           }
         });
-
+        
         setSolvedProblems(problemCount);
         setSubmissionData(submissionDates);
 

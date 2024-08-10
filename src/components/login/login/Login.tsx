@@ -13,6 +13,7 @@ import axios from 'axios';
 import ForgotPasswordForm from '../forgotPassword/ForgotPassword';
 import { Link } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
+const facebookUrl = import.meta.env.VITE_FACEBOOK_ID as string;
 
 const Login: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -57,7 +58,7 @@ const Login: React.FC = () => {
     const { accessToken } = response.authResponse;
 
     const result = await axios.get(
-      `https://graph.facebook.com/v12.0/me?fields=id,name,email&access_token=${accessToken}`,
+      `${facebookUrl}${accessToken}`,
     );
     console.log('Facebook User Data:', result.data);
 

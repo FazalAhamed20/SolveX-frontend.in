@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../../redux/Store';
+import { blockSubscription } from '../../../redux/actions/PaymentAction';
 import LogoutModal from '../../../utils/modal/LogoutModal';
 import AddSubscriptionModal from '../../../utils/modal/AddSubscriptionModal';
 
@@ -22,13 +25,13 @@ const SubscriptionTable: React.FC<Props> = ({ subscriptions }) => {
     useState<Subscription[]>(subscriptions);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [subscriptionIdToBlock, setSubscriptionIdToBlock] = useState<
-    string | null
-  >(null);
-  const [subscriptionToBlock, setSubscriptionToBlock] =
-    useState<Subscription | null>(null);
+  const [subscriptionIdToBlock, setSubscriptionIdToBlock] = useState<string | null>(null);
+  const [subscriptionToBlock, setSubscriptionToBlock] = useState<Subscription | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
+
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     setFilteredSubscriptions(subscriptions);
@@ -40,17 +43,49 @@ const SubscriptionTable: React.FC<Props> = ({ subscriptions }) => {
     setShowModal(true);
   };
 
-  const toggleBlockSubscription = (subscriptionId: string | null) => {
-    setShowModal(false);
-    setSubscriptionIdToBlock(null);
-    setSubscriptionToBlock(null);
-  };
+  const toggleBlockSubscription = async (subscriptionId: string | null) => {
+    setIsLoading(true);
+    if (subscriptionId) {
+      const subscriptionToBlock = filteredSubscriptions.find(
+        subscription => subscription._id === subscriptionId,
+      );
 
-  const handleAddSuccess = (newSubscription: any) => {
-    setFilteredSubscriptions(prevSubscriptions => [
-      ...prevSubscriptions,
-      newSubscription,
-    ]);
+      if (subscriptionToBlock) {
+        try {
+          const newBlockedStatus = !subscriptionToBlock.isBlocked;
+          const response = await dispatch(
+            blockSubscription({
+              ...subscriptionToBlock,
+              isBlocked: newBlockedStatus,
+            }),
+          );
+
+          if (blockSubscription.fulfilled.match(response)) {
+            const updatedSubscription = response.payload
+              .data as unknown as Subscription;
+
+            setFilteredSubscriptions(prevSubscriptions =>
+              prevSubscriptions.map(subscription =>
+                subscription._id === updatedSubscription._id
+                  ? { ...subscription, isBlocked: updatedSubscription.isBlocked }
+                  : subscription,
+              ),
+            );
+          } else {
+            console.error('Failed to block/unblock subscription:', response.payload);
+          }
+        } catch (error) {
+          console.error('Failed to block/unblock subscription:', error);
+        } finally {
+          setShowModal(false);
+          setSubscriptionIdToBlock(null);
+          setSubscriptionToBlock(null);
+          setIsLoading(false);
+        }
+      } else {
+        console.error('Subscription not found');
+      }
+    }
   };
 
   const handleSearch = (query: string) => {
@@ -89,6 +124,13 @@ const SubscriptionTable: React.FC<Props> = ({ subscriptions }) => {
   );
 
   const totalPages = Math.ceil(filteredSubscriptions.length / itemsPerPage);
+
+  const handleAddSuccess = (newSubscription: any) => {
+    setFilteredSubscriptions(prevSubscriptions => [
+      ...prevSubscriptions,
+      newSubscription,
+    ]);
+  };
 
   return (
     <div className='bg-white shadow-md rounded-lg p-6'>
@@ -200,8 +242,9 @@ const SubscriptionTable: React.FC<Props> = ({ subscriptions }) => {
         onClose={() => setShowModal(false)}
         onLogout={handleConfirm}
         data={subscriptionToBlock?.isBlocked ? 'Unblock' : 'Block'}
+        isLoading={isLoading}
       />
-      <AddSubscriptionModal
+        <AddSubscriptionModal
         isOpen={showAddModal}
         onClose={handleCloseAddModal}
         onAddSuccess={handleAddSuccess}

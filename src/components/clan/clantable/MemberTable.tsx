@@ -11,9 +11,11 @@ import {
   FaStar,
   FaCode,
   FaUserPlus,
+  FaUsers,
+  FaComments,
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../../redux/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -46,6 +48,7 @@ const MemberTable: React.FC = () => {
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
+  const navigate=useNavigate()
 
   const filteredMembers = useMemo(() => {
     return members.filter(member =>
@@ -75,15 +78,14 @@ const MemberTable: React.FC = () => {
         );
         console.log('members', response);
         if (response.payload && Array.isArray(response.payload)) {
-          // Sort members by the number of solved problems in descending order
           const sortedMembers = (response.payload as Member[]).sort(
             (a, b) => b.solvedProblems - a.solvedProblems,
           );
 
-          // Assign ranks based on the sorted order
+         
           const membersWithRank = sortedMembers.map((member, index) => ({
             ...member,
-            rank: index + 1, // rank starts from 1
+            rank: index + 1, 
           }));
 
           setMembers(membersWithRank);
@@ -187,6 +189,11 @@ const MemberTable: React.FC = () => {
       setMemberToRemove(null);
     }
   };
+  const handleChatClick = () => {
+   navigate(`/groupchat/${clanName}/${clanId}`)
+  };
+
+
 
   return (
     <div className='container mx-auto p-6 bg-white rounded-lg shadow-2xl mt-20'>
@@ -195,18 +202,31 @@ const MemberTable: React.FC = () => {
           <FaCode className='inline-block mr-3 mb-1' />
           {clanName || 'Clan'}
         </h1>
-        {isLeader && (
+      
+        <div className='flex space-x-4'>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className='px-4 py-2 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors duration-150 flex items-center'
-            onClick={() => setShowAddMemberModal(true)}
+            className='px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-150 flex items-center'
+            onClick={handleChatClick}
           >
-            <FaUserPlus className='mr-2' />
-            Add Members
+            <FaComments className='mr-2' />
+            Group Chat
           </motion.button>
-        )}
+          {isLeader && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-4 py-2 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors duration-150 flex items-center'
+              onClick={() => setShowAddMemberModal(true)}
+            >
+              <FaUserPlus className='mr-2' />
+              Add Members
+            </motion.button>
+          )}
+        </div>
       </div>
+
 
       <div className='mb-6 flex items-center bg-green-50 rounded-lg border border-green-200'>
         <FaSearch className='text-green-500 ml-4' />

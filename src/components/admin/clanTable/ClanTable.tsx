@@ -21,6 +21,7 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
   const [showModal, setShowModal] = useState(false);
   const [clanIdToBlock, setClanIdToBlock] = useState<string | null>(null);
   const [clanToBlock, setClanToBlock] = useState<Clan | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const dispatch: AppDispatch = useDispatch();
@@ -37,6 +38,7 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
   };
 
   const toggleBlockClan = async (clanId: string | null) => {
+    setIsLoading(true)
     console.log('calnID', clanId, filteredClans);
     if (clanId) {
       const clanToToggle = filteredClans.find(clan => clan._id === clanId);
@@ -70,6 +72,7 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
           setShowModal(false);
           setClanIdToBlock(null);
           setClanToBlock(null);
+          setIsLoading(false)
         }
       } else {
         console.error('Clan not found');
@@ -192,6 +195,7 @@ const ClanTable: React.FC<Props> = ({ clans }) => {
         onClose={() => setShowModal(false)}
         onLogout={handleLogout}
         data={clanToBlock?.isBlocked ? 'Unblock' : 'Block'}
+        isLoading={isLoading}
       />
     </div>
   );

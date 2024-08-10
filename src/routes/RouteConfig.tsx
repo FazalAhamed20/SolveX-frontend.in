@@ -19,6 +19,7 @@ const LeaderBoardPage = lazy(() => import('../pages/LeaderBoardPage'));
 const ClanPage = lazy(() => import('../pages/ClanPage'));
 const SubscriptionPage = lazy(() => import('../pages/SubscriptionPage'));
 const PaymentPage = lazy(() => import('../pages/PaymentPage'));
+const GroupChat = lazy(() => import('../pages/GroupChatPage'));
 
 const RouteConfig: React.FC = () => {
   return (
@@ -58,6 +59,10 @@ const RouteConfig: React.FC = () => {
       <Route
         path='/payment/:amount/:subscriptionId/:interval'
         element={<PrivateRoute element={<PaymentPage />} />}
+      />
+      <Route
+        path='/groupchat/:clanName/:clanId'
+        element={<PrivateRoute element={<GroupChat />} />}
       />
 
       {/* Public Routes */}

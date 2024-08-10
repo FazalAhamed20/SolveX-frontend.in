@@ -43,6 +43,7 @@ const LeaderBoardTable: React.FC = () => {
     try {
       const response = await dispatch(fetchAllSubmission() as any);
       const fetchedData = response.payload;
+      console.log(response)
 
       const sortedUsers = fetchedData
         .sort((a: any, b: any) => b.totalPoints - a.totalPoints)

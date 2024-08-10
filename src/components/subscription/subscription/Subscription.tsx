@@ -12,7 +12,8 @@ interface PlanProps {
   features: Array<{ text: string; included: boolean }>;
   icon: string;
   isBestValue?: boolean;
-  interval: 'monthly' | 'yearly'; // Add interval prop
+  interval: 'monthly' | 'yearly'; 
+  isBlocked: boolean;
 }
 
 const Plan: React.FC<PlanProps> = ({
@@ -23,6 +24,7 @@ const Plan: React.FC<PlanProps> = ({
   icon,
   interval,
   _id,
+ 
 }) => {
   const navigate = useNavigate();
   const handleGetStarted = () => {
@@ -148,25 +150,28 @@ const SubscriptionComponent: React.FC = () => {
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-        {plans.map(plan => (
-          <Plan
-            key={plan._id}
-            name={plan.title}
-            price={
-              interval === 'monthly'
-                ? plan.monthlyPrice ?? 0
-                : plan.yearlyPrice ?? 0
-            }
-            features={(plan.features ?? []).map(feature => ({
-              text: feature,
-              included: true,
-            }))}
-            icon={tierIconMap[plan.tier] ?? ''}
-            isBestValue={plan.tier === 'Pro'}
-            interval={interval}
-            _id={plan._id}
-          />
-        ))}
+        {plans
+          .filter(plan => !plan.isBlocked) 
+          .map(plan => (
+            <Plan
+              key={plan._id}
+              name={plan.title}
+              price={
+                interval === 'monthly'
+                  ? plan.monthlyPrice ?? 0
+                  : plan.yearlyPrice ?? 0
+              }
+              features={(plan.features ?? []).map(feature => ({
+                text: feature,
+                included: true,
+              }))}
+              icon={tierIconMap[plan.tier] ?? ''}
+              isBestValue={plan.tier === 'Pro'}
+              interval={interval}
+              _id={plan._id}
+              isBlocked={plan.isBlocked}
+            />
+          ))}
       </div>
     </div>
   );

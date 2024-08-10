@@ -1,4 +1,5 @@
 import { FiCode, FiBook, FiTrendingUp } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 function LandingHome() {
   return (
@@ -11,12 +12,12 @@ function LandingHome() {
           <p className='text-xl text-gray-700 mb-8'>
             The platform to sharpen your coding skills.
           </p>
-          <a
-            href=''
+          <Link to='/problem'
+          
             className='bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg shadow-lg transition duration-300 inline-block'
           >
             Get Started
-          </a>
+          </Link>
         </section>
 
         <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12'>
@@ -120,12 +121,12 @@ function LandingHome() {
             Join thousands of users on SolveX and take your coding skills to the
             next level.
           </p>
-          <a
-            href=''
+          <Link to='/problem'
+          
             className='bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg shadow-lg transition duration-300 inline-block'
           >
             Get Started
-          </a>
+          </Link>
         </section>
       </div>
     </div>

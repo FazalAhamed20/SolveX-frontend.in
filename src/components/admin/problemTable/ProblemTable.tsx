@@ -29,6 +29,7 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
   );
   const [problemToUpdate, setProblemToUpdate] = useState<Problem | null>(null);
   const [modalAction, setModalAction] = useState<'block' | 'premium'>('block');
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const dispatch: AppDispatch = useDispatch();
@@ -45,6 +46,7 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
   };
 
   const toggleBlockProblem = async (problemId: string | null) => {
+    setIsLoading(true);
     if (problemId) {
       const problemToBlock = filteredProblems.find(
         problem => problem._id === problemId,
@@ -86,6 +88,7 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
           setShowModal(false);
           setProblemIdToUpdate(null);
           setProblemToUpdate(null);
+          setIsLoading(false);
         }
       } else {
         console.error('Problem not found');
@@ -295,6 +298,7 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
             ? 'Make Free'
             : 'Make Premium'
         }
+        isLoading={isLoading}
       />
     </div>
   );

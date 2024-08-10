@@ -27,6 +27,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
   const [practicalToBlock, setPracticalToBlock] = useState<Practical | null>(
     null,
   );
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const dispatch: AppDispatch = useDispatch();
@@ -44,6 +45,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
   };
 
   const toggleBlockPractical = async (practicalId: string | null) => {
+    setIsLoading(true);
     if (practicalId) {
       const practicalToBlock = filteredPracticals.find(
         practical => practical._id === practicalId,
@@ -92,6 +94,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
           setShowModal(false);
           setPracticalIdToBlock(null);
           setPracticalToBlock(null);
+          setIsLoading(false);
         }
       } else {
         console.error('Practical not found');
@@ -208,6 +211,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
         onClose={() => setShowModal(false)}
         onLogout={handleLogout}
         data={practicalToBlock?.isBlocked ? 'Unblock' : 'Block'}
+        isLoading={isLoading}
       />
     </div>
   );
