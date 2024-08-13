@@ -10,7 +10,11 @@ import {
   FaTh,
 } from 'react-icons/fa';
 import CreateClanModal from '../../../utils/modal/CreateClanModal';
-import { createClan, fetchAllClan } from '../../../redux/actions/ClanAction';
+import {
+  createClan,
+  fetchAllClan,
+  joinRequest,
+} from '../../../redux/actions/ClanAction';
 import { AppDispatch } from '../../../redux/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -49,6 +53,7 @@ const ClanComponent: React.FC = () => {
   const [showMyClans, setShowMyClans] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [pendingRequests, setPendingRequests] = useState<string[]>([]);
   const closeModal = () => setIsModalOpen(false);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -62,6 +67,8 @@ const ClanComponent: React.FC = () => {
     };
     fetchAllClans();
   }, [dispatch]);
+
+ 
 
   useEffect(() => {
     const filtered = clans.filter(
@@ -106,11 +113,6 @@ const ClanComponent: React.FC = () => {
   const isUserMember = (clan: Clan): boolean => {
     return clan.members.some(member => member.id === user._id);
   };
-  const handleJoinClan = async () => {
-    console.log(`User ${user.name} is joining clan: ${selectedClan?.name}`);
-
-    setShowClanModal(false);
-  };
 
   const handleEnterClan = () => {
     console.log('selected clan', selectedClan);
@@ -131,6 +133,24 @@ const ClanComponent: React.FC = () => {
     } else {
       setIsModalOpen(true);
     }
+  };
+
+  const handleJoinClan = async () => {
+    if (selectedClan) {
+      console.log(
+        `User ${user.name} is requesting to join clan: ${selectedClan.name}`,
+      );
+      const response = await dispatch(
+        joinRequest({
+          clanId: selectedClan._id,
+          userId: user._id,
+        }),
+      );
+
+      console.log('response', response);
+      setPendingRequests(prev => [...prev, selectedClan._id]);
+    }
+    setShowClanModal(false);
   };
 
   return (
@@ -292,15 +312,24 @@ const ClanComponent: React.FC = () => {
                   className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
                     isUserMember(selectedClan)
                       ? 'bg-green-600 text-white'
+                      : pendingRequests.includes(selectedClan._id)
+                      ? 'bg-yellow-500 text-white'
                       : 'bg-white text-green-600 border border-green-600'
                   }`}
                   onClick={
                     isUserMember(selectedClan)
                       ? handleEnterClan
+                      : pendingRequests.includes(selectedClan._id)
+                      ? () => {}
                       : handleJoinClan
                   }
+                  disabled={pendingRequests.includes(selectedClan._id)}
                 >
-                  {isUserMember(selectedClan) ? 'Enter Clan' : 'Join Clan'}
+                  {isUserMember(selectedClan)
+                    ? 'Enter Clan'
+                    : pendingRequests.includes(selectedClan._id)
+                    ? 'Request Pending'
+                    : 'Join Clan'}
                 </button>
               </div>
             </motion.div>

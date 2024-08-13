@@ -159,3 +159,43 @@ export const blockClan = createAsyncThunk<
     return rejectWithValue(handleErrors(error));
   }
 });
+
+export const leaveClan = createAsyncThunk<
+  VerifyResponse,
+  { clanId: string; _id: string ,memberName:string},
+  { rejectValue: ErrorPayload }
+>(
+  'clan/remove-member',
+  async ({ clanId,_id,memberName}, { rejectWithValue }) => {
+    try {
+      
+      const response = await ClanAxios.delete('/clans/leaveclan', {
+        data: { clanId, _id ,memberName }
+      });
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);
+
+export const joinRequest = createAsyncThunk<
+  VerifyResponse,
+  { clanId: string;userId: string },
+  { rejectValue: ErrorPayload }
+>(
+  'clan/request-clan',
+  async ({ clanId,userId}, { rejectWithValue }) => {
+    try {
+      
+      const response = await ClanAxios.post('/request-clan', {
+       clanId,userId
+      });
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);

@@ -97,6 +97,11 @@ export type ClanMember = {
   avatar?: string;
 };
 
+export type RequestMember = {
+userId:any,
+status:string
+};
+
 export type Clan = {
   clanId?: string;
   id?: number;
@@ -105,4 +110,5 @@ export type Clan = {
   members?: ClanMember[];
   trophies?: number;
   userId?: string;
+  request?:RequestMember[]
 };
