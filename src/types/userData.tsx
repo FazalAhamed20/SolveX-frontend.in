@@ -99,7 +99,7 @@ export type ClanMember = {
 
 export type RequestMember = {
 userId:any,
-status:string
+status?:string
 };
 
 export type Clan = {

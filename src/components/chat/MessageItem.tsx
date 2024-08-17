@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import { FaCheck } from 'react-icons/fa';
+import React, { forwardRef, useState } from 'react';
+import { FaCheck, FaPlay, FaPause } from 'react-icons/fa';
 
 interface Message {
   _id: string;
@@ -11,6 +11,8 @@ interface Message {
   };
   createdAt: string;
   status: 'sent' | 'delivered' | 'read';
+  image?: string;
+  voice?: string; // New field for voice messages
 }
 
 interface MessageItemProps {
@@ -18,7 +20,11 @@ interface MessageItemProps {
   currentUser: any;
 }
 
-const MessageItem = ({ message, currentUser }:MessageItemProps,ref:any) => {
+const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(({ message, currentUser }, ref) => {
+  console.log("messages",message)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio] = useState(message.voice ? new Audio(message.voice) : null);
+
   const isOwnMessage = message.sender._id === currentUser._id;
 
   const formattedTime = new Date(message.createdAt).toLocaleTimeString([], {
@@ -48,9 +54,29 @@ const MessageItem = ({ message, currentUser }:MessageItemProps,ref:any) => {
     }
   };
 
+  const toggleAudio = () => {
+    if (audio) {
+      if (isPlaying) {
+        audio.pause();
+      } else {
+        audio.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  React.useEffect(() => {
+    if (audio) {
+      audio.addEventListener('ended', () => setIsPlaying(false));
+      return () => {
+        audio.removeEventListener('ended', () => setIsPlaying(false));
+      };
+    }
+  }, [audio]);
+
   return (
     <div
-    ref={ref}
+      ref={ref}
       className={`flex ${
         isOwnMessage ? 'justify-end' : 'justify-start'
       } mb-3 items-end`}
@@ -78,7 +104,30 @@ const MessageItem = ({ message, currentUser }:MessageItemProps,ref:any) => {
             {message.sender.name}
           </span>
         )}
-        <p className='text-sm leading-relaxed'>{message.text}</p>
+        {message.image && (
+          <img 
+            src={message.image} 
+            alt="Shared image" 
+            className="max-w-60 h-45 rounded-lg mb-2"
+          />
+        )}
+        {message.voice && (
+          <div className="flex items-center space-x-2 mb-2">
+            <button
+              onClick={toggleAudio}
+              className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200"
+            >
+              {isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+            </button>
+            <div className="flex-1 h-1 bg-green-200 rounded-full">
+              <div 
+                className="h-full bg-green-500 rounded-full"
+                style={{ width: `${(audio?.currentTime || 0) / (audio?.duration || 1) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+        {message.text && <p className='text-sm leading-relaxed'>{message.text}</p>}
         <div className='flex justify-end items-center mt-1 space-x-1.5'>
           <span className='block text-[11px] text-green-600'>
             {formattedTime}
@@ -101,6 +150,6 @@ const MessageItem = ({ message, currentUser }:MessageItemProps,ref:any) => {
       </div>
     </div>
   );
-};
+});
 
-export default forwardRef(MessageItem);
+export default MessageItem;

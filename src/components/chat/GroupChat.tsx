@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,9 +10,12 @@ import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
 import { useSocket } from '../../context/SocketContext';
+import axios from 'axios';
 
 interface Message {
   _id: string;
+  image: string;
+  audioUrl:string;
   text: string;
   sender: {
     avatar: any;
@@ -39,21 +41,30 @@ const GroupChat: React.FC = () => {
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [typingUser, setTypingUser] = useState<string>('');
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
-  
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  );
+  const [image, setImage] = useState('');
+  const [voice,setVoice]=useState('')
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
-  
-  const { clanName, clanId } = useParams<{ clanName: string; clanId: string; }>();
+
+  const { clanName, clanId } = useParams<{
+    clanName: string;
+    clanId: string;
+  }>();
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
   // const { socket, initializeSocket, disconnectSocket } = useSocket();
-useEffect(()=>{
-  chatContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-     console.log("____________________ rendereed due to msg");
-   
-},[messages])
+  useEffect(() => {
+    chatContainerRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    });
+    console.log('____________________ rendereed due to msg');
+  }, [messages]);
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -70,7 +81,9 @@ useEffect(()=>{
   useEffect(() => {
     const fetchAllMember = async () => {
       if (clanId && clanName) {
-        const response = await dispatch(fetchMember({ clanId, name: clanName }));
+        const response = await dispatch(
+          fetchMember({ clanId, name: clanName }),
+        );
         const members = response?.payload as unknown as GroupMember[];
         setGroupMembers(members.map(member => ({ ...member, online: false })));
       }
@@ -79,7 +92,9 @@ useEffect(()=>{
   }, [clanId, clanName, dispatch]);
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:3006', { query: { userId: user._id } });
+    socketRef.current = io('http://localhost:3006', {
+      query: { userId: user._id },
+    });
 
     socketRef.current.on('connect', () => {
       console.log('Connected to server');
@@ -91,7 +106,7 @@ useEffect(()=>{
         prevMembers.map(member => ({
           ...member,
           online: onlineUsers.includes(member.id),
-        }))
+        })),
       );
     });
 
@@ -111,21 +126,24 @@ useEffect(()=>{
     socketRef.current.on('userOnline', ({ userId }: { userId: string }) => {
       setGroupMembers(prevMembers =>
         prevMembers.map(member =>
-          member.id === userId ? { ...member, online: true } : member
-        )
+          member.id === userId ? { ...member, online: true } : member,
+        ),
       );
     });
 
     socketRef.current.on('userOffline', ({ userId }: { userId: string }) => {
       setGroupMembers(prevMembers =>
         prevMembers.map(member =>
-          member.id === userId ? { ...member, online: false } : member
-        )
+          member.id === userId ? { ...member, online: false } : member,
+        ),
       );
     });
 
     return () => {
-      socketRef.current?.emit('leaveRoom', { roomId: clanId, userId: user._id });
+      socketRef.current?.emit('leaveRoom', {
+        roomId: clanId,
+        userId: user._id,
+      });
       socketRef.current?.disconnect();
       if (typingTimeout) {
         clearTimeout(typingTimeout);
@@ -135,18 +153,26 @@ useEffect(()=>{
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputMessage.trim() !== '') {
+    if (inputMessage.trim() !== '' || image || voice) {
       try {
         const response = await ChatAxios.post('/chat/messages', {
+          image: image,
+          voice:voice,
           text: inputMessage,
           sender: { _id: user._id, name: user.username },
           clanId: clanId,
         });
 
         const newMessage = response.data;
-        socketRef.current?.emit('sendMessage', { roomId: clanId, message: newMessage });
+        
+        socketRef.current?.emit('sendMessage', {
+          roomId: clanId,
+          message: newMessage,
+        });
 
         setInputMessage('');
+      setImage('');
+      setVoice('');
       } catch (error) {
         console.error('Error sending message:', error);
       }
@@ -162,28 +188,72 @@ useEffect(()=>{
     setShowEmojiPicker(false);
   };
 
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'upload');
+
+      try {
+        const response = await axios.post(
+          `https://api.cloudinary.com/v1_1/dlitqiyia/image/upload`,
+          formData,
+        );
+
+        const imageUrl = response.data.secure_url;
+
+        setImage(imageUrl);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+  };
+  console.log('omage', image);
+  const handleVoiceMessage = async(audioBlob: Blob) => {
+     
+     const audioFile = new File([audioBlob], 'voice_message.webm', { type: 'audio/webm' });
+
+    
+     const formData = new FormData();
+     formData.append('file', audioFile);
+     formData.append('upload_preset', 'upload');
+
+    
+     const response = await axios.post(
+       `https://api.cloudinary.com/v1_1/dlitqiyia/video/upload`,
+       formData
+     );
+
+     const audioUrl = response.data.secure_url;
+     setVoice(audioUrl)
+  };
+
   return (
     <div className='min-h-screen bg-[#f0f4f0] p-2 sm:p-4 md:p-6 lg:p-8'>
       <div className='max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden'>
         <div className='flex flex-col md:flex-row h-[calc(100vh-2rem)] sm:h-[600px]'>
-          <MembersList 
-            showMembers={showMembers} 
-            groupMembers={groupMembers} 
+          <MembersList
+            showMembers={showMembers}
+            groupMembers={groupMembers}
             currentUser={user}
           />
           <div className='flex-1 flex flex-col'>
-            <ChatHeader 
-              clanName={clanName} 
-              showMembers={showMembers} 
-              setShowMembers={setShowMembers} 
+            <ChatHeader
+              clanName={clanName}
+              showMembers={showMembers}
+              setShowMembers={setShowMembers}
             />
-            <MessageList 
-              messages={messages} 
-              currentUser={user} 
+            <MessageList
+              messages={messages}
+              currentUser={user}
               typingUser={typingUser}
-              ref={chatContainerRef }
+              ref={chatContainerRef}
             />
-            <ChatInput 
+            <ChatInput
               inputMessage={inputMessage}
               setInputMessage={setInputMessage}
               handleSendMessage={handleSendMessage}
@@ -191,6 +261,8 @@ useEffect(()=>{
               showEmojiPicker={showEmojiPicker}
               setShowEmojiPicker={setShowEmojiPicker}
               handleEmojiClick={handleEmojiClick}
+              handleImageUpload={handleImageUpload}
+              handleVoiceMessage={handleVoiceMessage}
             />
           </div>
         </div>

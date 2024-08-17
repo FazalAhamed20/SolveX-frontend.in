@@ -199,3 +199,23 @@ export const joinRequest = createAsyncThunk<
     }
   },
 );
+
+export const acceptRequest = createAsyncThunk<
+  VerifyResponse,
+  { clanId: string;userId: string },
+  { rejectValue: ErrorPayload }
+>(
+  'clan/accept-clan',
+  async ({ clanId,userId}, { rejectWithValue }) => {
+    try {
+      
+      const response = await ClanAxios.post('/accept-clan', {
+       clanId,userId
+      });
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);

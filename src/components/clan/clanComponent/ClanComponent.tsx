@@ -22,6 +22,8 @@ import ClanGridView from './ClanGridView';
 import ClanTableView from './ClanTableView';
 import { checkSubscription } from '../../../redux/actions/PaymentAction';
 import SubscriptionModal from '../../../utils/modal/SubscriptionBannerModel';
+import { io, Socket } from 'socket.io-client';
+
 
 interface ClanMember {
   id: number;
@@ -31,6 +33,7 @@ interface ClanMember {
 }
 
 interface Clan {
+  
   _id: any;
   id: number;
   name: string;
@@ -40,9 +43,13 @@ interface Clan {
   userId: string;
   isBlocked: boolean;
   leaderId: string;
+  request?: { userId: string }[]; 
+}
+interface ClanComponentProps {
+  socket: Socket | null;
 }
 
-const ClanComponent: React.FC = () => {
+const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
   const [selectedClan, setSelectedClan] = useState<Clan | null>(null);
   const [showClanModal, setShowClanModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -58,15 +65,26 @@ const ClanComponent: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
+
   useEffect(() => {
     const fetchAllClans = async () => {
       const response = await dispatch(fetchAllClan());
       console.log('Fetched clans:', response);
-      setClans(response.payload as unknown as Clan[]);
-      setFilteredClans(response.payload as unknown as Clan[]);
+      const fetchedClans = response.payload as unknown as Clan[];
+      setClans(fetchedClans);
+      setFilteredClans(fetchedClans);
+      
+      
+      const pendingReqs = fetchedClans.flatMap(clan => 
+        clan.request?.filter((req: { userId: any; }) => req.userId === user._id).map(() => clan._id) || []
+      );
+      console.log("pemdings",pendingReqs)
+      setPendingRequests(pendingReqs);
     };
     fetchAllClans();
-  }, [dispatch]);
+  }, [dispatch, user._id]);
+
+  console.log("pemdings",pendingRequests)
 
  
 
@@ -95,6 +113,7 @@ const ClanComponent: React.FC = () => {
       _id: undefined,
       isBlocked: false,
       leaderId: user._id,
+      request: undefined
     };
     console.log('Creating new clan:', newClan);
 
@@ -138,7 +157,7 @@ const ClanComponent: React.FC = () => {
   const handleJoinClan = async () => {
     if (selectedClan) {
       console.log(
-        `User ${user.name} is requesting to join clan: ${selectedClan.name}`,
+        `User ${user.username} is requesting to join clan: ${selectedClan.name}`,
       );
       const response = await dispatch(
         joinRequest({
@@ -149,6 +168,18 @@ const ClanComponent: React.FC = () => {
 
       console.log('response', response);
       setPendingRequests(prev => [...prev, selectedClan._id]);
+      console.log("before emitted",selectedClan);
+      
+      if (socket) {
+        console.log("emmitted")
+        socket.emit('joinRequest', {
+          clanId: selectedClan._id,
+          userId: user._id,
+          userName: user.username,
+          clanName: selectedClan.name,
+          leaderId: selectedClan.userId
+        });
+      }
     }
     setShowClanModal(false);
   };
@@ -233,16 +264,20 @@ const ClanComponent: React.FC = () => {
         </div>
       ) : viewMode === 'grid' ? (
         <ClanGridView
-          clans={filteredClans}
-          onClanClick={handleClanClick}
-          isUserMember={isUserMember}
-        />
+        clans={filteredClans}
+        onClanClick={handleClanClick}
+        isUserMember={isUserMember}
+        pendingRequests={pendingRequests}
+        userId={user._id}
+      />
       ) : (
         <ClanTableView
-          clans={filteredClans}
-          onClanClick={handleClanClick}
-          isUserMember={isUserMember}
-        />
+        clans={filteredClans}
+        onClanClick={handleClanClick}
+        isUserMember={isUserMember}
+        pendingRequests={pendingRequests}
+        userId={user._id}
+      />
       )}
 
       <AnimatePresence>

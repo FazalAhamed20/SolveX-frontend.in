@@ -25,12 +25,16 @@ interface ClanGridViewProps {
   clans: Clan[];
   onClanClick: (clan: Clan) => void;
   isUserMember: (clan: Clan) => boolean;
+  pendingRequests: string[];
+  userId: string;
 }
 
 const ClanGridView: React.FC<ClanGridViewProps> = ({
   clans,
   onClanClick,
   isUserMember,
+  pendingRequests,
+  userId
 }) => {
   return (
     <motion.div
@@ -79,11 +83,17 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
               <button
                 className={`w-full py-2 rounded-lg transition-colors duration-300 ${
                   isUserMember(clan)
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-green-600 border border-green-600'
-                }`}
-              >
-                {isUserMember(clan) ? 'Enter Clan' : 'Join Clan'}
+                ? 'bg-green-600 text-white'
+                : pendingRequests.includes(clan._id)
+                ? 'bg-yellow-500 text-white'
+                : 'bg-white text-green-600 border border-green-600'
+            }`}
+          >
+            {isUserMember(clan)
+              ? 'Enter'
+              : pendingRequests.includes(clan._id)
+              ? 'Pending'
+              : 'Join'}
               </button>
             )}
           </div>

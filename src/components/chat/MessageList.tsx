@@ -4,6 +4,7 @@ import MessageItem from './MessageItem';
 interface Message {
   _id: string;
   text: string;
+  image?:string;
   sender: {
     avatar: any;
     _id: string;

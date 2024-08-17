@@ -14,6 +14,7 @@ import {
   FaUsers,
   FaComments,
   FaSignOutAlt,
+  FaTasks,
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -27,6 +28,8 @@ import {
 } from '../../../redux/actions/ClanAction';
 import AddMemberModal from '../../../utils/modal/AddMemberModal';
 import ConfirmModal from '../../../utils/modal/confirmModel';
+import QuizModal from '../../../utils/modal/quizzModel';
+import { getRandomTopic } from '../../../utils/random/topic';
 
 interface Member {
   _id: string | number;
@@ -47,11 +50,13 @@ const MemberTable: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showLeaveClanModal, setShowLeaveClanModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
+  const [showQuizModal, setShowQuizModal] = useState<boolean>(false);
+  const [dailyTasksCompleted, setDailyTasksCompleted] = useState<number>(0);
   const [isLeader, setIsLeader] = useState(false);
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   const filteredMembers = useMemo(() => {
     return members.filter(member =>
@@ -85,10 +90,9 @@ const MemberTable: React.FC = () => {
             (a, b) => b.solvedProblems - a.solvedProblems,
           );
 
-         
           const membersWithRank = sortedMembers.map((member, index) => ({
             ...member,
-            rank: index + 1, 
+            rank: index + 1,
           }));
 
           setMembers(membersWithRank);
@@ -124,6 +128,16 @@ const MemberTable: React.FC = () => {
     } else {
       console.error('Failed to fetch members:', response);
     }
+  };
+
+  const handleDailyTaskClick = () => {
+    setShowQuizModal(true);
+   
+  };
+
+  const handleQuizComplete = (score:number) => {
+    setDailyTasksCompleted(prev => prev + 1);
+    console.log(`Quiz completed with score: ${score}`);
   };
 
   const getRoleIcon = (role: Member['role']) => {
@@ -193,7 +207,7 @@ const MemberTable: React.FC = () => {
     }
   };
   const handleChatClick = () => {
-   navigate(`/groupchat/${clanName}/${clanId}`)
+    navigate(`/groupchat/${clanName}/${clanId}`);
   };
   const handleLeaveClan = () => {
     setShowLeaveClanModal(true);
@@ -201,70 +215,84 @@ const MemberTable: React.FC = () => {
   const confirmLeaveClan = async () => {
     if (clanId && user._id) {
       try {
-        const response = await dispatch(leaveClan({ clanId, _id: user._id ,memberName:user.username}));
-        console.log("Leave clan response:", response);
+        const response = await dispatch(
+          leaveClan({ clanId, _id: user._id, memberName: user.username }),
+        );
+        console.log('Leave clan response:', response);
 
-        console.log("leaveclan",response)
-        
+        console.log('leaveclan', response);
+
         if (response.payload) {
-        
           setShowLeaveClanModal(false);
-          
-          navigate('/clans');
+
+          navigate('/clan');
         } else {
-          // Handle error
-          console.error("Failed to leave clan:", response);
+         
+          console.error('Failed to leave clan:', response);
         }
       } catch (error) {
-        console.error("Error leaving clan:", error);
+        console.error('Error leaving clan:', error);
       }
     }
   };
 
-
-
   return (
     <div className='container mx-auto p-6 bg-white rounded-lg shadow-2xl mt-20'>
-     <div className='flex justify-between items-center mb-8'>
-  <h1 className='text-4xl font-extrabold text-green-700'>
-    <FaCode className='inline-block mr-3 mb-1' />
-    {clanName || 'Clan'}
-  </h1>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className='text-4xl font-extrabold text-green-700'>
+          <FaCode className='inline-block mr-3 mb-1' />
+          {clanName || 'Clan'}
+        </h1>
 
-  <div className='flex space-x-4'>
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className='px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-150 flex items-center'
-      onClick={handleChatClick}
-    >
-      <FaComments className='mr-2' />
-      Group Chat
-    </motion.button>
-    {isLeader ? (
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className='px-4 py-2 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors duration-150 flex items-center'
-        onClick={() => setShowAddMemberModal(true)}
-      >
-        <FaUserPlus className='mr-2' />
-        Add Members
-      </motion.button>
-    ) : (
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className='px-4 py-2 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors duration-150 flex items-center'
-        onClick={handleLeaveClan}
-      >
-        <FaSignOutAlt className='mr-2' />
-        Leave Clan
-      </motion.button>
-    )}
-  </div>
-</div>
-
+        <div className='flex space-x-4'>
+        <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className='px-4 py-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors duration-150 flex items-center'
+            onClick={handleDailyTaskClick}
+          >
+            <FaTasks className='mr-2' />
+            Quiz
+            
+          </motion.button>
+          <QuizModal
+        isOpen={showQuizModal}
+        onClose={() => setShowQuizModal(false)}
+        onComplete={handleQuizComplete}
+        topic = {getRandomTopic()}
+      />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className='px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-150 flex items-center'
+            onClick={handleChatClick}
+          >
+            <FaComments className='mr-2' />
+            Group Chat
+          </motion.button>
+          {isLeader ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-4 py-2 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors duration-150 flex items-center'
+              onClick={() => setShowAddMemberModal(true)}
+            >
+              <FaUserPlus className='mr-2' />
+              Add Members
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-4 py-2 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors duration-150 flex items-center'
+              onClick={handleLeaveClan}
+            >
+              <FaSignOutAlt className='mr-2' />
+              Leave Clan
+            </motion.button>
+          )}
+        </div>
+      </div>
 
       <div className='mb-6 flex items-center bg-green-50 rounded-lg border border-green-200'>
         <FaSearch className='text-green-500 ml-4' />
@@ -413,11 +441,11 @@ const MemberTable: React.FC = () => {
         message='Are you sure you want to remove this member?'
       />
       <ConfirmModal
-  isOpen={showLeaveClanModal}
-  onRequestClose={() => setShowLeaveClanModal(false)}
-  onConfirm={confirmLeaveClan}
-  message="Are you sure you want to leave this clan? This action cannot be undone."
-/>
+        isOpen={showLeaveClanModal}
+        onRequestClose={() => setShowLeaveClanModal(false)}
+        onConfirm={confirmLeaveClan}
+        message='Are you sure you want to leave this clan? This action cannot be undone.'
+      />
     </div>
   );
 };
