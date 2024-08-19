@@ -14,54 +14,6 @@ interface ChatInputProps {
   handleVoiceMessage: (audioBlob: Blob) => void;
 }
 
-const AudioVisualization: React.FC<{ data: number[] }> = ({ data }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        let animationFrameId: number;
-
-        const animate = (time: number) => {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          const centerY = canvas.height / 2;
-
-          ctx.beginPath();
-          ctx.moveTo(0, centerY);
-
-          for (let x = 0; x < canvas.width; x++) {
-            const y = centerY + Math.sin(x * 0.05 + time * 0.005) * 20;
-            ctx.lineTo(x, y);
-          }
-
-          ctx.strokeStyle = '#4caf50';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          ctx.lineTo(canvas.width, canvas.height);
-          ctx.lineTo(0, canvas.height);
-          ctx.fillStyle = 'rgba(76, 175, 80, 0.2)';
-          ctx.fill();
-
-          animationFrameId = requestAnimationFrame(animate);
-        };
-
-        animate(0);
-
-        return () => {
-          cancelAnimationFrame(animationFrameId);
-        };
-      }
-    }
-  }, []);
-
-  return <canvas ref={canvasRef} className="w-full h-16" />;
-};
 
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -77,7 +29,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioVisualizationData, setAudioVisualizationData] = useState<number[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -117,24 +68,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 256;
       source.connect(analyser);
-  
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-  
+     
       const draw = () => {
         if (!isRecording) return;
   
-        requestAnimationFrame(draw);
-        analyser.getByteTimeDomainData(dataArray);
-        
-        // Apply some smoothing to the data
-        const smoothedData = Array.from(dataArray).map((value, index, array) => {
-          const prev = array[index - 1] || value;
-          const next = array[index + 1] || value;
-          return (prev + value + next) / 3;
-        });
-        
-        setAudioVisualizationData(smoothedData);
       };
   
       mediaRecorder.ondataavailable = (event) => {
@@ -231,7 +168,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </button>
           {isRecording ? (
             <div className="flex-1 border-2 border-[#a5d6a7] rounded-full px-4 py-2 overflow-hidden">
-            <AudioVisualization data={audioVisualizationData} />
+           
           </div>
           ) : (
             <input

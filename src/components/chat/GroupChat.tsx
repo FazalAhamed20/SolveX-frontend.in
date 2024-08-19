@@ -9,7 +9,6 @@ import MembersList from './MembersList';
 import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
-import { useSocket } from '../../context/SocketContext';
 import axios from 'axios';
 
 interface Message {
@@ -47,6 +46,8 @@ const GroupChat: React.FC = () => {
   const [image, setImage] = useState('');
   const [voice,setVoice]=useState('')
 
+  const [isLoading,setIsLoading]=useState(false)
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
@@ -69,6 +70,7 @@ const GroupChat: React.FC = () => {
     const fetchMessages = async () => {
       try {
         const response = await ChatAxios.get(`/messages/clan/${clanId}`);
+        console.log("messages",response)
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -114,6 +116,10 @@ const GroupChat: React.FC = () => {
       setMessages(prevMessages => [...prevMessages, message]);
     });
 
+    socketRef.current.on('deleteMessage', (message: Message) => {
+      setMessages(prevMessages => [...prevMessages, message]);
+    });
+
     socketRef.current.on('typing', (data: { user: string }) => {
       setTypingUser(data.user);
       if (typingTimeout) {
@@ -154,6 +160,7 @@ const GroupChat: React.FC = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' || image || voice) {
+      console.log('voice',voice)
       try {
         const response = await ChatAxios.post('/chat/messages', {
           image: image,
@@ -191,6 +198,7 @@ const GroupChat: React.FC = () => {
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    setIsLoading(true)
     const file = event.target.files?.[0];
 
     if (file) {
@@ -207,6 +215,7 @@ const GroupChat: React.FC = () => {
         const imageUrl = response.data.secure_url;
 
         setImage(imageUrl);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error uploading image:', error);
       }
@@ -231,6 +240,17 @@ const GroupChat: React.FC = () => {
      const audioUrl = response.data.secure_url;
      setVoice(audioUrl)
   };
+  console.log('voice....',voice)
+
+  const handleDeleteMessage = async (messageId: string) => {
+    try {
+       await ChatAxios.delete(`/messages/${messageId}`);
+      setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
+      socketRef.current?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  };
 
   return (
     <div className='min-h-screen bg-[#f0f4f0] p-2 sm:p-4 md:p-6 lg:p-8'>
@@ -240,6 +260,7 @@ const GroupChat: React.FC = () => {
             showMembers={showMembers}
             groupMembers={groupMembers}
             currentUser={user}
+           
           />
           <div className='flex-1 flex flex-col'>
             <ChatHeader
@@ -252,6 +273,10 @@ const GroupChat: React.FC = () => {
               currentUser={user}
               typingUser={typingUser}
               ref={chatContainerRef}
+              isLoading={isLoading}
+              onDeleteMessage={handleDeleteMessage}
+              
+             
             />
             <ChatInput
               inputMessage={inputMessage}
