@@ -1,5 +1,6 @@
 import  { forwardRef } from 'react';
 import MessageItem from './MessageItem';
+import React from 'react';
 
 interface Message {
   _id: string;
@@ -24,6 +25,7 @@ interface MessageListProps {
 
 const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
   ({ messages, currentUser, typingUser ,isLoading,onDeleteMessage }: MessageListProps, ref) => {
+    console.log("typing",typingUser)
     return (
       <div  className='flex-1 overflow-y-auto px-4 py-4 bg-[#f0f4f0]'>
         {messages.map(message => (
@@ -37,4 +39,4 @@ const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
   }
 );
 
-export default MessageList;
+export default React.memo(MessageList);

@@ -113,7 +113,7 @@ const Navbar: React.FC<NavbarProps> = ({
       }
     };
     fetchPending();
-  }, [dispatch, user._id]);
+  }, [dispatch]);
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);

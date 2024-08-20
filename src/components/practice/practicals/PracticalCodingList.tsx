@@ -51,8 +51,10 @@ const PracticalCodingList: React.FC = () => {
   const [practicalCodings, setPracticalCodings] = useState<PracticalCoding[]>(
     [],
   );
+  const [isLoading,setIsLoading]=useState(false)
 
   const fetchPracticeList = async () => {
+    setIsLoading(true)
     try {
       const response = await dispatch(practicallist()).unwrap();
       console.log('res,.,.', response);
@@ -66,6 +68,8 @@ const PracticalCodingList: React.FC = () => {
       setPracticalCodings(filteredCodings);
     } catch (error) {
       console.error('Error fetching practical codings:', error);
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -108,6 +112,11 @@ const PracticalCodingList: React.FC = () => {
           </motion.div>
         </motion.div>
       </div>
+      {isLoading ? (
+  <div className="flex justify-center items-center h-64">
+   <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+</div>
+) : (
       <div className='text-center mb-8'>
         {practicalCodings.length === 0 ? (
           <p className='text-gray-700 text-lg'>
@@ -124,6 +133,7 @@ const PracticalCodingList: React.FC = () => {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

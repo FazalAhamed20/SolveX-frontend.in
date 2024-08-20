@@ -1,4 +1,10 @@
-import React, { forwardRef, useState, useEffect } from 'react';
+import React, {
+  forwardRef,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import {
   FaCheck,
   FaPlay,
@@ -7,7 +13,6 @@ import {
   FaChevronDown,
 } from 'react-icons/fa';
 import ConfirmModal from '../../utils/modal/confirmModel';
-
 import { ChatAxios } from '../../config/AxiosInstance';
 import Reactions from './Reaction';
 
@@ -30,6 +35,7 @@ interface Message {
   image?: string;
   voice?: string;
   reactions?: Reaction[];
+ 
 }
 
 interface MessageItemProps {
@@ -42,53 +48,41 @@ interface MessageItemProps {
 const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
   ({ message, currentUser, isLoading, onDeleteMessage }, ref) => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [audio] = useState(message.voice ? new Audio(message.voice) : null);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [reactions, setReactions] = useState<Reaction[]>(message.reactions || []);
+    const [reactions, setReactions] = useState<Reaction[]>(
+      message.reactions || [],
+    );
     const [showReactions, setShowReactions] = useState(false);
 
-    console.log('react message', message.reactions);
+    const isOwnMessage = useMemo(
+      () => message.sender._id === currentUser._id,
+      [message.sender._id, currentUser._id],
+    );
 
-    const isOwnMessage = message.sender._id === currentUser._id;
+    const audio = useMemo(
+      () => (message.voice ? new Audio(message.voice) : null),
+      [message.voice],
+    );
 
-    const handleDeleteClick = () => {
+    const formattedTime = useMemo(() => {
+      return new Date(message.createdAt).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }, [message.createdAt]);
+
+    const handleDeleteClick = useCallback(() => {
       setIsModalOpen(true);
-    };
+    }, []);
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = useCallback(() => {
       onDeleteMessage(message._id);
       setIsModalOpen(false);
-    };
+    }, [message._id, onDeleteMessage]);
 
-    const formattedTime = new Date(message.createdAt).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-
-    const renderMessageStatus = (status: 'sent' | 'delivered' | 'read') => {
-      switch (status) {
-        case 'sent':
-          return <FaCheck className='text-gray-400' />;
-        case 'delivered':
-          return (
-            <div className='flex'>
-              <FaCheck className='text-gray-400' />
-              <FaCheck className='text-gray-400 -ml-1' />
-            </div>
-          );
-        case 'read':
-          return (
-            <div className='flex'>
-              <FaCheck className='text-green-600' />
-              <FaCheck className='text-green-600 -ml-1' />
-            </div>
-          );
-      }
-    };
-
-    const toggleAudio = () => {
+    const toggleAudio = useCallback(() => {
       if (audio) {
         if (isPlaying) {
           audio.pause();
@@ -97,61 +91,105 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
         }
         setIsPlaying(!isPlaying);
       }
-    };
+    }, [audio, isPlaying]);
 
-    const handleReact = async (emoji: string | null) => {
-      let updatedReactions = [...reactions];
-    
-      const existingReactionIndex = updatedReactions.findIndex(
-        r => r.memberId === currentUser._id && r.messageId === message._id
-      );
-    
-      if (existingReactionIndex !== -1) {
-        if (emoji === null) {
-          // Remove the reaction
-          updatedReactions.splice(existingReactionIndex, 1);
-        } else {
-          // Update the existing reaction
-          updatedReactions[existingReactionIndex].emoji = emoji;
+    const handleReact = useCallback(
+      async (emoji: string | null) => {
+        let updatedReactions = [...reactions];
+
+        const existingReactionIndex = updatedReactions.findIndex(
+          r => r.memberId === currentUser._id && r.messageId === message._id,
+        );
+
+        if (existingReactionIndex !== -1) {
+          if (emoji === null) {
+            updatedReactions.splice(existingReactionIndex, 1);
+          } else {
+            updatedReactions[existingReactionIndex].emoji = emoji;
+          }
+        } else if (emoji !== null) {
+          updatedReactions.push({
+            memberId: currentUser._id,
+            emoji: emoji,
+            messageId: message._id,
+          });
         }
-      } else if (emoji !== null) {
-        // Add a new reaction
-        updatedReactions.push({
-          memberId: currentUser._id,
-          emoji: emoji,
-          messageId: message._id
-        });
-      }
-    
-      setReactions(updatedReactions);
-    
-      try {
-        const response = await ChatAxios.post('/messages/react', {
-          messageId: message._id,
-          emoji: emoji,
-          userId: currentUser._id,
-        });
-        console.log('response', response);
-      } catch (error) {
-        console.error('Failed to save reaction:', error);
-      }
-    };
+
+        setReactions(updatedReactions);
+
+        try {
+          await ChatAxios.post('/messages/react', {
+            messageId: message._id,
+            emoji: emoji,
+            userId: currentUser._id,
+          });
+        } catch (error) {
+          console.error('Failed to save reaction:', error);
+        }
+      },
+      [reactions, currentUser._id, message._id],
+    );
+
 
     useEffect(() => {
       if (audio) {
-        audio.addEventListener('ended', () => setIsPlaying(false));
+        const handleEnded = () => setIsPlaying(false);
+        audio.addEventListener('ended', handleEnded);
         return () => {
-          audio.removeEventListener('ended', () => setIsPlaying(false));
+          audio.removeEventListener('ended', handleEnded);
         };
       }
     }, [audio]);
+
+    const renderMessageStatus = useMemo(() => {
+      if (isOwnMessage) {
+        switch (message.status) {
+          case 'sent':
+            return (
+              <div className='absolute bottom-[6px] right-[6px]'>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+              </div>
+            );
+          case 'delivered':
+            return (
+              <div className='absolute bottom-0 right-0 mr-1 mb-1 flex'>
+                <FaCheck className='text-gray-400 text-xs' />
+                <FaCheck className='text-gray-400 text-xs -ml-0.5' />
+              </div>
+            );
+          case 'read':
+            return (
+              <div className='absolute bottom-0 right-0 mr-1 mb-1 flex'>
+                <FaCheck className='text-blue-500 text-xs' />
+                <FaCheck className='text-blue-500 text-xs -ml-0.5' />
+              </div>
+            );
+          default:
+            return null;
+        }
+      }
+      return null;
+    }, [message.status, isOwnMessage]);
+    
+
+
+    const reactionSummary = useMemo(() => {
+      return Object.entries(
+        reactions.reduce((acc, r) => {
+          acc[r.emoji] = (acc[r.emoji] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>),
+      );
+    }, [reactions]);
 
     return (
       <div
         ref={ref}
         className={`flex ${
           isOwnMessage ? 'justify-end' : 'justify-start'
-        } mb-3 items-end relative`}
+        } mb-3 items-end relative ${reactions.length > 0 ? 'mb-8' : 'mb-3'}`}
       >
         {isOwnMessage && showDropdown && (
           <div className='absolute right-0 top-0 transform -translate-y-full mb-1 w-28 bg-white rounded-md shadow-lg z-10'>
@@ -236,36 +274,27 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
             </p>
 
             {reactions.length > 0 && (
-  <div
-    className={`absolute -bottom-4 ${
-      isOwnMessage ? 'right-0' : 'left-0'
-    } flex space-x-1`}
-  >
-    {Object.entries(
-      reactions.reduce((acc, r) => {
-        acc[r.emoji] = (acc[r.emoji] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    ).map(([emoji, count]) => (
-      <div
-        key={emoji}
-        className='bg-white shadow-md px-2 py-1 rounded-full text-xs'
-      >
-        {emoji} {count}
-      </div>
-    ))}
-  </div>
-)}
+              <div
+                className={`absolute -bottom-6 ${
+                  isOwnMessage ? 'right-0' : 'left-0'
+                } flex space-x-1`}
+              >
+                {reactionSummary.map(([emoji, count]) => (
+                  <div
+                    key={emoji}
+                    className='bg-white shadow-md px-2 py-1 rounded-full text-xs'
+                  >
+                    {emoji} {count}
+                  </div>
+                ))}
+              </div>
+            )}
 
-            <div className='flex justify-end items-center mt-1 space-x-1.5'>
+<div className='flex justify-end items-center mt-1 space-x-1.5'>
               <span className='block text-[11px] text-green-600'>
                 {formattedTime}
               </span>
-              {isOwnMessage && (
-                <span className='text-[11px] text-green-600'>
-                  {renderMessageStatus(message.status)}
-                </span>
-              )}
+              {renderMessageStatus}
             </div>
           </div>
 
@@ -291,13 +320,16 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           )}
 
           {showReactions && (
-          <Reactions
-          reactions={reactions}
-          onReact={handleReact}
-          currentUserId={currentUser._id}
-          isOwnMessage={isOwnMessage}
-          messageId={message._id}
-        />
+            <Reactions
+              reactions={reactions}
+              onReact={handleReact}
+              currentUserId={currentUser._id}
+              isOwnMessage={isOwnMessage}
+              messageId={message._id}
+              className={`absolute ${isOwnMessage ? 'right-0' : 'left-0'} ${
+                reactions.length > 0 ? '-bottom-12' : '-bottom-6'
+              }`}
+            />
           )}
         </div>
         <ConfirmModal

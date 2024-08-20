@@ -1,4 +1,5 @@
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { FaSmile } from "react-icons/fa";
 
@@ -14,6 +15,8 @@ interface ReactionProps {
   currentUserId: string;
   isOwnMessage: boolean;
   messageId: string;
+  className:string,
+ 
 }
 
 const DEFAULT_EMOJIS = ['👍', '❤️', '😂', '😮', '👏'];
@@ -24,9 +27,13 @@ const Reactions: React.FC<ReactionProps> = ({
   currentUserId,
   isOwnMessage,
   messageId,
+  className,
+ 
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,10 +63,8 @@ const Reactions: React.FC<ReactionProps> = ({
   const handleReaction = (emoji: string) => {
     const currentReaction = getUserReaction();
     if (currentReaction === emoji) {
-      // Remove reaction if clicking the same emoji
       onReact(null);
     } else {
-      // Add or change reaction
       onReact(emoji);
     }
   };
@@ -68,7 +73,7 @@ const Reactions: React.FC<ReactionProps> = ({
 
   return (
     <div
-      className={`absolute bottom-0 ${
+      className={`${className}absolute bottom-0 ${
         isOwnMessage ? 'right-0' : 'left-0'
       } transform translate-y-full mt-1 flex items-center bg-white rounded-full shadow-md p-1 z-10`}
     >
@@ -100,4 +105,4 @@ const Reactions: React.FC<ReactionProps> = ({
   );
 };
 
-export default Reactions;
+export default React.memo(Reactions);

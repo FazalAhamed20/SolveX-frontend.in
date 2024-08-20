@@ -52,6 +52,7 @@ const MemberTable: React.FC = () => {
   const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
   const [showQuizModal, setShowQuizModal] = useState<boolean>(false);
   const [dailyTasksCompleted, setDailyTasksCompleted] = useState<number>(0);
+  const [isLoading,setIsLoading]=useState(false)
   const [isLeader, setIsLeader] = useState(false);
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
@@ -76,6 +77,7 @@ const MemberTable: React.FC = () => {
   console.log('clanId', clanId);
 
   useEffect(() => {
+    setIsLoading(true)
     const fetchAllMember = async () => {
       if (clanId && clanName) {
         const response = await dispatch(
@@ -96,6 +98,7 @@ const MemberTable: React.FC = () => {
           }));
 
           setMembers(membersWithRank);
+          setIsLoading(false)
         } else {
           console.error('Failed to fetch members:', response);
         }
@@ -304,6 +307,11 @@ const MemberTable: React.FC = () => {
           onChange={e => setSearch(e.target.value)}
         />
       </div>
+      {isLoading ? (
+  <div className="flex justify-center items-center h-64">
+  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+</div>
+) : (
 
       <div className='overflow-x-auto bg-white shadow-lg rounded-lg border border-green-200'>
         <table className='min-w-full divide-y divide-green-200'>
@@ -388,6 +396,7 @@ const MemberTable: React.FC = () => {
           </tbody>
         </table>
       </div>
+)}
 
       <div className='mt-6 flex justify-between items-center'>
         <div className='text-sm text-green-600'>

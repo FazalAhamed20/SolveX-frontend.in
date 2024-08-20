@@ -61,6 +61,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [pendingRequests, setPendingRequests] = useState<string[]>([]);
+  const [isLoading,setIsLoading]=useState(false)
   const closeModal = () => setIsModalOpen(false);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -68,18 +69,24 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
 
   useEffect(() => {
     const fetchAllClans = async () => {
-      const response = await dispatch(fetchAllClan());
-      console.log('Fetched clans:', response);
-      const fetchedClans = response.payload as unknown as Clan[];
-      setClans(fetchedClans);
-      setFilteredClans(fetchedClans);
-      
-      
-      const pendingReqs = fetchedClans.flatMap(clan => 
-        clan.request?.filter((req: { userId: any; }) => req.userId === user._id).map(() => clan._id) || []
-      );
-      console.log("pemdings",pendingReqs)
-      setPendingRequests(pendingReqs);
+      setIsLoading(true);
+      try {
+        const response = await dispatch(fetchAllClan());
+        console.log('Fetched clans:', response);
+        const fetchedClans = response.payload as unknown as Clan[];
+        setClans(fetchedClans);
+        setFilteredClans(fetchedClans);
+        
+        const pendingReqs = fetchedClans.flatMap(clan => 
+          clan.request?.filter((req: { userId: any; }) => req.userId === user._id).map(() => clan._id) || []
+        );
+        console.log("pemdings", pendingReqs);
+        setPendingRequests(pendingReqs);
+      } catch (error) {
+        console.error('Failed to fetch clans:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchAllClans();
   }, [dispatch, user._id]);
@@ -89,12 +96,15 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
  
 
   useEffect(() => {
+   
     const filtered = clans.filter(
       clan =>
         clan.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (!showMyClans || clan.members.some(member => member.id === user._id)),
     );
+  
     setFilteredClans(filtered);
+   
   }, [searchTerm, showMyClans, clans, user._id]);
 
   const handleClanClick = (clan: Clan) => {
@@ -238,7 +248,11 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
         </div>
       </div>
 
-      {filteredClans.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      ) : filteredClans.length === 0 ? (
         <div className='text-center py-12'>
           <svg
             className='mx-auto h-12 w-12 text-gray-400'
@@ -269,6 +283,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
         isUserMember={isUserMember}
         pendingRequests={pendingRequests}
         userId={user._id}
+        loading={isLoading}
       />
       ) : (
         <ClanTableView

@@ -28,7 +28,7 @@ const ProblemList: React.FC = () => {
     Problem['difficulty'] | 'All'
   >('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isLoading,setIsLoading]=useState(false)
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
@@ -36,11 +36,14 @@ const ProblemList: React.FC = () => {
   const navigate = useNavigate();
   const closeModal = () => setIsModalOpen(false);
   const fetchProblemList = async () => {
+    setIsLoading(true)
     try {
       const response = await dispatch(problemlist()).unwrap();
       setProblems(response as Problem[]);
     } catch (error) {
       console.error('Error fetching problems:', error);
+    }finally{
+      setIsLoading(false)
     }
   };
   useEffect(() => {
@@ -152,6 +155,11 @@ const ProblemList: React.FC = () => {
           <option value='Hard'>Hard</option>
         </select>
       </div>
+      {isLoading ? (
+  <div className="flex justify-center items-center h-64">
+  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+</div>
+) : (
 
       <div className='overflow-x-auto bg-white shadow-md rounded-lg'>
         <table className='min-w-full table-auto'>
@@ -239,6 +247,7 @@ const ProblemList: React.FC = () => {
           </tbody>
         </table>
       </div>
+      )}
 
       <div className='mt-4 flex justify-between items-center'>
         <button

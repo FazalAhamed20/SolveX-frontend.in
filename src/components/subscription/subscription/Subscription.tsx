@@ -106,17 +106,31 @@ const tierIconMap: { [key: string]: string } = {
 const SubscriptionComponent: React.FC = () => {
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [plans, setPlans] = useState<Subscription[]>([]);
+  const [isLoading,setIsLoading]=useState(false)
   const dispatch: AppDispatch = useDispatch();
 
   const fetchAllSubscription = async () => {
-    const response = await dispatch(getAllSubscription());
-    setPlans(response.payload?.data as unknown as Subscription[]);
+    setIsLoading(true);
+    try {
+      const response = await dispatch(getAllSubscription());
+      setPlans(response.payload?.data as unknown as Subscription[]);
+    } catch (error) {
+      console.error('Failed to fetch subscriptions:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchAllSubscription();
   }, []);
-
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
   return (
     <div className='container mx-auto px-4 py-16 bg-gradient-to-br'>
       <h2 className='text-4xl font-bold text-center mb-4 text-gray-800'>

@@ -1,9 +1,16 @@
 import { FiCode, FiBook, FiTrendingUp } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import WelcomeModal from '../../../utils/modal/WelcomeModal';
+import { useState } from 'react';
 
 function LandingHome() {
+  const [isModalOpen, setIsModalOpen] = useState(true);
   return (
     <div className='bg-white-100 min-h-screen'>
+       <WelcomeModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
       <div className='max-w-7xl mx-auto px-4 py-8'>
         <section className='text-center mb-12'>
           <h1 className='text-5xl font-bold mb-4 text-green-600'>

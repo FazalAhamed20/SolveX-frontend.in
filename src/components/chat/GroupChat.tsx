@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import io, { Socket } from 'socket.io-client';
 import { AppDispatch, RootState } from '../../redux/Store';
 import { fetchMember } from '../../redux/actions/ClanAction';
 import { ChatAxios } from '../../config/AxiosInstance';
@@ -10,11 +9,13 @@ import ChatHeader from './ChatHeader';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
 import axios from 'axios';
+import { useSocket } from '../../context/SocketContext';
+import debounce from 'lodash/debounce';
 
 interface Message {
   _id: string;
   image: string;
-  audioUrl:string;
+  audioUrl: string;
   text: string;
   sender: {
     avatar: any;
@@ -40,37 +41,42 @@ const GroupChat: React.FC = () => {
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [typingUser, setTypingUser] = useState<string>('');
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
-    null,
-  );
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const [image, setImage] = useState('');
-  const [voice,setVoice]=useState('')
-
-  const [isLoading,setIsLoading]=useState(false)
+  const [voice, setVoice] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const socketRef = useRef<Socket | null>(null);
 
-  const { clanName, clanId } = useParams<{
-    clanName: string;
-    clanId: string;
-  }>();
+  const { clanName, clanId } = useParams<{ clanName: string; clanId: string }>();
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
-  // const { socket, initializeSocket, disconnectSocket } = useSocket();
+  const { socket, initializeSocket, disconnectSocket } = useSocket();
+
   useEffect(() => {
     chatContainerRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'end',
     });
-    console.log('____________________ rendereed due to msg');
   }, [messages]);
+  useLayoutEffect(() => {
+    const fetchAllMember = async () => {
+      if (clanId && clanName) {
+        const response = await dispatch(fetchMember({ clanId, name: clanName }));
+        const members = response?.payload as unknown as GroupMember[];
+        setGroupMembers(members.map(member => ({ ...member, online: false })));
+      }
+    };
+    
+    fetchAllMember();
+  }, [clanId, clanName, dispatch]);
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await ChatAxios.get(`/messages/clan/${clanId}`);
-        console.log("messages",response)
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -80,91 +86,104 @@ const GroupChat: React.FC = () => {
     fetchMessages();
   }, [clanId]);
 
-  useEffect(() => {
-    const fetchAllMember = async () => {
-      if (clanId && clanName) {
-        const response = await dispatch(
-          fetchMember({ clanId, name: clanName }),
-        );
-        const members = response?.payload as unknown as GroupMember[];
-        setGroupMembers(members.map(member => ({ ...member, online: false })));
-      }
-    };
-    fetchAllMember();
-  }, [clanId, clanName, dispatch]);
+
+  const handleNewMessage = useCallback((message: Message) => {
+    setMessages(prevMessages => [...prevMessages, message]);
+  }, []);
+
+  const handleDeleteMessage = useCallback((messageId: string) => {
+    setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
+  }, []);
+ 
+
+  const handleTyping = useCallback((data: { user: string }) => {
+    setTypingUser(data.user);
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    const timeout = setTimeout(() => setTypingUser(''), 1000);
+    setTypingTimeout(timeout);
+  }, []);
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:3006', {
-      query: { userId: user._id },
-    });
+    if (user._id) {
+      initializeSocket(user._id);
+    }
+  }, [user._id, initializeSocket]);
 
-    socketRef.current.on('connect', () => {
-      console.log('Connected to server');
-      socketRef.current?.emit('joinRoom', { roomId: clanId, userId: user._id });
-    });
+  useEffect(() => {
+    if (user._id) {
+      initializeSocket(user._id);
+    if (socket) {
+      socket.emit('joinRoom', { roomId: clanId, userId: user._id });
+      socket.on('message', handleNewMessage);
+      socket.on('deleteMessage', handleDeleteMessage);
+      socket.on('typing', handleTyping);
+      socket.on('userJoined', handleUserJoined);
+      socket.on('userLeft', handleUserLeft);
+      socket.on('onlineUsers', handleOnlineUsers);
+      socket.on('messageStatusUpdate', handleMessageStatusUpdate);
 
-    socketRef.current.on('initialOnlineStatus', (onlineUsers: string[]) => {
-      setGroupMembers(prevMembers =>
-        prevMembers.map(member => ({
-          ...member,
-          online: onlineUsers.includes(member.id),
-        })),
-      );
-    });
+  
 
-    socketRef.current.on('message', (message: Message) => {
-      setMessages(prevMessages => [...prevMessages, message]);
-    });
+      return () => {
+        socket.emit('leaveRoom', { roomId: clanId, userId: user._id });
+      
+        socket.off('message');
+        socket.off('deleteMessage');
+        socket.off('typing');
+        socket.off('userJoined');
+        socket.off('userLeft');
+        socket.off('onlineUsers');
+        socket.off('messageStatusUpdate');
+      
+      };
+    }
+  }
+}, [user._id,socket, clanId, user._id,  handleNewMessage, handleDeleteMessage, handleTyping]);
 
-    socketRef.current.on('deleteMessage', (message: Message) => {
-      setMessages(prevMessages => [...prevMessages, message]);
-    });
+const handleUserJoined = useCallback((userId: string) => {
+  setOnlineUsers(prevUsers => [...new Set([...prevUsers, userId])]);
+  setGroupMembers(prevMembers =>
+    prevMembers.map(member => 
+      member.id === userId ? { ...member, online: true } : member
+    )
+  );
+}, []);
 
-    socketRef.current.on('typing', (data: { user: string }) => {
-      setTypingUser(data.user);
-      if (typingTimeout) {
-        clearTimeout(typingTimeout);
-      }
-      const timeout = setTimeout(() => setTypingUser(''), 1000);
-      setTypingTimeout(timeout);
-    });
+const handleMessageStatusUpdate = useCallback((updatedMessage: Message) => {
+  setMessages(prevMessages =>
+    prevMessages.map(msg =>
+      msg._id === updatedMessage._id ? { ...msg, status: updatedMessage.status } : msg
+    )
+  );
+}, []);
 
-    socketRef.current.on('userOnline', ({ userId }: { userId: string }) => {
-      setGroupMembers(prevMembers =>
-        prevMembers.map(member =>
-          member.id === userId ? { ...member, online: true } : member,
-        ),
-      );
-    });
-
-    socketRef.current.on('userOffline', ({ userId }: { userId: string }) => {
-      setGroupMembers(prevMembers =>
-        prevMembers.map(member =>
-          member.id === userId ? { ...member, online: false } : member,
-        ),
-      );
-    });
-
-    return () => {
-      socketRef.current?.emit('leaveRoom', {
-        roomId: clanId,
-        userId: user._id,
-      });
-      socketRef.current?.disconnect();
-      if (typingTimeout) {
-        clearTimeout(typingTimeout);
-      }
-    };
-  }, [clanId, user._id]);
+const handleUserLeft = useCallback((userId: string) => {
+  setOnlineUsers(prevUsers => prevUsers.filter(id => id !== userId));
+  setGroupMembers(prevMembers =>
+    prevMembers.map(member => 
+      member.id === userId ? { ...member, online: false } : member
+    )
+  );
+}, []);
+const handleOnlineUsers = useCallback((users: string[]) => {
+  setOnlineUsers(users);
+  setGroupMembers(prevMembers =>
+    prevMembers.map(member => ({
+      ...member,
+      online: users.includes(member.id)
+    }))
+  );
+}, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' || image || voice) {
-      console.log('voice',voice)
       try {
         const response = await ChatAxios.post('/chat/messages', {
           image: image,
-          voice:voice,
+          voice: voice,
           text: inputMessage,
           sender: { _id: user._id, name: user.username },
           clanId: clanId,
@@ -172,33 +191,34 @@ const GroupChat: React.FC = () => {
 
         const newMessage = response.data;
         
-        socketRef.current?.emit('sendMessage', {
+        socket?.emit('sendMessage', {
           roomId: clanId,
           message: newMessage,
         });
 
         setInputMessage('');
-      setImage('');
-      setVoice('');
+        setImage('');
+        setVoice('');
       } catch (error) {
         console.error('Error sending message:', error);
       }
     }
   };
 
-  const handleTyping = () => {
-    socketRef.current?.emit('typing', { roomId: clanId, user: user.username });
-  };
+  const debouncedTyping = useCallback(
+    debounce(() => {
+      socket?.emit('typing', { roomId: clanId, user: user.username });
+    }, 300),
+    [socket, clanId, user.username]
+  );
 
   const handleEmojiClick = (emoji: { emoji: string }) => {
     setInputMessage(prev => prev + emoji.emoji);
     setShowEmojiPicker(false);
   };
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setIsLoading(true)
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoading(true);
     const file = event.target.files?.[0];
 
     if (file) {
@@ -213,40 +233,39 @@ const GroupChat: React.FC = () => {
         );
 
         const imageUrl = response.data.secure_url;
-
         setImage(imageUrl);
-        setIsLoading(false)
       } catch (error) {
         console.error('Error uploading image:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
-  console.log('omage', image);
-  const handleVoiceMessage = async(audioBlob: Blob) => {
-     
-     const audioFile = new File([audioBlob], 'voice_message.webm', { type: 'audio/webm' });
 
-    
-     const formData = new FormData();
-     formData.append('file', audioFile);
-     formData.append('upload_preset', 'upload');
+  const handleVoiceMessage = async (audioBlob: Blob) => {
+    const audioFile = new File([audioBlob], 'voice_message.webm', { type: 'audio/webm' });
+    const formData = new FormData();
+    formData.append('file', audioFile);
+    formData.append('upload_preset', 'upload');
 
-    
-     const response = await axios.post(
-       `https://api.cloudinary.com/v1_1/dlitqiyia/video/upload`,
-       formData
-     );
-
-     const audioUrl = response.data.secure_url;
-     setVoice(audioUrl)
-  };
-  console.log('voice....',voice)
-
-  const handleDeleteMessage = async (messageId: string) => {
     try {
-       await ChatAxios.delete(`/messages/${messageId}`);
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dlitqiyia/video/upload`,
+        formData
+      );
+
+      const audioUrl = response.data.secure_url;
+      setVoice(audioUrl);
+    } catch (error) {
+      console.error('Error uploading voice message:', error);
+    }
+  };
+
+  const handleDeleteMessageRequest = async (messageId: string) => {
+    try {
+      await ChatAxios.delete(`/messages/${messageId}`);
       setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
-      socketRef.current?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
+      socket?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
     } catch (error) {
       console.error('Error deleting message:', error);
     }
@@ -260,7 +279,7 @@ const GroupChat: React.FC = () => {
             showMembers={showMembers}
             groupMembers={groupMembers}
             currentUser={user}
-           
+            onlineUsers={onlineUsers}
           />
           <div className='flex-1 flex flex-col'>
             <ChatHeader
@@ -274,15 +293,13 @@ const GroupChat: React.FC = () => {
               typingUser={typingUser}
               ref={chatContainerRef}
               isLoading={isLoading}
-              onDeleteMessage={handleDeleteMessage}
-              
-             
+              onDeleteMessage={handleDeleteMessageRequest}
             />
             <ChatInput
               inputMessage={inputMessage}
               setInputMessage={setInputMessage}
               handleSendMessage={handleSendMessage}
-              handleTyping={handleTyping}
+              handleTyping={debouncedTyping}
               showEmojiPicker={showEmojiPicker}
               setShowEmojiPicker={setShowEmojiPicker}
               handleEmojiClick={handleEmojiClick}
@@ -296,4 +313,4 @@ const GroupChat: React.FC = () => {
   );
 };
 
-export default GroupChat;
+export default GroupChat

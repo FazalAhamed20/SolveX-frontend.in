@@ -1,11 +1,14 @@
 import { useNavigate } from 'react-router-dom';
+import WelcomeModal from '../../../utils/modal/WelcomeModal';
+import { useState } from 'react';
 
 const Home = () => {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   return (
     <div className='bg-slate-100'>
-      {/* Hero Section */}
+      
       <div className='container mx-auto py-16 px-5 md:px-20'>
         <div className='flex flex-col md:flex-row items-center justify-between gap-10'>
           <div className='flex-1'>

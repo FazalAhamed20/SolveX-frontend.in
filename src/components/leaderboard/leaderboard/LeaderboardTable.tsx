@@ -36,10 +36,12 @@ const getRankIcon = (rank: number) => {
 const LeaderBoardTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoading,setIsLoading]=useState(false)
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
 
   const fetchAllSubmissions = async () => {
+    setIsLoading(true)
     try {
       const response = await dispatch(fetchAllSubmission() as any);
       const fetchedData = response.payload;
@@ -55,6 +57,8 @@ const LeaderBoardTable: React.FC = () => {
       setUsers(sortedUsers);
     } catch (error) {
       console.error('Failed to fetch submissions:', error);
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -74,6 +78,7 @@ const LeaderBoardTable: React.FC = () => {
   }
 
   return (
+    
     <div className='container mx-auto p-6'>
       <div className='bg-white shadow-xl rounded-lg overflow-hidden'>
         <div className='overflow-x-auto'>
@@ -86,8 +91,18 @@ const LeaderBoardTable: React.FC = () => {
                 <th className='py-3 px-4 text-left'>Points</th>
               </tr>
             </thead>
+          
             <tbody>
-              {currentUsers.map(user => (
+            {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="text-center py-4">
+                    <div className="flex justify-center items-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              currentUsers.map(user => (
                 <tr
                   key={user.id}
                   className='border-b border-gray-200 hover:bg-gray-100 transition duration-200'
@@ -112,7 +127,8 @@ const LeaderBoardTable: React.FC = () => {
                     </span>
                   </td>
                 </tr>
-              ))}
+              ))
+            )}
             </tbody>
           </table>
         </div>
@@ -148,6 +164,7 @@ const LeaderBoardTable: React.FC = () => {
             </div>
           </div>
         </div>
+        
       </div>
     </div>
   );

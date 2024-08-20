@@ -27,6 +27,7 @@ interface ClanGridViewProps {
   isUserMember: (clan: Clan) => boolean;
   pendingRequests: string[];
   userId: string;
+  loading:boolean
 }
 
 const ClanGridView: React.FC<ClanGridViewProps> = ({
@@ -34,10 +35,17 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
   onClanClick,
   isUserMember,
   pendingRequests,
-  userId
+  userId,
+  loading
 }) => {
+  console.log(loading)
   return (
-    <motion.div
+    loading ? (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    ) : (
+      <motion.div
       className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -100,7 +108,8 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
         </motion.div>
       ))}
     </motion.div>
-  );
+  )
+);
 };
 
 export default ClanGridView;
