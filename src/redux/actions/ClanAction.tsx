@@ -219,3 +219,25 @@ export const acceptRequest = createAsyncThunk<
     }
   },
 );
+
+
+export const  completeQuiz = createAsyncThunk<
+  VerifyResponse,
+  { clanId?: string;userId: string,score:number },
+  { rejectValue: ErrorPayload }
+>(
+  'clan/completeQuiz',
+  async(data: { clanId?: string; userId: string; score: number }, {rejectWithValue}) => {
+    try {
+      
+      const response = await ClanAxios.post('/complete-quiz', {
+       data
+      });
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);
+

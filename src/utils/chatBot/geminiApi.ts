@@ -34,3 +34,18 @@ export async function generateQuizQuestions(topic: string, numberOfQuestions: nu
     throw error;
   }
 }
+
+
+export async function generateWelcomeSpeech(): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const prompt = "Generate a single-sentence welcome message for the admin of SolveX, a coding platform web application and admin name is fazal ahamed.";
+  const result = await model.generateContent(prompt);
+  return result.response.text().trim();
+}
+
+export async function generateWelcomeUserSpeech(): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const prompt = "Generate a single-sentence  welcome message for the user of SolveX, a coding platform web application.";
+  const result = await model.generateContent(prompt);
+  return result.response.text().trim();
+}

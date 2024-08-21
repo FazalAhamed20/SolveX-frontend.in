@@ -1,6 +1,6 @@
 
 
-const topics=['Javascript programming','Data Structures','Typescript programming','HTML',]
+const topics=['Javascript programming','Data Structures','HTML',]
 export function getRandomTopic() {
     const randomIndex = Math.floor(Math.random() * topics.length);
     console.log(randomIndex)

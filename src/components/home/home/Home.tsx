@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import WelcomeModal from '../../../utils/modal/WelcomeModal';
-import { useState } from 'react';
+
 
 const Home = () => {
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const navigate = useNavigate()
 
   return (
     <div className='bg-slate-100'>

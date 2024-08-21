@@ -11,12 +11,14 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { FacebookProvider } from 'react-facebook';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { SocketProvider } from './context/SocketContext.tsx';
+import ErrorBoundary from './utils/errorboundary/errorBoundary.tsx';
 
 const clientId = String(import.meta.env.VITE_CLIENTID);
 const appId = String(import.meta.env.VITE_APPID);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
+    <ErrorBoundary>
     <Provider store={Store}>
       <PersistGate loading={null} persistor={persistor}>
         <GoogleOAuthProvider clientId={clientId}>
@@ -31,5 +33,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </GoogleOAuthProvider>
       </PersistGate>
     </Provider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   FaSearch,
   FaTrash,
@@ -11,7 +11,6 @@ import {
   FaStar,
   FaCode,
   FaUserPlus,
-  FaUsers,
   FaComments,
   FaSignOutAlt,
   FaTasks,
@@ -22,6 +21,7 @@ import { AppDispatch, RootState } from '../../../redux/Store';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addMember,
+  completeQuiz,
   fetchMember,
   leaveClan,
   removeMember,
@@ -32,12 +32,13 @@ import QuizModal from '../../../utils/modal/quizzModel';
 import { getRandomTopic } from '../../../utils/random/topic';
 
 interface Member {
+  isToday: unknown;
   _id: string | number;
   id: number;
   rank: number;
   name: string;
   role: 'leader' | 'Co-Leader' | 'member';
-  solvedProblems: number;
+  score: any;
   clanName: string;
   level: number;
 }
@@ -50,18 +51,32 @@ const MemberTable: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showLeaveClanModal, setShowLeaveClanModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
-  const [showQuizModal, setShowQuizModal] = useState<boolean>(false);
-  const [dailyTasksCompleted, setDailyTasksCompleted] = useState<number>(0);
-  const [isLoading,setIsLoading]=useState(false)
+  const [currentTopic, setCurrentTopic] = useState('');
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLeader, setIsLeader] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(true);
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+    const currentUserMember = members.find((member) => member.id === user._id);
+    setShowQuiz(!currentUserMember?.isToday);
+  }, [members, user._id]);
+
+  const { clanName } = useParams<{ clanName: string }>();
+  const { clanId } = useParams<{ clanId: string }>();
+
+  const memoizedClanId = useMemo(() => clanId, [clanId]);
+  const memoizedClanName = useMemo(() => clanName, [clanName]);
+
   const filteredMembers = useMemo(() => {
-    return members.filter(member =>
-      member.name.toLowerCase().includes(search.toLowerCase()),
+    return members.filter((member) =>
+      member.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [members, search]);
 
@@ -72,60 +87,50 @@ const MemberTable: React.FC = () => {
 
   const pageCount = Math.ceil(filteredMembers.length / itemsPerPage);
 
-  const { clanName } = useParams<{ clanName: string }>();
-  const { clanId } = useParams<{ clanId: string }>();
-  console.log('clanId', clanId);
-
-  useEffect(() => {
-    setIsLoading(true)
-    const fetchAllMember = async () => {
-      if (clanId && clanName) {
-        const response = await dispatch(
-          fetchMember({
-            clanId: clanId,
-            name: clanName,
-          }),
-        );
-        console.log('members', response);
-        if (response.payload && Array.isArray(response.payload)) {
-          const sortedMembers = (response.payload as Member[]).sort(
-            (a, b) => b.solvedProblems - a.solvedProblems,
-          );
-
-          const membersWithRank = sortedMembers.map((member, index) => ({
-            ...member,
-            rank: index + 1,
-          }));
-
-          setMembers(membersWithRank);
-          setIsLoading(false)
-        } else {
-          console.error('Failed to fetch members:', response);
-        }
-      }
-    };
-    fetchAllMember();
-  }, [dispatch, clanId, clanName]);
-
-  useEffect(() => {
-    console.log('user', user._id);
-    if (user && user._id) {
-      console.log('members', members);
-      const leader = members.some(
-        member => member.role === 'leader' && member.id === user._id,
+  const fetchAllMember = useCallback(async () => {
+    if (memoizedClanId && memoizedClanName) {
+      setIsLoading(true);
+      const response = await dispatch(
+        fetchMember({
+          clanId: memoizedClanId,
+          name: memoizedClanName,
+        })
       );
-      console.log('leader', leader);
+      if (response.payload && Array.isArray(response.payload)) {
+        const sortedMembers = (response.payload as Member[]).sort(
+          (a, b) => b.score - a.score
+        );
+
+        const membersWithRank = sortedMembers.map((member, index) => ({
+          ...member,
+          rank: index + 1,
+        }));
+
+        setMembers(membersWithRank);
+        setIsLoading(false);
+      } else {
+        console.error('Failed to fetch members:', response);
+      }
+    }
+  }, [dispatch, memoizedClanId, memoizedClanName]);
+
+  useEffect(() => {
+    fetchAllMember();
+  }, [fetchAllMember]);
+
+  useEffect(() => {
+    if (user && user._id) {
+      const leader = members.some(
+        (member) => member.role === 'leader' && member.id === user._id
+      );
       setIsLeader(leader);
     }
   }, [members, user]);
 
   const handleRemove = async (_id: any, name: string) => {
-    console.log('id', _id, name, clanId);
-
     const response = await dispatch(
-      removeMember({ clanId, _id, memberName: name }),
+      removeMember({ clanId: memoizedClanId, _id, memberName: name })
     );
-    console.log('clan response', response);
     if (response.payload && Array.isArray(response.payload)) {
       setMembers(response.payload as Member[]);
     } else {
@@ -133,30 +138,21 @@ const MemberTable: React.FC = () => {
     }
   };
 
-  const handleDailyTaskClick = () => {
-    setShowQuizModal(true);
-   
-  };
-
-  const handleQuizComplete = (score:number) => {
-    setDailyTasksCompleted(prev => prev + 1);
-    console.log(`Quiz completed with score: ${score}`);
-  };
-
   const getRoleIcon = (role: Member['role']) => {
     switch (role) {
       case 'leader':
-        return <FaCrown className='text-yellow-500' />;
+        return <FaCrown className="text-yellow-500" />;
       case 'Co-Leader':
-        return <FaShieldAlt className='text-blue-500' />;
+        return <FaShieldAlt className="text-blue-500" />;
       default:
-        return <FaUser className='text-gray-500' />;
+        return <FaUser className="text-gray-500" />;
     }
   };
+
   const getActionIcon = (member: Member) => {
     if (member.role === 'leader') {
       return (
-        <span className='px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full'>
+        <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full">
           Leader
         </span>
       );
@@ -165,7 +161,7 @@ const MemberTable: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className='text-green-600 hover:text-green-700 transition-colors duration-150'
+          className="text-green-600 hover:text-green-700 transition-colors duration-150"
           onClick={() => confirmRemove(member)}
         >
           <FaTrash />
@@ -178,8 +174,8 @@ const MemberTable: React.FC = () => {
   const onAddMember = async (username: string, _id: number) => {
     const response = await dispatch(
       addMember({
-        clanId: clanId,
-        name: clanName,
+        clanId: memoizedClanId,
+        name: memoizedClanName,
         members: [
           {
             id: _id,
@@ -187,9 +183,8 @@ const MemberTable: React.FC = () => {
             role: 'member',
           },
         ],
-      }),
+      })
     );
-    console.log('response error', response);
     if (response.payload && Array.isArray(response.payload)) {
       setMembers(response.payload as Member[]);
     } else {
@@ -209,28 +204,25 @@ const MemberTable: React.FC = () => {
       setMemberToRemove(null);
     }
   };
+
   const handleChatClick = () => {
-    navigate(`/groupchat/${clanName}/${clanId}`);
+    navigate(`/groupchat/${memoizedClanName}/${memoizedClanId}`);
   };
+
   const handleLeaveClan = () => {
     setShowLeaveClanModal(true);
   };
+
   const confirmLeaveClan = async () => {
-    if (clanId && user._id) {
+    if (memoizedClanId && user._id) {
       try {
         const response = await dispatch(
-          leaveClan({ clanId, _id: user._id, memberName: user.username }),
+          leaveClan({ clanId: memoizedClanId, _id: user._id, memberName: user.username })
         );
-        console.log('Leave clan response:', response);
-
-        console.log('leaveclan', response);
-
         if (response.payload) {
           setShowLeaveClanModal(false);
-
           navigate('/clan');
         } else {
-         
           console.error('Failed to leave clan:', response);
         }
       } catch (error) {
@@ -238,6 +230,57 @@ const MemberTable: React.FC = () => {
       }
     }
   };
+
+ 
+
+  const handleDailyTaskClick = () => {
+    if (!isQuizCompleted) {
+      setCurrentTopic(getRandomTopic());
+      setIsQuizModalOpen(true);
+      setShowQuiz(false);
+    }
+  };
+
+  const handleQuizComplete = async (score: number) => {
+    console.log("score", score);
+    try {
+      const updatedMembers = members.map((member) => {
+        if (member.id === user._id) {
+          return {
+            ...member,
+            score: member.score + score,
+            isToday: true,
+          };
+        }
+        return member;
+      });
+  
+      setMembers(updatedMembers);
+  
+      const response = await dispatch(
+        completeQuiz({
+          clanId: memoizedClanId,
+          userId: user._id,
+          score,
+        })
+      );
+  
+      console.log("Quiz completion response:", response);
+      if (response?.payload?.success) {
+        setIsQuizCompleted(true);
+        setIsQuizModalOpen(false);
+        setShowQuiz(false);
+      } else {
+        console.error("Failed to complete quiz:", response);
+      }
+    } catch (error) {
+      console.error("Error completing quiz:", error);
+    }
+  };
+
+ 
+
+
 
   return (
     <div className='container mx-auto p-6 bg-white rounded-lg shadow-2xl mt-20'>
@@ -248,22 +291,28 @@ const MemberTable: React.FC = () => {
         </h1>
 
         <div className='flex space-x-4'>
+        <div className="timer-container">
         <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className='px-4 py-2 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-colors duration-150 flex items-center'
-            onClick={handleDailyTaskClick}
-          >
-            <FaTasks className='mr-2' />
-            Quiz
-            
-          </motion.button>
-          <QuizModal
-        isOpen={showQuizModal}
-        onClose={() => setShowQuizModal(false)}
-        onComplete={handleQuizComplete}
-        topic = {getRandomTopic()}
-      />
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className={`px-4 py-2 text-white rounded-full shadow-lg transition-colors duration-150 flex items-center ${
+          isQuizCompleted
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-purple-600 hover:bg-purple-700'
+        }`}
+        onClick={handleDailyTaskClick}
+        disabled={isQuizCompleted}
+      >
+        <FaTasks className="mr-2" />
+        {showQuiz ? 'Daily Task' : 'Task Completed'}
+      </motion.button>
+        <QuizModal
+          isOpen={isQuizModalOpen}
+          onClose={() => setIsQuizModalOpen(false)}
+          onComplete={handleQuizComplete}
+          topic={currentTopic}
+        />
+      </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -317,7 +366,7 @@ const MemberTable: React.FC = () => {
         <table className='min-w-full divide-y divide-green-200'>
           <thead>
             <tr>
-              {['Rank', 'Name', 'Role', 'Solved Problems', 'Level'].map(
+              {['Rank', 'Name', 'Role', 'Score', 'Level'].map(
                 header => (
                   <th
                     key={header}
@@ -376,7 +425,7 @@ const MemberTable: React.FC = () => {
                   <div className='flex items-center'>
                     <FaCode className='mr-2 text-green-500' />
                     <span className='font-semibold text-green-700'>
-                      {member.solvedProblems}
+                      {member.score}
                     </span>
                   </div>
                 </td>
@@ -459,4 +508,6 @@ const MemberTable: React.FC = () => {
   );
 };
 
-export default MemberTable;
+export default MemberTable
+
+

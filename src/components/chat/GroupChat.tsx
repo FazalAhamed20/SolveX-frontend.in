@@ -142,6 +142,19 @@ const GroupChat: React.FC = () => {
   }
 }, [user._id,socket, clanId, user._id,  handleNewMessage, handleDeleteMessage, handleTyping]);
 
+useEffect(() => {
+  const markMessagesAsRead = () => {
+    const unreadMessages = messages.filter(msg => 
+      msg.sender._id !== user._id && msg.status !== 'read'
+    );
+    unreadMessages.forEach(msg => {
+      socket?.emit('messageRead', { roomId: clanId, messageId: msg._id, userId: user._id });
+    });
+  };
+
+  markMessagesAsRead();
+}, [messages, user._id, clanId, socket]);
+
 const handleUserJoined = useCallback((userId: string) => {
   setOnlineUsers(prevUsers => [...new Set([...prevUsers, userId])]);
   setGroupMembers(prevMembers =>

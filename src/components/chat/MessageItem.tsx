@@ -146,24 +146,38 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
         switch (message.status) {
           case 'sent':
             return (
-              <div className='absolute bottom-[6px] right-[6px]'>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+<div className='absolute bottom-[6px] right-[6px]'>
+  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24">
+    <path fill="#808080" fill-rule="evenodd" d="M19.7071 6.29289C20.0976 6.68342 20.0976 7.31658 19.7071 7.70711L9.70711 17.7071C9.51957 17.8946 9.26522 18 9 18C8.73478 18 8.48043 17.8946 8.29289 17.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L9 15.5858L18.2929 6.29289C18.6834 5.90237 19.3166 5.90237 19.7071 6.29289Z" clip-rule="evenodd"/>
   </svg>
-              </div>
+</div>
             );
           case 'delivered':
             return (
-              <div className='absolute bottom-0 right-0 mr-1 mb-1 flex'>
-                <FaCheck className='text-gray-400 text-xs' />
-                <FaCheck className='text-gray-400 text-xs -ml-0.5' />
-              </div>
+              <div className='absolute bottom-[6px] right-[6px]'>
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" id="double-check">
+                <path fill="url(#paint0_linear_1233_4362)" fill-rule="evenodd" d="M22.7071 7.70709C23.0976 7.31656 23.0976 6.68339 22.7071 6.29288C22.3166 5.90236 21.6834 5.90238 21.2929 6.29291L12.0003 15.5859L11.207 14.7928C10.8164 14.4023 10.1833 14.4024 9.79279 14.793C9.40232 15.1836 9.40242 15.8167 9.793 16.2072L11.2934 17.7072C11.684 18.0976 12.3171 18.0976 12.7076 17.7071L22.7071 7.70709ZM16.7071 7.70711C17.0976 7.31658 17.0976 6.68342 16.7071 6.29289C16.3166 5.90237 15.6834 5.90237 15.2929 6.29289L6 15.5858L2.70711 12.2929C2.31658 11.9024 1.68342 11.9024 1.29289 12.2929C0.902369 12.6834 0.902369 13.3166 1.29289 13.7071L5.29289 17.7071C5.48043 17.8946 5.73478 18 6 18C6.26522 18 6.51957 17.8946 6.70711 17.7071L16.7071 7.70711Z" clip-rule="evenodd"></path>
+                <defs>
+                  <linearGradient id="paint0_linear_1233_4362" x1="12" x2="12" y1="6" y2="18" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#57EAEA"></stop>
+                    <stop offset="1" stop-color="#2BC9FF"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
             );
           case 'read':
             return (
-              <div className='absolute bottom-0 right-0 mr-1 mb-1 flex'>
-                <FaCheck className='text-blue-500 text-xs' />
-                <FaCheck className='text-blue-500 text-xs -ml-0.5' />
+              <div className='absolute bottom-[6px] right-[6px]'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" id="double-check">
+                  <path fill="url(#paint0_linear_1233_4362)" fill-rule="evenodd" d="M22.7071 7.70709C23.0976 7.31656 23.0976 6.68339 22.7071 6.29288C22.3166 5.90236 21.6834 5.90238 21.2929 6.29291L12.0003 15.5859L11.207 14.7928C10.8164 14.4023 10.1833 14.4024 9.79279 14.793C9.40232 15.1836 9.40242 15.8167 9.793 16.2072L11.2934 17.7072C11.684 18.0976 12.3171 18.0976 12.7076 17.7071L22.7071 7.70709ZM16.7071 7.70711C17.0976 7.31658 17.0976 6.68342 16.7071 6.29289C16.3166 5.90237 15.6834 5.90237 15.2929 6.29289L6 15.5858L2.70711 12.2929C2.31658 11.9024 1.68342 11.9024 1.29289 12.2929C0.902369 12.6834 0.902369 13.3166 1.29289 13.7071L5.29289 17.7071C5.48043 17.8946 5.73478 18 6 18C6.26522 18 6.51957 17.8946 6.70711 17.7071L16.7071 7.70711Z" clip-rule="evenodd"></path>
+                  <defs>
+                    <linearGradient id="paint0_linear_1233_4362" x1="12" x2="12" y1="6" y2="18" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#57EAEA"></stop>
+                      <stop offset="1" stop-color="#2BC9FF"></stop>
+                    </linearGradient>
+                  </defs>
+                </svg>
               </div>
             );
           default:

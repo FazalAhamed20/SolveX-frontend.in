@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { generateWelcomeSpeech } from '../chatBot/geminiApi';
+import {  generateWelcomeUserSpeech } from '../chatBot/geminiApi';
+
 
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: () => void;
+  username:string
 }
 
-const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
+const WelcomeUserModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose ,username}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [adminSpeech, setAdminSpeech] = useState('');
+  const [userSpeech, setUserSpeech] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -20,8 +22,8 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
   const loadSpeech = async () => {
     setIsLoading(true);
     try {
-      const speech = await generateWelcomeSpeech();
-      setAdminSpeech(speech);
+      const speech = await generateWelcomeUserSpeech();
+      setUserSpeech(speech);
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to load speech:', error);
@@ -44,85 +46,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
     show: { opacity: 1, y: 0 },
   };
 
-  const CodingPlatformSVG = () => {
-    const containerVariants = {
-      hidden: {
-        opacity: 0,
-        scale: 0.8,
-      },
-      visible: {
-        opacity: 1,
-        scale: 1,
-        transition: {
-          duration: 0.5,
-          ease: 'easeInOut',
-        },
-      },
-    };
   
-    const elementVariants = {
-      hidden: {
-        opacity: 0,
-        y: 20,
-      },
-      visible: {
-        opacity: 1,
-        y: 0,
-        transition: {
-          duration: 0.5,
-          ease: 'easeInOut',
-        },
-      },
-    };
-  
-    return (
-      <motion.svg
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 200 200"
-        className="w-full h-auto"
-      >
-        <rect width="200" height="200" fill="#F0FDF4" />
-        <motion.g variants={elementVariants}>
-          <rect x="50" y="50" width="100" height="100" rx="20" fill="#10B981" />
-          <rect x="60" y="60" width="80" height="80" rx="15" fill="#F0FDF4" />
-          <motion.circle
-            cx="100"
-            cy="100"
-            r="20"
-            fill="#10B981"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: 'easeInOut', delay: 0.3 }}
-          />
-          <motion.rect
-            x="70"
-            y="70"
-            width="60"
-            height="60"
-            rx="10"
-            fill="#F0FDF4"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: 'easeInOut', delay: 0.5 }}
-          />
-          <motion.rect
-            x="80"
-            y="80"
-            width="40"
-            height="40"
-            rx="5"
-            fill="#10B981"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: 'easeInOut', delay: 0.7 }}
-          />
-        </motion.g>
-      </motion.svg>
-    );
-  };
   
   return (
     <AnimatePresence>
@@ -142,12 +66,12 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
           >
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/2 bg-green-100 flex items-center justify-center p-6">
-                <CodingPlatformSVG />
+               <img src='../../../src/assets/images/chatbot.jpg' alt="" />
               </div>
               <div className="p-8 md:w-1/2 flex flex-col justify-center">
                 <motion.div variants={container} initial="hidden" animate="show">
                   <motion.h2 variants={item} className="text-3xl font-bold mb-4 text-green-700">
-                    {'Welcome Back Admin'.split('').map((char, index) => (
+                    {`Welcome ${username}`.split('').map((char, index) => (
                       <motion.span
                         key={index}
                         initial={{ opacity: 0 }}
@@ -159,7 +83,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                     ))}
                   </motion.h2>
                   <motion.p variants={item} className="mb-6 text-gray-700 leading-relaxed">
-                    {isLoading ? 'Loading...' : adminSpeech.split(' ').map((word, index) => (
+                    {isLoading ? 'Loading...' : userSpeech.split(' ').map((word, index) => (
                       <motion.span
                         key={index}
                         initial={{ opacity: 0 }}
@@ -178,7 +102,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
                       onClick={onClose}
                       className="w-full bg-green-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-800 transition-colors duration-300"
                     >
-                      Welcome Back
+                      Welcome 
                     </motion.button>
                   </motion.div>
                 </motion.div>
@@ -191,4 +115,4 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default WelcomeModal;
+export default WelcomeUserModal;

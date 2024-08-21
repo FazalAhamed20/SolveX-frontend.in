@@ -8,6 +8,7 @@ import axios, {
 import { getGlobalDispatch } from '../redux/dispatchStore';
 import { Logout } from '../redux/actions/AuthActions';
 import { toast } from 'react-toastify';
+
 interface ErrorResponse {
   message: string;
  
@@ -72,6 +73,11 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
           handleLogout();
           return Promise.reject(refreshError);
         }
+      }
+      if (error.response?.status === 500) {
+        console.error('Internal Server Error (500):', error.response);
+        
+        throw error;
       }
 
       return Promise.reject(error);

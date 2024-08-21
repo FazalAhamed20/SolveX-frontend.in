@@ -1,16 +1,26 @@
 import { FiCode, FiBook, FiTrendingUp } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
-import WelcomeModal from '../../../utils/modal/WelcomeModal';
+
+import WelcomeUserModal from '../../../utils/modal/WelcomeUserModal';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/Store';
 
 function LandingHome() {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+
+  const handleOpenWelcomeModal = () => {
+    setIsWelcomeModalOpen(true);
+  };
+
+  const handleCloseWelcomeModal = () => {
+    setIsWelcomeModalOpen(false);
+  };
+  const user = useSelector((state: RootState) => state.user.user);
+  
   return (
     <div className='bg-white-100 min-h-screen'>
-       <WelcomeModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      <WelcomeUserModal isOpen={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} username={user.username} />
+      
       <div className='max-w-7xl mx-auto px-4 py-8'>
         <section className='text-center mb-12'>
           <h1 className='text-5xl font-bold mb-4 text-green-600'>
@@ -19,12 +29,14 @@ function LandingHome() {
           <p className='text-xl text-gray-700 mb-8'>
             The platform to sharpen your coding skills.
           </p>
-          <Link to='/problem'
-          
+        
+          <button
             className='bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg shadow-lg transition duration-300 inline-block'
+            onClick={handleOpenWelcomeModal}
           >
             Get Started
-          </Link>
+          </button>
+          
         </section>
 
         <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12'>
@@ -128,12 +140,12 @@ function LandingHome() {
             Join thousands of users on SolveX and take your coding skills to the
             next level.
           </p>
-          <Link to='/problem'
-          
+          <button
             className='bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg shadow-lg transition duration-300 inline-block'
+            onClick={handleOpenWelcomeModal}
           >
             Get Started
-          </Link>
+          </button>
         </section>
       </div>
     </div>
