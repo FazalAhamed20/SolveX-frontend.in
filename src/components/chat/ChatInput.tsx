@@ -1,17 +1,40 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, FormEvent } from 'react';
 import { FaPaperPlane, FaSmile, FaImage, FaTimes, FaMicrophone, FaStop } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
+
+interface Message {
+  _id: string;
+  image: string;
+  voice: string;
+  text: string;
+  sender: {
+    avatar: any;
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  status: 'sent' | 'delivered' | 'read';
+  replyTo?: {
+    _id: string;
+    text: string;
+    sender: {
+      name: string;
+    };
+  };
+}
 
 interface ChatInputProps {
   inputMessage: string;
   setInputMessage: React.Dispatch<React.SetStateAction<string>>;
-  handleSendMessage: (e: React.FormEvent) => void;
+  handleSendMessage: (text: string, replyTo: Message | null) => void;
   handleTyping: () => void;
   showEmojiPicker: boolean;
   setShowEmojiPicker: React.Dispatch<React.SetStateAction<boolean>>;
   handleEmojiClick: (emoji: { emoji: string }) => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleVoiceMessage: (audioBlob: Blob) => void;
+  replyTo: Message | null;
+  clearReply: () => void;
 }
 
 
@@ -25,7 +48,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
   setShowEmojiPicker,
   handleEmojiClick,
   handleImageUpload,
-  handleVoiceMessage
+  handleVoiceMessage,
+  replyTo,
+  clearReply,
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -52,8 +77,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSendMessage(e);
+    console.log("sub submitted",inputMessage);
+   
+    handleSendMessage(inputMessage, replyTo);
+    console.log("after submitted");
     setPreviewImage(null);
+    setInputMessage('');
+    clearReply();
+  
   };
 
   const startRecording = async () => {
@@ -84,6 +115,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         handleVoiceMessage(audioBlob);
         stream.getTracks().forEach(track => track.stop());
+        const syntheticEvent = {
+          preventDefault: () => {},
+        } as FormEvent<HTMLFormElement>;
+        handleSubmit(syntheticEvent);
+        console.log("submitted");
+        
       };
   
       mediaRecorder.start();
@@ -164,23 +201,60 @@ const ChatInput: React.FC<ChatInputProps> = ({
               isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-[#4caf50] hover:bg-[#43a047]'
             }`}
           >
-            {isRecording ? <FaStop size={18} /> : <FaMicrophone size={18} />}
+           {isRecording ? <FaStop size={18} /> : <FaMicrophone size={18} />}
           </button>
           {isRecording ? (
-            <div className="flex-1 border-2 border-[#a5d6a7] rounded-full px-4 py-2 overflow-hidden">
-           
-          </div>
+            <div className="flex-1 flex items-center">
+             
+              <div className="flex-shrink-0 bg-red-500 text-white px-3 py-1 rounded-full animate-pulse">
+                Recording
+              </div>
+            </div>
           ) : (
-            <input
-    type='text'
-    value={inputMessage}
-    onChange={e => {
-      setInputMessage(e.target.value);
-      handleTyping();
-    }}
-    className='flex-1 border-2 border-[#a5d6a7] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#4caf50] transition-all duration-300'
-    placeholder='Type a message'
-  />
+            <div className="flex-1">
+  {replyTo && (
+    <div className="bg-gray-100 p-2 rounded-md mb-2">
+      <div className="flex justify-between items-center mb-1">
+        <span className="font-semibold">Replying to {replyTo.sender.name}</span>
+        <button 
+          onClick={clearReply} 
+          className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        >
+          ×
+        </button>
+      </div>
+      <div className="flex items-center">
+        {replyTo.image && (
+          <img 
+            src={replyTo.image} 
+            alt="Reply preview" 
+            className="w-10 h-10 object-cover rounded mr-2"
+          />
+        )}
+        {replyTo.voice && (
+          <div className="mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          </div>
+        )}
+        <p className="text-gray-600 truncate flex-1">
+          {replyTo.text ? replyTo.text : replyTo.image ? 'Image' : replyTo.voice ? 'Voice message' : 'Message'}
+        </p>
+      </div>
+    </div>
+  )}
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={e => {
+                  setInputMessage(e.target.value);
+                  handleTyping();
+                }}
+                className="w-full border-2 border-[#a5d6a7] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#4caf50] transition-all duration-300"
+                placeholder="Type a message"
+              />
+            </div>
           )}
           <button
             type='submit'
@@ -188,7 +262,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           >
             <FaPaperPlane size={18} />
           </button>
-        </div>
+          </div>
       </form>
     </div>
   );

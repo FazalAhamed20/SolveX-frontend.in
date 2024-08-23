@@ -1,21 +1,25 @@
 // CreateClanModal.tsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaTimes } from 'react-icons/fa';
+import { FaSpinner, FaTimes } from 'react-icons/fa';
 
 interface CreateClanModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateClan: (name: string, description: string) => void;
+  isCreated:boolean
 }
 
 const CreateClanModal: React.FC<CreateClanModalProps> = ({
   isOpen,
   onClose,
   onCreateClan,
+  isCreated
+
 }) => {
   const [newClanName, setNewClanName] = useState('');
   const [newClanDescription, setNewClanDescription] = useState('');
+  
 
   const handleCreateClan = () => {
     if (newClanName && newClanDescription) {
@@ -68,8 +72,15 @@ const CreateClanModal: React.FC<CreateClanModalProps> = ({
           onClick={handleCreateClan}
           className='w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors duration-300'
         >
-          Create Clan
+          {isCreated ? (
+      <FaSpinner className='mr-2 animate-spin' /> 
+    ) : (
+      <div className='mr-2' />
+    )}
+    {isCreated ? 'Creating...' : 'Create clan'}
         </button>
+
+       
       </motion.div>
     </motion.div>
   );

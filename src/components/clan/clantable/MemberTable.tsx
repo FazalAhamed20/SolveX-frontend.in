@@ -1,10 +1,7 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   FaSearch,
   FaTrash,
-  FaCrown,
-  FaUser,
-  FaShieldAlt,
   FaTrophy,
   FaChevronLeft,
   FaChevronRight,
@@ -30,9 +27,10 @@ import AddMemberModal from '../../../utils/modal/AddMemberModal';
 import ConfirmModal from '../../../utils/modal/confirmModel';
 import QuizModal from '../../../utils/modal/quizzModel';
 import { getRandomTopic } from '../../../utils/random/topic';
+import { getRoleIcon } from '../../../utils';
 
 interface Member {
-  isToday: unknown;
+  isToday: boolean;
   _id: string | number;
   id: number;
   rank: number;
@@ -56,17 +54,16 @@ const MemberTable: React.FC = () => {
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLeader, setIsLeader] = useState(false);
-  const [showQuiz, setShowQuiz] = useState(true);
   const itemsPerPage = 5;
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
   const navigate = useNavigate();
 
-
   useEffect(() => {
-    const currentUserMember = members.find((member) => member.id === user._id);
-    setShowQuiz(!currentUserMember?.isToday);
+    const currentUserMember = members.find(member => member.id === user._id);
+    setIsQuizCompleted(currentUserMember?.isToday || false);
   }, [members, user._id]);
+  console.log('hello', isQuizCompleted);
 
   const { clanName } = useParams<{ clanName: string }>();
   const { clanId } = useParams<{ clanId: string }>();
@@ -75,8 +72,8 @@ const MemberTable: React.FC = () => {
   const memoizedClanName = useMemo(() => clanName, [clanName]);
 
   const filteredMembers = useMemo(() => {
-    return members.filter((member) =>
-      member.name.toLowerCase().includes(search.toLowerCase())
+    return members.filter(member =>
+      member.name.toLowerCase().includes(search.toLowerCase()),
     );
   }, [members, search]);
 
@@ -94,11 +91,11 @@ const MemberTable: React.FC = () => {
         fetchMember({
           clanId: memoizedClanId,
           name: memoizedClanName,
-        })
+        }),
       );
       if (response.payload && Array.isArray(response.payload)) {
         const sortedMembers = (response.payload as Member[]).sort(
-          (a, b) => b.score - a.score
+          (a, b) => b.score - a.score,
         );
 
         const membersWithRank = sortedMembers.map((member, index) => ({
@@ -121,7 +118,7 @@ const MemberTable: React.FC = () => {
   useEffect(() => {
     if (user && user._id) {
       const leader = members.some(
-        (member) => member.role === 'leader' && member.id === user._id
+        member => member.role === 'leader' && member.id === user._id,
       );
       setIsLeader(leader);
     }
@@ -129,7 +126,7 @@ const MemberTable: React.FC = () => {
 
   const handleRemove = async (_id: any, name: string) => {
     const response = await dispatch(
-      removeMember({ clanId: memoizedClanId, _id, memberName: name })
+      removeMember({ clanId: memoizedClanId, _id, memberName: name }),
     );
     if (response.payload && Array.isArray(response.payload)) {
       setMembers(response.payload as Member[]);
@@ -138,21 +135,10 @@ const MemberTable: React.FC = () => {
     }
   };
 
-  const getRoleIcon = (role: Member['role']) => {
-    switch (role) {
-      case 'leader':
-        return <FaCrown className="text-yellow-500" />;
-      case 'Co-Leader':
-        return <FaShieldAlt className="text-blue-500" />;
-      default:
-        return <FaUser className="text-gray-500" />;
-    }
-  };
-
   const getActionIcon = (member: Member) => {
     if (member.role === 'leader') {
       return (
-        <span className="px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full">
+        <span className='px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded-full'>
           Leader
         </span>
       );
@@ -161,7 +147,7 @@ const MemberTable: React.FC = () => {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="text-green-600 hover:text-green-700 transition-colors duration-150"
+          className='text-green-600 hover:text-green-700 transition-colors duration-150'
           onClick={() => confirmRemove(member)}
         >
           <FaTrash />
@@ -183,7 +169,7 @@ const MemberTable: React.FC = () => {
             role: 'member',
           },
         ],
-      })
+      }),
     );
     if (response.payload && Array.isArray(response.payload)) {
       setMembers(response.payload as Member[]);
@@ -217,7 +203,11 @@ const MemberTable: React.FC = () => {
     if (memoizedClanId && user._id) {
       try {
         const response = await dispatch(
-          leaveClan({ clanId: memoizedClanId, _id: user._id, memberName: user.username })
+          leaveClan({
+            clanId: memoizedClanId,
+            _id: user._id,
+            memberName: user.username,
+          }),
         );
         if (response.payload) {
           setShowLeaveClanModal(false);
@@ -231,20 +221,17 @@ const MemberTable: React.FC = () => {
     }
   };
 
- 
-
   const handleDailyTaskClick = () => {
     if (!isQuizCompleted) {
       setCurrentTopic(getRandomTopic());
       setIsQuizModalOpen(true);
-      setShowQuiz(false);
     }
   };
 
   const handleQuizComplete = async (score: number) => {
-    console.log("score", score);
+    console.log('score', score);
     try {
-      const updatedMembers = members.map((member) => {
+      const updatedMembers = members.map(member => {
         if (member.id === user._id) {
           return {
             ...member,
@@ -254,69 +241,64 @@ const MemberTable: React.FC = () => {
         }
         return member;
       });
-  
+
       setMembers(updatedMembers);
-  
+
       const response = await dispatch(
         completeQuiz({
           clanId: memoizedClanId,
           userId: user._id,
           score,
-        })
+        }),
       );
-  
-      console.log("Quiz completion response:", response);
+
+      console.log('Quiz completion response:', response);
       if (response?.payload?.success) {
         setIsQuizCompleted(true);
         setIsQuizModalOpen(false);
-        setShowQuiz(false);
       } else {
-        console.error("Failed to complete quiz:", response);
+        console.error('Failed to complete quiz:', response);
       }
     } catch (error) {
-      console.error("Error completing quiz:", error);
+      console.error('Error completing quiz:', error);
     }
   };
 
- 
-
-
-
   return (
-    <div className='container mx-auto p-6 bg-white rounded-lg shadow-2xl mt-20'>
-      <div className='flex justify-between items-center mb-8'>
-        <h1 className='text-4xl font-extrabold text-green-700'>
+    <div className='container mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-2xl mt-10 sm:mt-20'>
+      <div className='flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8'>
+        <h1 className='text-3xl sm:text-4xl font-extrabold text-green-700 mb-4 sm:mb-0'>
           <FaCode className='inline-block mr-3 mb-1' />
           {clanName || 'Clan'}
         </h1>
 
-        <div className='flex space-x-4'>
-        <div className="timer-container">
-        <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className={`px-4 py-2 text-white rounded-full shadow-lg transition-colors duration-150 flex items-center ${
-          isQuizCompleted
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-purple-600 hover:bg-purple-700'
-        }`}
-        onClick={handleDailyTaskClick}
-        disabled={isQuizCompleted}
-      >
-        <FaTasks className="mr-2" />
-        {showQuiz ? 'Daily Task' : 'Task Completed'}
-      </motion.button>
-        <QuizModal
-          isOpen={isQuizModalOpen}
-          onClose={() => setIsQuizModalOpen(false)}
-          onComplete={handleQuizComplete}
-          topic={currentTopic}
-        />
-      </div>
+        <div className='flex flex-wrap justify-center sm:justify-end space-x-2 sm:space-x-4'>
+          <div className='timer-container mb-2 sm:mb-0'>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-3 sm:px-4 py-2 text-white rounded-full shadow-lg transition-colors duration-150 flex items-center text-sm sm:text-base ${
+                isQuizCompleted
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-purple-600 hover:bg-purple-700'
+              }`}
+              onClick={handleDailyTaskClick}
+              disabled={isQuizCompleted}
+            >
+              <FaTasks className='mr-2' />
+              {isQuizCompleted ? 'Task Completed' : 'Daily Task'}
+            </motion.button>
+            <QuizModal
+              isOpen={isQuizModalOpen}
+              onClose={() => setIsQuizModalOpen(false)}
+              onComplete={handleQuizComplete}
+              topic={currentTopic}
+            />
+          </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className='px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-150 flex items-center'
+            className='px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-150 flex items-center text-sm sm:text-base mb-2 sm:mb-0'
             onClick={handleChatClick}
           >
             <FaComments className='mr-2' />
@@ -326,7 +308,7 @@ const MemberTable: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className='px-4 py-2 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors duration-150 flex items-center'
+              className='px-3 sm:px-4 py-2 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors duration-150 flex items-center text-sm sm:text-base'
               onClick={() => setShowAddMemberModal(true)}
             >
               <FaUserPlus className='mr-2' />
@@ -336,7 +318,7 @@ const MemberTable: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className='px-4 py-2 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors duration-150 flex items-center'
+              className='px-3 sm:px-4 py-2 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors duration-150 flex items-center text-sm sm:text-base'
               onClick={handleLeaveClan}
             >
               <FaSignOutAlt className='mr-2' />
@@ -356,99 +338,97 @@ const MemberTable: React.FC = () => {
           onChange={e => setSearch(e.target.value)}
         />
       </div>
-      {isLoading ? (
-  <div className="flex justify-center items-center h-64">
-  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
-</div>
-) : (
 
-      <div className='overflow-x-auto bg-white shadow-lg rounded-lg border border-green-200'>
-        <table className='min-w-full divide-y divide-green-200'>
-          <thead>
-            <tr>
-              {['Rank', 'Name', 'Role', 'Score', 'Level'].map(
-                header => (
+      {isLoading ? (
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500'></div>
+        </div>
+      ) : (
+        <div className='overflow-x-auto bg-white shadow-lg rounded-lg border border-green-200'>
+          <table className='min-w-full divide-y divide-green-200'>
+            <thead>
+              <tr>
+                {['Rank', 'Name', 'Role', 'Score', 'Level'].map(header => (
                   <th
                     key={header}
-                    className='px-6 py-4 text-left text-xs font-medium text-green-700 uppercase tracking-wider'
+                    className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider'
                   >
                     {header}
                   </th>
-                ),
-              )}
-              {isLeader && (
-                <th className='px-6 py-4 text-left text-xs font-medium text-green-700 uppercase tracking-wider'>
-                  Actions
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className='divide-y divide-green-100'>
-            {paginatedMembers.map(member => (
-              <motion.tr
-                key={member.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.3 }}
-                className='hover:bg-green-50 transition-colors duration-150 ease-in-out'
-              >
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <div className='flex items-center'>
-                    <FaTrophy
-                      className={`mr-2 ${
-                        member.rank <= 3 ? 'text-green-600' : 'text-green-400'
-                      }`}
-                    />
-                    <span
-                      className={`font-semibold ${
-                        member.rank <= 3 ? 'text-green-600' : 'text-green-500'
-                      }`}
-                    >
-                      {member.rank}
-                    </span>
-                  </div>
-                </td>
+                ))}
+                {isLeader && (
+                  <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider'>
+                    Actions
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody className='bg-white divide-y divide-green-100'>
+              {paginatedMembers.map(member => (
+                <motion.tr
+                  key={member.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3 }}
+                  className='hover:bg-green-50 transition-colors duration-150 ease-in-out'
+                >
+                  <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
+                    <div className='flex items-center'>
+                      <FaTrophy
+                        className={`mr-2 ${
+                          member.rank <= 3 ? 'text-green-600' : 'text-green-400'
+                        }`}
+                      />
+                      <span
+                        className={`font-semibold ${
+                          member.rank <= 3 ? 'text-green-600' : 'text-green-500'
+                        }`}
+                      >
+                        {member.rank}
+                      </span>
+                    </div>
+                  </td>
 
-                <td className='px-6 py-4 whitespace-nowrap font-medium text-green-700'>
-                  {member.name}
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <div className='flex items-center'>
-                    {getRoleIcon(member.role)}
-                    <span className='ml-2 text-sm text-green-600'>
-                      {member.role}
-                    </span>
-                  </div>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <div className='flex items-center'>
-                    <FaCode className='mr-2 text-green-500' />
-                    <span className='font-semibold text-green-700'>
-                      {member.score}
-                    </span>
-                  </div>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <div className='flex items-center'>
-                    <FaStar className='text-green-500 mr-1' />
-                    <span className='font-semibold text-green-700'>
-                      {member.level}
-                    </span>
-                  </div>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  {getActionIcon(member)}
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-)}
+                  <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
+                    {member.name}
+                  </td>
+                  <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
+                    <div className='flex items-center'>
+                      {getRoleIcon(member.role)}
+                      <span className='ml-2 text-sm text-green-600'>
+                        {member.role}
+                      </span>
+                    </div>
+                  </td>
+                  <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
+                    <div className='flex items-center'>
+                      <FaCode className='mr-2 text-green-500' />
+                      <span className='font-semibold text-green-700'>
+                        {member.score}
+                      </span>
+                    </div>
+                  </td>
+                  <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
+                    <div className='flex items-center'>
+                      <FaStar className='text-green-500 mr-1' />
+                      <span className='font-semibold text-green-700'>
+                        {member.level}
+                      </span>
+                    </div>
+                  </td>
+                  <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
+                    {getActionIcon(member)}
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <div className='mt-6 flex justify-between items-center'>
-        <div className='text-sm text-green-600'>
+      <div className='mt-6 flex flex-col sm:flex-row justify-between items-center'>
+        <div className='text-sm text-green-600 mb-4 sm:mb-0'>
           Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
           {Math.min(currentPage * itemsPerPage, filteredMembers.length)} of{' '}
           {filteredMembers.length} entries
@@ -508,6 +488,4 @@ const MemberTable: React.FC = () => {
   );
 };
 
-export default MemberTable
-
-
+export default MemberTable;

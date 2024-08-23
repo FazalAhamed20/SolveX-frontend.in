@@ -26,23 +26,23 @@ const TestCases: React.FC<TestCasesProps> = ({
           <div className='text-center'>Loading test cases...</div>
         ) : (
           <>
-            <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
-              {testCases.map((testCase, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleTestCaseClick(index)}
-                  className={`p-1 rounded-md text-xs font-bold ${
-                    testResults[index] === null
-                      ? 'bg-gray-300 text-[#4B5563]'
-                      : testResults[index]
-                      ? 'bg-green-500 text-white'
-                      : 'bg-red-500 text-white'
-                  }`}
-                >
-                  Case {index + 1}
-                </button>
-              ))}
-            </div>
+<div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+  {testCases.map((_, index) => (
+    <button
+      key={index}
+      onClick={() => handleTestCaseClick(index)}
+      className={`p-1 rounded-md text-xs font-bold ${
+        testResults[index] === null
+          ? 'bg-gray-300 text-[#4B5563]'
+          : testResults[index]
+          ? 'bg-green-500 text-white'
+          : 'bg-red-500 text-white'
+      }`}
+    >
+      Case {index + 1}
+    </button>
+  ))}
+</div>
 
             {selectedTestCase !== null && (
               <div className='mt-4 p-4 bg-gray-100 rounded-md'>

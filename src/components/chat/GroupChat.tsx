@@ -11,11 +11,13 @@ import ChatInput from './ChatInput';
 import axios from 'axios';
 import { useSocket } from '../../context/SocketContext';
 import debounce from 'lodash/debounce';
+const cloudinary_Image = import.meta.env.VITE_CLOUDINARY_IMAGE as string
+const cloudinary_Audio= import.meta.env.VITE_CLOUDINARY_AUDIO as string
 
 interface Message {
   _id: string;
   image: string;
-  audioUrl: string;
+  voice: string;
   text: string;
   sender: {
     avatar: any;
@@ -24,6 +26,15 @@ interface Message {
   };
   createdAt: string;
   status: 'sent' | 'delivered' | 'read';
+  replyTo?: {
+    _id: string;
+    text?: string;
+    image?: string;
+    voice?: string;
+    sender: {
+      name: string;
+    };
+  };
 }
 
 interface GroupMember {
@@ -46,6 +57,8 @@ const GroupChat: React.FC = () => {
   const [voice, setVoice] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [replyTo, setReplyTo] = useState(null);
+ 
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +66,7 @@ const GroupChat: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
-  const { socket, initializeSocket, disconnectSocket } = useSocket();
+  const { socket, initializeSocket } = useSocket();
 
   useEffect(() => {
     chatContainerRef.current?.scrollIntoView({
@@ -77,6 +90,7 @@ const GroupChat: React.FC = () => {
     const fetchMessages = async () => {
       try {
         const response = await ChatAxios.get(`/messages/clan/${clanId}`);
+        console.log('response',response)
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -92,7 +106,9 @@ const GroupChat: React.FC = () => {
   }, []);
 
   const handleDeleteMessage = useCallback((messageId: string) => {
-    setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
+    console.log('socket',messageId)
+  handleDeleteMessageRequest(messageId)
+    
   }, []);
  
 
@@ -144,9 +160,11 @@ const GroupChat: React.FC = () => {
 
 useEffect(() => {
   const markMessagesAsRead = () => {
+    console.log('msg._id status',messages)
     const unreadMessages = messages.filter(msg => 
       msg.sender._id !== user._id && msg.status !== 'read'
     );
+    console.log('msg._id',unreadMessages)
     unreadMessages.forEach(msg => {
       socket?.emit('messageRead', { roomId: clanId, messageId: msg._id, userId: user._id });
     });
@@ -190,33 +208,53 @@ const handleOnlineUsers = useCallback((users: string[]) => {
   );
 }, []);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputMessage.trim() !== '' || image || voice) {
-      try {
-        const response = await ChatAxios.post('/chat/messages', {
-          image: image,
-          voice: voice,
-          text: inputMessage,
-          sender: { _id: user._id, name: user.username },
-          clanId: clanId,
-        });
+const handleSendMessage = async (text: string, replyToMessage: Message | null) => {
+  console.log("voice came");
+  
+ 
+  if (text.trim() !== '' || image || voice) {
+    try {
+      console.log("voice till came");
+      const messageData = {
+        image: image,
+        voice: voice,
+        text: text,
+        sender: { _id: user._id, name: user.username },
+        clanId: clanId,
+        replyTo: replyToMessage
+          ? {
+              _id: replyToMessage._id,
+              text: replyToMessage.text,
+              image: replyToMessage.image,
+              voice: replyToMessage.voice,
+              sender: { name: replyToMessage.sender.name }
+            }
+          : undefined,
+        createdAt: new Date().toISOString() 
+      };
 
-        const newMessage = response.data;
-        
-        socket?.emit('sendMessage', {
-          roomId: clanId,
-          message: newMessage,
-        });
+      console.log('message data',messageData)
+      const response = await ChatAxios.post('/chat/messages', messageData);
+      const newMessage = response.data;
+      console.log('newMessages',newMessage)
+      socket?.emit('sendMessage', {
+        roomId: clanId,
+        message: newMessage,
+      });
+      
+     
 
-        setInputMessage('');
-        setImage('');
-        setVoice('');
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+      setInputMessage('');
+      setImage('');
+      setVoice('');
+      setReplyTo(null);
+     
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  };
+  }
+};
+console.log('all',messages)
 
   const debouncedTyping = useCallback(
     debounce(() => {
@@ -241,7 +279,7 @@ const handleOnlineUsers = useCallback((users: string[]) => {
 
       try {
         const response = await axios.post(
-          `https://api.cloudinary.com/v1_1/dlitqiyia/image/upload`,
+          `${cloudinary_Image}`,
           formData,
         );
 
@@ -263,7 +301,7 @@ const handleOnlineUsers = useCallback((users: string[]) => {
 
     try {
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/dlitqiyia/video/upload`,
+        `${cloudinary_Audio}`,
         formData
       );
 
@@ -275,13 +313,24 @@ const handleOnlineUsers = useCallback((users: string[]) => {
   };
 
   const handleDeleteMessageRequest = async (messageId: string) => {
+    console.log("mmm......",messageId)
     try {
-      await ChatAxios.delete(`/messages/${messageId}`);
       setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
       socket?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
+      await ChatAxios.delete(`/messages/${messageId}`);
+      
+      
     } catch (error) {
       console.error('Error deleting message:', error);
     }
+  };
+
+  const handleReply = (message:any) => {
+    setReplyTo(message);
+  };
+
+  const clearReply = () => {
+    setReplyTo(null);
   };
 
   return (
@@ -293,6 +342,7 @@ const handleOnlineUsers = useCallback((users: string[]) => {
             groupMembers={groupMembers}
             currentUser={user}
             onlineUsers={onlineUsers}
+            typingUser={typingUser}
           />
           <div className='flex-1 flex flex-col'>
             <ChatHeader
@@ -303,22 +353,25 @@ const handleOnlineUsers = useCallback((users: string[]) => {
             <MessageList
               messages={messages}
               currentUser={user}
-              typingUser={typingUser}
               ref={chatContainerRef}
               isLoading={isLoading}
-              onDeleteMessage={handleDeleteMessageRequest}
+              onDeleteMessage={handleDeleteMessage}
+              onReplyMessage={handleReply}
+              
             />
-            <ChatInput
-              inputMessage={inputMessage}
-              setInputMessage={setInputMessage}
-              handleSendMessage={handleSendMessage}
-              handleTyping={debouncedTyping}
-              showEmojiPicker={showEmojiPicker}
-              setShowEmojiPicker={setShowEmojiPicker}
-              handleEmojiClick={handleEmojiClick}
-              handleImageUpload={handleImageUpload}
-              handleVoiceMessage={handleVoiceMessage}
-            />
+           <ChatInput
+  inputMessage={inputMessage}
+  setInputMessage={setInputMessage}
+  handleSendMessage={handleSendMessage}
+  handleTyping={debouncedTyping}
+  showEmojiPicker={showEmojiPicker}
+  setShowEmojiPicker={setShowEmojiPicker}
+  handleEmojiClick={handleEmojiClick}
+  handleImageUpload={handleImageUpload}
+  handleVoiceMessage={handleVoiceMessage}
+  replyTo={replyTo}
+  clearReply={clearReply}
+/>
           </div>
         </div>
       </div>

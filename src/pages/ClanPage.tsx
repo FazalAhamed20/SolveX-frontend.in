@@ -1,17 +1,20 @@
-import { useDispatch, useSelector } from 'react-redux';
+import {  useSelector } from 'react-redux';
 import ClanComponent from '../components/clan/clanComponent/ClanComponent';
 import Navbar from '../components/navbar/Navbar';
 import { useSocketNotification } from '../hooks/useSocketNotification';
-import { AppDispatch } from '../redux/Store';
+
+
+
 
 const ClanPage = () => {
-  const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
-  const { socket, notifications, clearNotification } = useSocketNotification(user._id);
+  const { socket, notifications, clearNotification,isAccepted,isReject } = useSocketNotification(user._id);
+  console.log('./././',socket)
   return (
     <div>
-       <Navbar notifications={notifications} clearNotification={clearNotification} />
-       <ClanComponent socket={socket} />
+       <Navbar notifications={notifications} clearNotification={clearNotification} socket={socket} />
+       <ClanComponent socket={socket} isAccepted={isAccepted} isReject={isReject} />
+      
     </div>
   );
 };

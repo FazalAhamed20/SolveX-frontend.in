@@ -6,15 +6,16 @@ import React, {
   useCallback,
 } from 'react';
 import {
-  FaCheck,
   FaPlay,
   FaPause,
   FaTrash,
   FaChevronDown,
+  FaReply,
 } from 'react-icons/fa';
 import ConfirmModal from '../../utils/modal/confirmModel';
 import { ChatAxios } from '../../config/AxiosInstance';
 import Reactions from './Reaction';
+import ReplyPreview from './ReplyPreview';
 
 interface Reaction {
   memberId: string;
@@ -22,20 +23,31 @@ interface Reaction {
   messageId: string;
 }
 
+
+interface ReplyTo {
+  _id: string;
+  text?: string;
+  image?: string;
+  voice?: string;
+  sender: {
+    name: string;
+  };
+}
+
 interface Message {
   _id: string;
-  text: string;
+  text?: string;
+  image?: string;
+  voice?: string;
   sender: {
-    avatar: any;
+    avatar: string;
     _id: string;
     name: string;
   };
   createdAt: string;
   status: 'sent' | 'delivered' | 'read';
-  image?: string;
-  voice?: string;
   reactions?: Reaction[];
- 
+  replyTo?: ReplyTo;
 }
 
 interface MessageItemProps {
@@ -43,10 +55,17 @@ interface MessageItemProps {
   currentUser: any;
   isLoading: boolean;
   onDeleteMessage: (messageId: string) => void;
+  onReplyMessage: (message: Message) => void;
+ 
 }
 
+
+
 const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
-  ({ message, currentUser, isLoading, onDeleteMessage }, ref) => {
+  (
+    { message, currentUser, isLoading, onDeleteMessage, onReplyMessage },
+    ref,
+  ) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,6 +73,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
       message.reactions || [],
     );
     const [showReactions, setShowReactions] = useState(false);
+   
 
     const isOwnMessage = useMemo(
       () => message.sender._id === currentUser._id,
@@ -78,6 +98,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     }, []);
 
     const handleConfirmDelete = useCallback(() => {
+      console.log('delete',message)
       onDeleteMessage(message._id);
       setIsModalOpen(false);
     }, [message._id, onDeleteMessage]);
@@ -92,6 +113,11 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
         setIsPlaying(!isPlaying);
       }
     }, [audio, isPlaying]);
+
+    const handleReply = useCallback(() => {
+      onReplyMessage(message);
+      setShowDropdown(false);
+    }, [message, onReplyMessage]);
 
     const handleReact = useCallback(
       async (emoji: string | null) => {
@@ -130,7 +156,6 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
       [reactions, currentUser._id, message._id],
     );
 
-
     useEffect(() => {
       if (audio) {
         const handleEnded = () => setIsPlaying(false);
@@ -146,35 +171,84 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
         switch (message.status) {
           case 'sent':
             return (
-<div className='absolute bottom-[6px] right-[6px]'>
-  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24">
-    <path fill="#808080" fill-rule="evenodd" d="M19.7071 6.29289C20.0976 6.68342 20.0976 7.31658 19.7071 7.70711L9.70711 17.7071C9.51957 17.8946 9.26522 18 9 18C8.73478 18 8.48043 17.8946 8.29289 17.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L9 15.5858L18.2929 6.29289C18.6834 5.90237 19.3166 5.90237 19.7071 6.29289Z" clip-rule="evenodd"/>
-  </svg>
-</div>
+              <div className='absolute bottom-[6px] right-[6px]'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='17'
+                  height='17'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    fill='#808080'
+                    fillRule='evenodd'
+                    d='M19.7071 6.29289C20.0976 6.68342 20.0976 7.31658 19.7071 7.70711L9.70711 17.7071C9.51957 17.8946 9.26522 18 9 18C8.73478 18 8.48043 17.8946 8.29289 17.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L9 15.5858L18.2929 6.29289C18.6834 5.90237 19.3166 5.90237 19.7071 6.29289Z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+              </div>
             );
           case 'delivered':
             return (
               <div className='absolute bottom-[6px] right-[6px]'>
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" id="double-check">
-                <path fill="url(#paint0_linear_1233_4362)" fill-rule="evenodd" d="M22.7071 7.70709C23.0976 7.31656 23.0976 6.68339 22.7071 6.29288C22.3166 5.90236 21.6834 5.90238 21.2929 6.29291L12.0003 15.5859L11.207 14.7928C10.8164 14.4023 10.1833 14.4024 9.79279 14.793C9.40232 15.1836 9.40242 15.8167 9.793 16.2072L11.2934 17.7072C11.684 18.0976 12.3171 18.0976 12.7076 17.7071L22.7071 7.70709ZM16.7071 7.70711C17.0976 7.31658 17.0976 6.68342 16.7071 6.29289C16.3166 5.90237 15.6834 5.90237 15.2929 6.29289L6 15.5858L2.70711 12.2929C2.31658 11.9024 1.68342 11.9024 1.29289 12.2929C0.902369 12.6834 0.902369 13.3166 1.29289 13.7071L5.29289 17.7071C5.48043 17.8946 5.73478 18 6 18C6.26522 18 6.51957 17.8946 6.70711 17.7071L16.7071 7.70711Z" clip-rule="evenodd"></path>
-                <defs>
-                  <linearGradient id="paint0_linear_1233_4362" x1="12" x2="12" y1="6" y2="18" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#57EAEA"></stop>
-                    <stop offset="1" stop-color="#2BC9FF"></stop>
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='17'
+                  height='17'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  id='double-check'
+                >
+                  <path
+                    fill='url(#paint0_linear_1233_4362)'
+                    fillRule='evenodd'
+                    d='M22.7071 7.70709C23.0976 7.31656 23.0976 6.68339 22.7071 6.29288C22.3166 5.90236 21.6834 5.90238 21.2929 6.29291L12.0003 15.5859L11.207 14.7928C10.8164 14.4023 10.1833 14.4024 9.79279 14.793C9.40232 15.1836 9.40242 15.8167 9.793 16.2072L11.2934 17.7072C11.684 18.0976 12.3171 18.0976 12.7076 17.7071L22.7071 7.70709ZM16.7071 7.70711C17.0976 7.31658 17.0976 6.68342 16.7071 6.29289C16.3166 5.90237 15.6834 5.90237 15.2929 6.29289L6 15.5858L2.70711 12.2929C2.31658 11.9024 1.68342 11.9024 1.29289 12.2929C0.902369 12.6834 0.902369 13.3166 1.29289 13.7071L5.29289 17.7071C5.48043 17.8946 5.73478 18 6 18C6.26522 18 6.51957 17.8946 6.70711 17.7071L16.7071 7.70711Z'
+                    clipRule='evenodd'
+                  ></path>
+                  <defs>
+                    <linearGradient
+                      id='paint0_linear_1233_4362'
+                      x1='12'
+                      x2='12'
+                      y1='6'
+                      y2='18'
+                      gradientUnits='userSpaceOnUse'
+                    >
+                      <stop stopColor='#57EAEA'></stop>
+                      <stop offset='1' stopColor='#2BC9FF'></stop>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
             );
           case 'read':
             return (
               <div className='absolute bottom-[6px] right-[6px]'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" id="double-check">
-                  <path fill="url(#paint0_linear_1233_4362)" fill-rule="evenodd" d="M22.7071 7.70709C23.0976 7.31656 23.0976 6.68339 22.7071 6.29288C22.3166 5.90236 21.6834 5.90238 21.2929 6.29291L12.0003 15.5859L11.207 14.7928C10.8164 14.4023 10.1833 14.4024 9.79279 14.793C9.40232 15.1836 9.40242 15.8167 9.793 16.2072L11.2934 17.7072C11.684 18.0976 12.3171 18.0976 12.7076 17.7071L22.7071 7.70709ZM16.7071 7.70711C17.0976 7.31658 17.0976 6.68342 16.7071 6.29289C16.3166 5.90237 15.6834 5.90237 15.2929 6.29289L6 15.5858L2.70711 12.2929C2.31658 11.9024 1.68342 11.9024 1.29289 12.2929C0.902369 12.6834 0.902369 13.3166 1.29289 13.7071L5.29289 17.7071C5.48043 17.8946 5.73478 18 6 18C6.26522 18 6.51957 17.8946 6.70711 17.7071L16.7071 7.70711Z" clip-rule="evenodd"></path>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='17'
+                  height='17'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  id='double-check'
+                >
+                  <path
+                    fill='url(#paint0_linear_1233_4362)'
+                    fillRule='evenodd'
+                    d='M22.7071 7.70709C23.0976 7.31656 23.0976 6.68339 22.7071 6.29288C22.3166 5.90236 21.6834 5.90238 21.2929 6.29291L12.0003 15.5859L11.207 14.7928C10.8164 14.4023 10.1833 14.4024 9.79279 14.793C9.40232 15.1836 9.40242 15.8167 9.793 16.2072L11.2934 17.7072C11.684 18.0976 12.3171 18.0976 12.7076 17.7071L22.7071 7.70709ZM16.7071 7.70711C17.0976 7.31658 17.0976 6.68342 16.7071 6.29289C16.3166 5.90237 15.6834 5.90237 15.2929 6.29289L6 15.5858L2.70711 12.2929C2.31658 11.9024 1.68342 11.9024 1.29289 12.2929C0.902369 12.6834 0.902369 13.3166 1.29289 13.7071L5.29289 17.7071C5.48043 17.8946 5.73478 18 6 18C6.26522 18 6.51957 17.8946 6.70711 17.7071L16.7071 7.70711Z'
+                    clipRule='evenodd'
+                  ></path>
                   <defs>
-                    <linearGradient id="paint0_linear_1233_4362" x1="12" x2="12" y1="6" y2="18" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#57EAEA"></stop>
-                      <stop offset="1" stop-color="#2BC9FF"></stop>
+                    <linearGradient
+                      id='paint0_linear_1233_4362'
+                      x1='12'
+                      x2='12'
+                      y1='6'
+                      y2='18'
+                      gradientUnits='userSpaceOnUse'
+                    >
+                      <stop stopColor='#57EAEA'></stop>
+                      <stop offset='1' stopColor='#2BC9FF'></stop>
                     </linearGradient>
                   </defs>
                 </svg>
@@ -186,8 +260,6 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
       }
       return null;
     }, [message.status, isOwnMessage]);
-    
-
 
     const reactionSummary = useMemo(() => {
       return Object.entries(
@@ -197,6 +269,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
         }, {} as Record<string, number>),
       );
     }, [reactions]);
+    
 
     return (
       <div
@@ -209,10 +282,17 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           <div className='absolute right-0 top-0 transform -translate-y-full mb-1 w-28 bg-white rounded-md shadow-lg z-10'>
             <button
               onClick={handleDeleteClick}
-              className='flex items-center px-4 py-2 w-full text-sm text-red-600 hover:bg-red-100 rounded-md'
+              className='flex items-center px-4 py-2 w-full text-sm text-red-600 hover:bg-red-100 rounded-md z-10'
             >
               <FaTrash size={12} className='mr-2' />
               Delete
+            </button>
+            <button
+              onClick={handleReply}
+              className='flex items-center px-4 py-2 w-full text-sm text-blue-600 hover:bg-blue-100 rounded-md'
+            >
+              <FaReply size={12} className='mr-2' />
+              Reply
             </button>
           </div>
         )}
@@ -242,10 +322,20 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           onMouseLeave={() => setShowReactions(false)}
         >
           {!isOwnMessage && (
-            <span className='block text-xs font-bold mb-1 text-green-700'>
-              {message.sender.name}
-            </span>
+            <div className='flex justify-between items-center mb-1'>
+              <span className='text-xs font-bold text-green-700 mr-6'>
+                {message.sender.name}
+              </span>
+              <button
+                onClick={handleReply}
+                className='p-1 text-gray-500 hover:text-gray-700 transition-colors duration-200'
+              >
+                <FaReply size={14} />
+              </button>
+            </div>
           )}
+
+          {message.replyTo && <ReplyPreview replyTo={message.replyTo} />}
 
           {message.image && (
             <>
@@ -261,28 +351,28 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
             </>
           )}
 
-          {message.voice && (
-            <div className='flex items-center space-x-2 mb-2'>
-              <button
-                onClick={toggleAudio}
-                className='p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200'
-              >
-                {isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
-              </button>
-              <div className='flex-1 h-1 bg-green-200 rounded-full'>
-                <div
-                  className='h-full bg-green-500 rounded-full'
-                  style={{
-                    width: `${
-                      ((audio?.currentTime || 0) / (audio?.duration || 1)) * 100
-                    }%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          )}
+{message.voice && (
+  <div className='flex items-center space-x-2 mb-2'>
+    <button
+      onClick={toggleAudio}
+      className='p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200'
+    >
+      {isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+    </button>
+    <div className='flex-1 h-1 bg-green-200 rounded-full'>
+      <div
+        className='h-full bg-green-500 rounded-full'
+        style={{
+          width: `${
+            ((audio?.currentTime || 0) / (audio?.duration || 1)) * 100
+          }%`,
+        }}
+      ></div>
+    </div>
+  </div>
+)}
 
-          <div className='pr-6'>
+          <div className='pr-8'>
             <p className='text-sm leading-relaxed break-words whitespace-pre-wrap'>
               {message.text}
             </p>
@@ -304,7 +394,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
               </div>
             )}
 
-<div className='flex justify-end items-center mt-1 space-x-1.5'>
+            <div className='flex justify-end items-center mt-1 space-x-1.5'>
               <span className='block text-[11px] text-green-600'>
                 {formattedTime}
               </span>
@@ -313,25 +403,24 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           </div>
 
           <div
-            className={`absolute w-3 h-3 ${
-              isOwnMessage
-                ? 'right-0 -mr-1.5 bg-green-100'
-                : 'left-0 -ml-1.5 bg-white'
-            } bottom-[8px] transform ${
-              isOwnMessage ? 'rotate-45' : '-rotate-45'
-            }`}
-          ></div>
-
-          {isOwnMessage && (
-            <div className='absolute top-2 right-2 z-10'>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className='p-1 text-gray-500 hover:text-gray-700 transition-colors duration-200'
-              >
-                <FaChevronDown size={14} />
-              </button>
-            </div>
-          )}
+    className={`absolute w-3 h-3 ${
+      isOwnMessage
+        ? 'right-0 -mr-1.5 bg-green-100'
+        : 'left-0 -ml-1.5 bg-white'
+    } bottom-[8px] transform ${
+      isOwnMessage ? 'rotate-45' : '-rotate-45'
+    }`}
+  ></div>
+         {isOwnMessage && (
+    <div className='absolute top-2 right-2 z-10'>
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className='p-1 text-gray-500 hover:text-gray-700 transition-colors duration-200'
+      >
+        <FaChevronDown size={14} />
+      </button>
+    </div>
+  )}
 
           {showReactions && (
             <Reactions
@@ -356,5 +445,4 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     );
   },
 );
-
 export default React.memo(MessageItem);

@@ -18,22 +18,22 @@ interface Message {
 interface MessageListProps {
   messages: Message[];
   currentUser: any;
-  typingUser: string;
   isLoading:boolean;
   onDeleteMessage: (messageId: string) => void;
+  onReplyMessage:any
 }
 
 const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
-  ({ messages, currentUser, typingUser ,isLoading,onDeleteMessage }: MessageListProps, ref) => {
-    console.log("typing",typingUser)
+  ({ messages, currentUser ,isLoading,onDeleteMessage,onReplyMessage }: MessageListProps, ref) => {
+
+  
+
     return (
       <div  className='flex-1 overflow-y-auto px-4 py-4 bg-[#f0f4f0]'>
         {messages.map(message => (
-          <MessageItem ref={ref} key={message._id} message={message} currentUser={currentUser} isLoading={isLoading} onDeleteMessage={onDeleteMessage}  />
+          <MessageItem ref={ref} key={message._id} message={message} currentUser={currentUser} isLoading={isLoading} onDeleteMessage={onDeleteMessage} onReplyMessage={onReplyMessage}  />
         ))}
-        {typingUser && (
-          <p className='italic text-[#4caf50] mt-2'>{typingUser} is typing...</p>
-        )}
+        
       </div>
     );
   }

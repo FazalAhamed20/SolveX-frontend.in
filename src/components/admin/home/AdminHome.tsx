@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { Logout } from '../../../redux/actions/AuthActions';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../../redux/Store';
-import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import {
   BarChart,
   Bar,
@@ -23,15 +23,7 @@ import UserTable from '../userTable/UserTable';
 import ProblemTable from '../problemTable/ProblemTable';
 import LogoutModal from '../../../utils/modal/LogoutModal';
 import { motion } from 'framer-motion';
-import {
-  FaChartPie,
-  FaUsers,
-  FaCode,
-  FaTrophy,
-  FaCrown,
-  FaFlask,
-  FaFortAwesome,
-} from 'react-icons/fa';
+import { menuItems } from '../../../utils';
 import PracticalTable from '../practicalTable/PracticalTable';
 import ClanTable from '../clanTable/ClanTable';
 import SubscriptionTable from '../subscriptionTable/SubscriptionTable';
@@ -152,15 +144,7 @@ const AdminDashboard: React.FC = () => {
   
   }));
 
-  const menuItems = [
-    { name: 'dashboard', icon: FaChartPie },
-    { name: 'problems', icon: FaCode },
-    { name: 'users', icon: FaUsers },
-    { name: 'practice', icon: FaFlask },
-    { name: 'leaderboard', icon: FaTrophy },
-    { name: 'subscription', icon: FaCrown },
-    { name: 'clans', icon: FaFortAwesome },
-  ];
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -186,7 +170,7 @@ const AdminDashboard: React.FC = () => {
       >
         <h2 className='text-2xl font-bold mb-8'>Admin Panel</h2>
         <ul>
-          {menuItems.map((item, index) => (
+          {menuItems.map((item:any, index:any) => (
             <motion.li
               key={item.name}
               className={`mb-4 cursor-pointer flex items-center ${

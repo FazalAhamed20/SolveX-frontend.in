@@ -8,6 +8,7 @@ import {
   FaFilter,
   FaTable,
   FaTh,
+  FaSpinner,
 } from 'react-icons/fa';
 import CreateClanModal from '../../../utils/modal/CreateClanModal';
 import {
@@ -22,7 +23,7 @@ import ClanGridView from './ClanGridView';
 import ClanTableView from './ClanTableView';
 import { checkSubscription } from '../../../redux/actions/PaymentAction';
 import SubscriptionModal from '../../../utils/modal/SubscriptionBannerModel';
-import { io, Socket } from 'socket.io-client';
+import {  Socket } from 'socket.io-client';
 
 
 interface ClanMember {
@@ -47,9 +48,11 @@ interface Clan {
 }
 interface ClanComponentProps {
   socket: Socket | null;
+  isAccepted:boolean;
+  isReject:boolean
 }
 
-const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
+const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isReject}) => {
   const [selectedClan, setSelectedClan] = useState<Clan | null>(null);
   const [showClanModal, setShowClanModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -62,9 +65,13 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [pendingRequests, setPendingRequests] = useState<string[]>([]);
   const [isLoading,setIsLoading]=useState(false)
+  const [isCreate,setIsCreate]=useState(false)
+  const [isCreated,setIsCreated]=useState(false)
   const closeModal = () => setIsModalOpen(false);
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+
+  console.log("isAccepted",isAccepted,'isReject',isReject)
 
 
   useEffect(() => {
@@ -113,6 +120,8 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
   };
 
   const handleCreateClan = async (name: string, description: string) => {
+    setIsCreated(true)
+  
     const newClan: Clan = {
       id: clans.length + 1,
       name,
@@ -136,6 +145,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
       ]);
     }
     console.log('clans', clans);
+    setIsCreated(false)
     setShowCreateModal(false);
   };
 
@@ -151,6 +161,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
     setShowClanModal(false);
   };
   const handleCreate = async () => {
+    setIsCreate(true)
     const response = await dispatch(
       checkSubscription({
         userId: user._id,
@@ -158,6 +169,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
     );
     if (response.payload?.success) {
       console.log('response', response.payload?.success);
+      setIsCreate(false)
       setShowCreateModal(true);
     } else {
       setIsModalOpen(true);
@@ -240,11 +252,17 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
             {viewMode === 'grid' ? 'Table' : 'Grid'}
           </button>
           <button
-            onClick={handleCreate}
-            className='flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300'
-          >
-            <FaPlus className='mr-2' /> Create
-          </button>
+    onClick={handleCreate}
+    className='flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300'
+    disabled={isCreate} 
+  >
+    {isCreate ? (
+      <FaSpinner className='mr-2 animate-spin' /> 
+    ) : (
+      <FaPlus className='mr-2' />
+    )}
+    {isCreate ? 'Creating...' : 'Create'}
+  </button>
         </div>
       </div>
 
@@ -284,14 +302,17 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
         pendingRequests={pendingRequests}
         userId={user._id}
         loading={isLoading}
+        isAccepted={isAccepted}
+        isReject={isReject}
       />
       ) : (
         <ClanTableView
-        clans={filteredClans}
-        onClanClick={handleClanClick}
-        isUserMember={isUserMember}
-        pendingRequests={pendingRequests}
-        userId={user._id}
+                clans={filteredClans}
+                onClanClick={handleClanClick}
+                isUserMember={isUserMember}
+                pendingRequests={pendingRequests}
+                userId={user._id}
+                isAccepted={isAccepted}     
       />
       )}
 
@@ -352,36 +373,42 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
                 </ul>
               </div>
               <div className='flex items-center justify-between'>
-                <div className='flex items-center'>
-                  <FaTrophy className='text-yellow-500 mr-2' />
-                  <span className='text-gray-600'>
-                    {selectedClan.trophies} trophies
-                  </span>
-                </div>
-                <button
-                  className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                    isUserMember(selectedClan)
-                      ? 'bg-green-600 text-white'
-                      : pendingRequests.includes(selectedClan._id)
-                      ? 'bg-yellow-500 text-white'
-                      : 'bg-white text-green-600 border border-green-600'
-                  }`}
-                  onClick={
-                    isUserMember(selectedClan)
-                      ? handleEnterClan
-                      : pendingRequests.includes(selectedClan._id)
-                      ? () => {}
-                      : handleJoinClan
-                  }
-                  disabled={pendingRequests.includes(selectedClan._id)}
-                >
-                  {isUserMember(selectedClan)
-                    ? 'Enter Clan'
-                    : pendingRequests.includes(selectedClan._id)
-                    ? 'Request Pending'
-                    : 'Join Clan'}
-                </button>
-              </div>
+  <div className='flex items-center'>
+    <FaTrophy className='text-yellow-500 mr-2' />
+    <span className='text-gray-600'>
+      {selectedClan.trophies} trophies
+    </span>
+  </div>
+  <button
+  className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
+    isUserMember(selectedClan)
+      ? 'bg-green-600 text-white'
+      : pendingRequests.includes(selectedClan._id) && !isReject
+        ? isAccepted
+          ? 'bg-green-600 text-white'
+          : 'bg-yellow-500 text-white'
+        : 'bg-white text-green-600 border border-green-600'
+  }`}
+  onClick={
+    isUserMember(selectedClan) || (pendingRequests.includes(selectedClan._id) && isAccepted)
+      ? handleEnterClan
+      : isReject || !pendingRequests.includes(selectedClan._id)
+        ? handleJoinClan
+        : () => {}
+  }
+  disabled={pendingRequests.includes(selectedClan._id) && !isAccepted && !isReject}
+>
+  {isUserMember(selectedClan)
+    ? 'Enter Clan'
+    : pendingRequests.includes(selectedClan._id)
+      ? isAccepted
+        ? 'Enter Clan'
+        : isReject
+          ? 'Join Clan'
+          : 'Request Pending'
+      : 'Join Clan'}
+</button>
+</div>
             </motion.div>
           </motion.div>
         )}
@@ -392,6 +419,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket }) => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreateClan={handleCreateClan}
+        isCreated={isCreated}
       />
     </div>
   );

@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-  FaTrophy,
-  FaMedal,
-  FaAward,
-  FaStar,
   FaCode,
   FaCoins,
 } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../redux/Store';
 import { fetchAllSubmission } from '../../../redux/actions/SubmissionAction';
+import { getRankIcon } from '../../../utils';
 
 interface User {
   id: number;
@@ -19,19 +16,6 @@ interface User {
   totalPoints: number;
   languages: string[];
 }
-
-const getRankIcon = (rank: number) => {
-  switch (rank) {
-    case 1:
-      return <FaTrophy className='text-yellow-500' />;
-    case 2:
-      return <FaMedal className='text-gray-400' />;
-    case 3:
-      return <FaAward className='text-orange-500' />;
-    default:
-      return <FaStar className='text-blue-500' />;
-  }
-};
 
 const LeaderBoardTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);

@@ -14,11 +14,13 @@ interface MembersListProps {
   groupMembers: GroupMember[];
   currentUser: any;
   onlineUsers: string[];
+  typingUser: string;
 }
 
-const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers }) => {
+const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
   console.log("group members", groupMembers);
   console.log("online members", onlineUsers);
+  console.log("typing user", typingUser);
 
   return (
     <div className={`${showMembers ? 'block' : 'hidden'} md:block w-full md:w-1/4 lg:w-1/5 bg-[#f8faf8] border-b md:border-r border-gray-200`}>
@@ -30,6 +32,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
           .filter(member => member.name !== currentUser.username)
           .map(member => {
             const isOnline = onlineUsers.includes(member.id);
+            const isTyping = typingUser === member.name;
             return (
               <div
                 key={member.id}
@@ -46,7 +49,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
                         isOnline ? 'text-green-500' : 'text-gray-400'
                       }`}
                     />
-                    {isOnline ? 'Online' : 'Offline'}
+                    {isTyping ? 'Typing...' : (isOnline ? 'Online' : 'Offline')}
                   </p>
                 </div>
               </div>

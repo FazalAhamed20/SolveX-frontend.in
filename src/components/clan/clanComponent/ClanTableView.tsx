@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface ClanMember {
@@ -25,14 +26,16 @@ interface ClanTableViewProps {
   isUserMember: (clan: Clan) => boolean;
   pendingRequests: string[];
   userId: string;
+  isAccepted:boolean,
+  
 }
 
 const ClanTableView: React.FC<ClanTableViewProps> = ({
   clans,
-  onClanClick,
   isUserMember,
   pendingRequests,
-  userId
+  isAccepted,
+
 }) => {
   return (
     <div className='overflow-x-auto'>
@@ -67,21 +70,25 @@ const ClanTableView: React.FC<ClanTableViewProps> = ({
                   </button>
                 ) : (
                   <button
-                    onClick={() => onClanClick(clan)}
-                    className={`px-4 py-2 rounded-lg transition-colors duration-300 ${
-                      isUserMember(clan)
-                      ? 'bg-green-600 text-white'
-                      : pendingRequests.includes(clan._id)
-                      ? 'bg-yellow-500 text-white'
-                      : 'bg-white text-green-600 border border-green-600'
-                  }`}
-                >
-                  {isUserMember(clan)
-                    ? 'Enter'
-                    : pendingRequests.includes(clan._id)
-                    ? 'Pending'
-                    : 'Join'}
-                  </button>
+                  className={`w-full py-2 rounded-lg transition-colors duration-300 ${
+                    isUserMember(clan)
+                    ? 'bg-green-600 text-white'
+                    : pendingRequests.includes(clan._id) 
+                      ? isAccepted
+                        ? 'bg-green-600 text-white'
+                        : 'bg-yellow-500 text-white'
+                    : 'bg-white text-green-600 border border-green-600'
+              }`}
+            >
+              {isUserMember(clan)
+      ? 'Enter'
+      : pendingRequests.includes(clan._id)
+        ? isAccepted
+          ? 'Enter'
+          : 'Pending'
+        : 'Join'}
+                </button>
+                  
                 )}
               </td>
             </tr>

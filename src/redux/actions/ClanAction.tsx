@@ -220,6 +220,27 @@ export const acceptRequest = createAsyncThunk<
   },
 );
 
+export const rejectRequest = createAsyncThunk<
+  VerifyResponse,
+  { clanId: string;userId: string },
+  { rejectValue: ErrorPayload }
+>(
+  'clan/reject-clan',
+  async ({ clanId,userId}, { rejectWithValue }) => {
+    try {
+      
+      const response = await ClanAxios.post('/reject-clan', {
+       clanId,userId
+      });
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(handleErrors(error));
+    }
+  },
+);
+
+
 
 export const  completeQuiz = createAsyncThunk<
   VerifyResponse,

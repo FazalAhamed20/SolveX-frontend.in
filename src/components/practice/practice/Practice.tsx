@@ -110,7 +110,21 @@ const CodePlatform: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-white text-gray-800 p-6'>
+    <div className='flex flex-col h-screen bg-gray-50 p-4'>
+    {/* Message for small and medium screens */}
+    <div className='lg:hidden'>
+      <div
+        className='bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4'
+        role='alert'
+      >
+        <p className='font-bold'>Please open on a desktop</p>
+        <p>
+          This code editor is optimized for larger screens. For the best
+          experience, please use a desktop or laptop computer.
+        </p>
+      </div>
+    </div>
+    <div className='hidden lg:block'>
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -289,6 +303,7 @@ value: ${input[2]}`}
       </motion.div>
 
       {loading && <RunningModal isOpen={false} />}
+    </div>
     </div>
   );
 };

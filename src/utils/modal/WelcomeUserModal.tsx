@@ -65,9 +65,18 @@ const WelcomeUserModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose ,userna
             className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden"
           >
             <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/2 bg-green-100 flex items-center justify-center p-6">
-               <img src='../../../src/assets/images/chatbot.jpg' alt="" />
-              </div>
+            <div className="md:w-1/2 bg-green-100 flex items-center justify-center p-6">
+  <video 
+    className="w-full h-auto max-w-full" 
+    autoPlay 
+    loop 
+    muted 
+    playsInline
+  >
+    <source src="../../../src/assets/images/boy.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
               <div className="p-8 md:w-1/2 flex flex-col justify-center">
                 <motion.div variants={container} initial="hidden" animate="show">
                   <motion.h2 variants={item} className="text-3xl font-bold mb-4 text-green-700">

@@ -9,7 +9,7 @@ interface ChatHeaderProps {
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({ clanName, showMembers, setShowMembers }) => {
   return (
-    <div className='bg-[#e8f5e9] text-[#2e7d32] px-4 py-3 flex items-center justify-between border-b border-[#c8e6c9]'>
+    <div className='bg-[#e8f5e9] text-[#2e7d32] px-4 py-3 flex items-center justify-between border-b border-[#c8e6c9] z-0'>
       <div className='text-xl font-semibold'>{clanName || 'Group Chat'}</div>
       <button
         onClick={() => setShowMembers(!showMembers)}

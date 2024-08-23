@@ -98,7 +98,7 @@ const ForgotPasswordForm: React.FC = () => {
           isOpen={isModalOpen}
           onClose={closeModal}
           onSubmit={handleModalSubmit}
-          email={email} // Pass the email as a prop to the modal
+          email={email} 
         />
       )}
     </div>

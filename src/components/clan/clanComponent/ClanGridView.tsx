@@ -28,6 +28,9 @@ interface ClanGridViewProps {
   pendingRequests: string[];
   userId: string;
   loading:boolean
+  isAccepted:boolean
+  isReject:boolean
+ 
 }
 
 const ClanGridView: React.FC<ClanGridViewProps> = ({
@@ -35,8 +38,10 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
   onClanClick,
   isUserMember,
   pendingRequests,
-  userId,
-  loading
+  loading,
+  isAccepted,
+  isReject
+ 
 }) => {
   console.log(loading)
   return (
@@ -89,20 +94,26 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
               </button>
             ) : (
               <button
-                className={`w-full py-2 rounded-lg transition-colors duration-300 ${
-                  isUserMember(clan)
-                ? 'bg-green-600 text-white'
+              className={`w-full py-2 rounded-lg transition-colors duration-300 ${
+                isUserMember(clan)
+                  ? 'bg-green-600 text-white'
+                  : pendingRequests.includes(clan._id) && !isReject
+                    ? isAccepted
+                      ? 'bg-green-600 text-white'
+                      : 'bg-yellow-500 text-white'
+                    : 'bg-white text-green-600 border border-green-600'
+              }`}
+            >
+              {isUserMember(clan)
+                ? 'Enter'
                 : pendingRequests.includes(clan._id)
-                ? 'bg-yellow-500 text-white'
-                : 'bg-white text-green-600 border border-green-600'
-            }`}
-          >
-            {isUserMember(clan)
-              ? 'Enter'
-              : pendingRequests.includes(clan._id)
-              ? 'Pending'
-              : 'Join'}
-              </button>
+                  ? isAccepted
+                    ? 'Enter'
+                    : isReject
+                      ? 'Join'
+                      : 'Pending'
+                  : 'Join'}
+            </button>
             )}
           </div>
         </motion.div>

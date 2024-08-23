@@ -20,8 +20,7 @@ interface TestCase {
 }
 
 const CodeEditorMain: React.FC = () => {
-  const [code, setCode] = useState('');
-  const [output, setOutput] = useState<string>('');
+  const [code, setCode] = useState('')
   const [testCaseOutputs, setTestCaseOutputs] = useState<any[][]>([]);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [raw, setRaw] = useState([]);
@@ -248,7 +247,6 @@ const CodeEditorMain: React.FC = () => {
 
           setSolved(response?.submited);
           setIsModalOpen(true);
-          setOutput('Code submitted successfully!');
           setError(null);
         } else {
           setError('Submission was not successful. Please try again.');

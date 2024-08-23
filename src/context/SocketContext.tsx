@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 
-// Define the type for the socket context
 interface SocketContextProps {
   socket: Socket | null;
   initializeSocket: (userId: string) => void;
   disconnectSocket: () => void;
+  
+
 }
 
 const SocketContext = createContext<SocketContextProps | undefined>(undefined);

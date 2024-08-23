@@ -20,6 +20,7 @@ interface EditProfileModalProps {
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
+  handleRemoveImage: () => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -30,6 +31,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   handleImageChange,
   handleSubmit,
   isLoading,
+  handleRemoveImage,
 }) => {
   const [errors, setErrors] = useState({
     username: '',
@@ -74,12 +76,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     }
   };
 
-  const [isImageRemoved, setIsImageRemoved] = useState(false);
-
-  const handleRemoveImage = () => {
-    profile.profileImage = '';
-    setIsImageRemoved(true);
-  };
+ 
   console.log('profile', profile);
 
   return (

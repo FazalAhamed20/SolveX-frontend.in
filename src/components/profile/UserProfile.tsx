@@ -89,26 +89,16 @@ const UserProfile: React.FC = () => {
         return;
       }
 
-      try {
-        const imageData = new FormData();
-        imageData.append('file', file);
-        imageData.append('upload_preset', 'upload');
+   
+        
 
-        const response = await axios.post(
-          'https://api.cloudinary.com/v1_1/dlitqiyia/image/upload',
-          imageData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
+      const imageUrl = URL.createObjectURL(file);
 
-        setProfile({ ...profile, profileImage: response.data.url });
-      } catch (error) {
-        console.error('Error uploading image to Cloudinary: ', error);
-        toast.error('Error uploading image. Please try again later.');
-      }
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        profileImage: imageUrl,
+      }));
+      
     }
   };
   useEffect(() => {
@@ -195,17 +185,64 @@ const UserProfile: React.FC = () => {
 
     fetchSubmissionProblem();
   }, [dispatch, user.email]);
+  const uploadImageToCloudinary = async (file: File) => {
+    const imageData = new FormData();
+    imageData.append('file', file);
+    imageData.append('upload_preset', 'upload');
+
+    const response = await axios.post(
+      'https://api.cloudinary.com/v1_1/dlitqiyia/image/upload',
+      imageData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+    return response.data.url
+
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await dispatch(updateProfile(profile));
-    console.log('isBlock', response);
-    if (response.payload?.success === true) {
-      toast.success('Profile Updated');
-      closeModal();
-    }
-  };
+    console.log('submit',profile)
+
+    if (profile.profileImage?.startsWith('blob:')) {
+      try {
+        const file = await fetch(profile.profileImage)
+          .then((res) => res.blob())
+          .then((blob) => new File([blob], 'profileImage.png', { type: blob.type }));
+        const uploadedImageUrl = await uploadImageToCloudinary(file);
+        console.log('uploaded',uploadedImageUrl)
+        setProfile((prevProfile) => ({
+          ...prevProfile,
+          profileImage: uploadedImageUrl
+        }));
+        console.log('submit after',profile)
+
+        const response = await dispatch(updateProfile({ ...profile, profileImage: uploadedImageUrl || "" }));
+  
+        console.log('isBlock', response);
+  
+        if (response.payload?.success === true) {
+          toast.success('Profile Updated');
+          closeModal(); 
+        } else {
+          toast.error('Failed to update profile. Please try again.');
+        }
+      } catch (error) {
+        toast.error('An error occurred while uploading the image. Please try again.');
+        console.error('Image upload error:', error);
+      }
+    // const response = await dispatch(updateProfile(profile));
+    // console.log('isBlock', response);
+    // if (response.payload?.success === true) {
+    //   toast.success('Profile Updated');
+    //   closeModal();
+    // }
+
+    }}
   useLayoutEffect(() => {
     const fetchSubscription = async () => {
       try {
@@ -225,6 +262,12 @@ const UserProfile: React.FC = () => {
     fetchSubscription();
   }, [dispatch, user._id]);
   console.log("subs",subscription)
+  const handleRemoveImage = () => {
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      profileImage: '',
+    }));
+  };
 
   return (
     <div className='min-h-screen bg-gray-100 flex flex-col md:flex-row'>
@@ -261,6 +304,7 @@ const UserProfile: React.FC = () => {
         handleImageChange={handleImageChange}
         handleSubmit={handleSubmit}
         isLoading={false}
+        handleRemoveImage={handleRemoveImage}
       />
     </div>
   );
