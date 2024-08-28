@@ -15,8 +15,7 @@ interface ReactionProps {
   currentUserId: string;
   isOwnMessage: boolean;
   messageId: string;
-  className:string,
- 
+  className: string;
 }
 
 const DEFAULT_EMOJIS = ['👍', '❤️', '😂', '😮', '👏'];
@@ -26,14 +25,10 @@ const Reactions: React.FC<ReactionProps> = ({
   onReact,
   currentUserId,
   isOwnMessage,
-  messageId,
   className,
- 
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
-
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,24 +51,24 @@ const Reactions: React.FC<ReactionProps> = ({
     setShowEmojiPicker(false);
   };
 
-  const getUserReaction = () => {
-    return reactions.find(r => r.memberId === currentUserId && r.messageId === messageId)?.emoji || null;
+  const getCurrentUserReaction = () => {
+    return reactions.find(r => r.memberId === currentUserId)?.emoji || null;
   };
 
   const handleReaction = (emoji: string) => {
-    const currentReaction = getUserReaction();
+    const currentReaction = getCurrentUserReaction();
     if (currentReaction === emoji) {
-      onReact(null);
+      onReact(null); 
     } else {
-      onReact(emoji);
+      onReact(emoji); 
     }
   };
 
-  const currentUserReaction = getUserReaction();
+  const currentUserReaction = getCurrentUserReaction();
 
   return (
     <div
-      className={`${className}absolute bottom-0 ${
+      className={`${className} absolute bottom-0 ${
         isOwnMessage ? 'right-0' : 'left-0'
       } transform translate-y-full mt-1 flex items-center bg-white rounded-full shadow-md p-1 z-10`}
     >
@@ -88,6 +83,14 @@ const Reactions: React.FC<ReactionProps> = ({
           {emoji}
         </button>
       ))}
+      {currentUserReaction && !DEFAULT_EMOJIS.includes(currentUserReaction) && (
+        <button
+          onClick={() => handleReaction(currentUserReaction)}
+          className="mx-1 text-lg bg-green-100 hover:bg-gray-100 rounded-full p-1 transition-colors duration-200"
+        >
+          {currentUserReaction}
+        </button>
+      )}
       <div className='relative' ref={emojiPickerRef}>
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}

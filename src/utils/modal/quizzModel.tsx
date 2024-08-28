@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaHourglassHalf, FaCheckCircle, FaTimesCircle, FaTrophy, 
-  FaBolt, FaMedal, FaRegLightbulb, FaFireAlt, FaRegStar
+  FaBolt, FaMedal, FaRegLightbulb, FaFireAlt
 } from 'react-icons/fa';
 import confetti from 'canvas-confetti';
 import { generateQuizQuestions } from '../chatBot/geminiApi';

@@ -1,6 +1,7 @@
 import  { forwardRef } from 'react';
 import MessageItem from './MessageItem';
 import React from 'react';
+import { Socket } from 'socket.io-client';
 
 interface Message {
   _id: string;
@@ -21,17 +22,18 @@ interface MessageListProps {
   isLoading:boolean;
   onDeleteMessage: (messageId: string) => void;
   onReplyMessage:any
+  socket:Socket | null
 }
 
 const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
-  ({ messages, currentUser ,isLoading,onDeleteMessage,onReplyMessage }: MessageListProps, ref) => {
+  ({ messages, currentUser ,isLoading,onDeleteMessage,onReplyMessage ,socket}: MessageListProps, ref) => {
 
   
 
     return (
       <div  className='flex-1 overflow-y-auto px-4 py-4 bg-[#f0f4f0]'>
         {messages.map(message => (
-          <MessageItem ref={ref} key={message._id} message={message} currentUser={currentUser} isLoading={isLoading} onDeleteMessage={onDeleteMessage} onReplyMessage={onReplyMessage}  />
+          <MessageItem ref={ref} key={message._id} message={message} currentUser={currentUser} isLoading={isLoading} onDeleteMessage={onDeleteMessage} onReplyMessage={onReplyMessage} socket={socket}  />
         ))}
         
       </div>

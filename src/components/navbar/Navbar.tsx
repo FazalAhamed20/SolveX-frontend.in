@@ -32,18 +32,21 @@ interface Notification {
   };
   clanId?: string;
   clanName?: string;
+  isRead:boolean
 }
 
 interface NavbarProps {
   notifications:any;
   clearNotification: (index: number) => void;
   socket: Socket | null;
+
 }
 
 const Navbar: React.FC<NavbarProps> = ({
   notifications,
   clearNotification,
-  socket
+  socket,
+
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notification, setNotification] = useState<Notification[]>([]);
@@ -86,7 +89,8 @@ const Navbar: React.FC<NavbarProps> = ({
                     username: req.username,
                   },
                   clanId: clan._id,
-                  clanName:clan.name
+                  clanName:clan.name,
+                   isRead: false,
                 }));
             }
             return [];
@@ -106,6 +110,8 @@ const Navbar: React.FC<NavbarProps> = ({
             clanId: clan._id,
             clanName: clan.name,
           },
+          
+          isRead: false,
         }));
         const acceptNotifications = userPendingClans.map(clan => ({
           id: `${clan._id}-${user._id}-accept`,
@@ -115,6 +121,7 @@ const Navbar: React.FC<NavbarProps> = ({
             clanId: clan._id,
             clanName: clan.name,
           },
+          isRead: false,
         }));
   
         newNotifications = [...newNotifications, ...pendingNotifications,...acceptNotifications];
@@ -139,6 +146,19 @@ const Navbar: React.FC<NavbarProps> = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const markAsRead = (id: string) => {
+    console.log("id",id)
+    
+    if (socket) {
+      socket.emit('markNotificationAsRead', { notificationId: id });
+    }
+    setNotification(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, isRead: true } : notif
+      )
+    );
+  };
+
   return (
     <nav className='bg-white shadow-md z-10'>
       <div className='max-w-full mx-auto px-2 sm:px-6 lg:px-8'>
@@ -158,6 +178,7 @@ const Navbar: React.FC<NavbarProps> = ({
             notifications={notification}
             clearNotification={clearNotification}
             socket={socket}
+            markAsRead={markAsRead}
           />
 
           <div className='flex sm:hidden'>

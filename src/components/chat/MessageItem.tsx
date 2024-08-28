@@ -16,11 +16,15 @@ import ConfirmModal from '../../utils/modal/confirmModel';
 import { ChatAxios } from '../../config/AxiosInstance';
 import Reactions from './Reaction';
 import ReplyPreview from './ReplyPreview';
+import { Socket } from 'socket.io-client';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/Store';
 
 interface Reaction {
   memberId: string;
   emoji: string;
   messageId: string;
+  createdAt:any
 }
 
 
@@ -56,6 +60,7 @@ interface MessageItemProps {
   isLoading: boolean;
   onDeleteMessage: (messageId: string) => void;
   onReplyMessage: (message: Message) => void;
+  socket:Socket | null
  
 }
 
@@ -63,7 +68,7 @@ interface MessageItemProps {
 
 const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
   (
-    { message, currentUser, isLoading, onDeleteMessage, onReplyMessage },
+    { message, currentUser, isLoading, onDeleteMessage, onReplyMessage,socket },
     ref,
   ) => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -73,6 +78,62 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
       message.reactions || [],
     );
     const [showReactions, setShowReactions] = useState(false);
+    const [scrollToMessageId, setScrollToMessageId] = useState<string | null>(null);
+    const user = useSelector((state: RootState) => state.user.user);
+    useEffect(() => {
+   
+   if(socket){
+    socket.on('reaction_updated', ({ messageId, emoji, memberId, createdAt }) => {
+      setReactions((prevReactions) => {
+        const updatedReactions = [...prevReactions];
+        const existingReactionIndex = updatedReactions.findIndex(
+          (r) => r.memberId === memberId && r.messageId === messageId
+        );
+
+        if (existingReactionIndex !== -1) {
+    
+          if (emoji === null) {
+            updatedReactions.splice(existingReactionIndex, 1);
+          } else {
+            updatedReactions[existingReactionIndex] = {
+              ...updatedReactions[existingReactionIndex],
+              emoji,
+              createdAt,
+            };
+          }
+        } else if (emoji !== null) {
+        
+          updatedReactions.push({
+            memberId,
+            emoji,
+            messageId,
+            createdAt,
+          });
+        }
+
+        return updatedReactions;
+      });
+    });
+
+   
+    return () => {
+      socket.off('reaction_updated');
+    };
+   }
+  }, []);
+
+    useEffect(() => {
+      if (scrollToMessageId) {
+        const element = document.getElementById(`message-${scrollToMessageId}`);
+        if (element) {
+          document.querySelectorAll('.bg-green-200').forEach(el => el.classList.remove('bg-green-200'));
+          
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('bg-green-200');
+          setTimeout(() => element.classList.remove('bg-green-200'), 2000);
+        }
+      }
+    }, [scrollToMessageId]);
    
 
     const isOwnMessage = useMemo(
@@ -121,28 +182,51 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
 
     const handleReact = useCallback(
       async (emoji: string | null) => {
+        if (socket) {
+       
+          socket.emit('react_to_message', {
+            messageId: message._id,
+            emoji: emoji,
+            userId: user._id,
+          });
+          
+  
+          console.log("reaction ", socket);
+        }
+  
         let updatedReactions = [...reactions];
-
         const existingReactionIndex = updatedReactions.findIndex(
-          r => r.memberId === currentUser._id && r.messageId === message._id,
+          r => r.memberId === currentUser._id
         );
-
+    
         if (existingReactionIndex !== -1) {
           if (emoji === null) {
             updatedReactions.splice(existingReactionIndex, 1);
           } else {
-            updatedReactions[existingReactionIndex].emoji = emoji;
+           
+            updatedReactions[existingReactionIndex] = {
+              ...updatedReactions[existingReactionIndex],
+              emoji: emoji,
+              createdAt: new Date().toISOString()
+            };
           }
         } else if (emoji !== null) {
+          
           updatedReactions.push({
             memberId: currentUser._id,
             emoji: emoji,
             messageId: message._id,
+            createdAt: new Date().toISOString(),
           });
         }
-
+        console.log('updated reaction',updatedReactions)
+    
         setReactions(updatedReactions);
-
+      
+    
+       
+      
+    
         try {
           await ChatAxios.post('/messages/react', {
             messageId: message._id,
@@ -153,7 +237,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           console.error('Failed to save reaction:', error);
         }
       },
-      [reactions, currentUser._id, message._id],
+      [reactions, currentUser._id, message._id]
     );
 
     useEffect(() => {
@@ -262,18 +346,31 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     }, [message.status, isOwnMessage]);
 
     const reactionSummary = useMemo(() => {
-      return Object.entries(
-        reactions.reduce((acc, r) => {
-          acc[r.emoji] = (acc[r.emoji] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>),
-      );
+      const uniqueReactions = reactions.reduce((acc, reaction) => {
+        acc[reaction.emoji] = (acc[reaction.emoji] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+    
+      
+      const sortedReactions = Object.entries(uniqueReactions)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 2);
+    
+      return Object.fromEntries(sortedReactions);
     }, [reactions]);
     
+
+  
+
+    const onReplyClick = (messageId: any) => {
+      setScrollToMessageId(null);
+      setTimeout(() => setScrollToMessageId(messageId), 0);
+    }
 
     return (
       <div
         ref={ref}
+        id={`message-${message._id}`}
         className={`flex ${
           isOwnMessage ? 'justify-end' : 'justify-start'
         } mb-3 items-end relative ${reactions.length > 0 ? 'mb-8' : 'mb-3'}`}
@@ -335,7 +432,12 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
             </div>
           )}
 
-          {message.replyTo && <ReplyPreview replyTo={message.replyTo} />}
+{message.replyTo && (
+          <ReplyPreview 
+            replyTo={message.replyTo} 
+            onReplyClick={() => onReplyClick(message.replyTo!._id)} 
+          />
+        )}
 
           {message.image && (
             <>
@@ -378,21 +480,26 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
             </p>
 
             {reactions.length > 0 && (
-              <div
-                className={`absolute -bottom-6 ${
-                  isOwnMessage ? 'right-0' : 'left-0'
-                } flex space-x-1`}
-              >
-                {reactionSummary.map(([emoji, count]) => (
-                  <div
-                    key={emoji}
-                    className='bg-white shadow-md px-2 py-1 rounded-full text-xs'
-                  >
-                    {emoji} {count}
-                  </div>
-                ))}
-              </div>
-            )}
+  <div
+    className={`absolute -bottom-6 ${
+      isOwnMessage ? 'right-0' : 'left-0'
+    } flex space-x-1`}
+  >
+    {Object.entries(reactionSummary).map(([emoji, count]) => (
+      <div
+        key={emoji}
+        className='bg-white shadow-md px-2 py-1 rounded-full text-xs'
+      >
+        {emoji} {count}
+      </div>
+    ))}
+    {Object.keys(reactionSummary).length < reactions.length && (
+      <div className='bg-white shadow-md px-2 py-1 rounded-full text-xs'>
+        +{reactions.length - Object.keys(reactionSummary).length}
+      </div>
+    )}
+  </div>
+)}
 
             <div className='flex justify-end items-center mt-1 space-x-1.5'>
               <span className='block text-[11px] text-green-600'>
@@ -423,16 +530,16 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
   )}
 
           {showReactions && (
-            <Reactions
-              reactions={reactions}
-              onReact={handleReact}
-              currentUserId={currentUser._id}
-              isOwnMessage={isOwnMessage}
-              messageId={message._id}
-              className={`absolute ${isOwnMessage ? 'right-0' : 'left-0'} ${
-                reactions.length > 0 ? '-bottom-12' : '-bottom-6'
-              }`}
-            />
+           <Reactions
+           reactions={reactions}
+           onReact={handleReact}
+           currentUserId={currentUser._id}
+           isOwnMessage={isOwnMessage}
+           messageId={message._id}
+           className={`absolute ${isOwnMessage ? 'right-0' : 'left-0'} ${
+             reactions.length > 0 ? '-bottom-12' : '-bottom-6'
+           }`}
+         />
           )}
         </div>
         <ConfirmModal

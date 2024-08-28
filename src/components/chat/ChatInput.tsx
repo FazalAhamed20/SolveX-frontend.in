@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, FormEvent } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaSmile, FaImage, FaTimes, FaMicrophone, FaStop } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 
@@ -56,6 +56,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [voiceReady, setVoiceReady] = useState<boolean>(false);
 
   const handleLocalImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,11 +79,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("sub submitted",inputMessage);
-   
+    
     handleSendMessage(inputMessage, replyTo);
     console.log("after submitted");
     setPreviewImage(null);
     setInputMessage('');
+    setVoiceReady(false);
     clearReply();
   
   };
@@ -115,12 +117,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         handleVoiceMessage(audioBlob);
         stream.getTracks().forEach(track => track.stop());
-        const syntheticEvent = {
-          preventDefault: () => {},
-        } as FormEvent<HTMLFormElement>;
-        handleSubmit(syntheticEvent);
-        console.log("submitted");
-        
       };
   
       mediaRecorder.start();
@@ -131,17 +127,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
   const stopRecording = () => {
+    console.log('stopped')
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      setVoiceReady(true);
     }
   };
+
 
   useEffect(() => {
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stop();
       }
+      setVoiceReady(false);
     };
   }, []);
 
@@ -204,13 +204,19 @@ const ChatInput: React.FC<ChatInputProps> = ({
            {isRecording ? <FaStop size={18} /> : <FaMicrophone size={18} />}
           </button>
           {isRecording ? (
-            <div className="flex-1 flex items-center">
-             
-              <div className="flex-shrink-0 bg-red-500 text-white px-3 py-1 rounded-full animate-pulse">
-                Recording
-              </div>
-            </div>
-          ) : (
+  <div className="flex-1 flex items-center">
+    <div className="flex-shrink-0 bg-red-500 text-white px-3 py-1 rounded-full animate-pulse">
+      Recording
+    </div>
+  </div>
+) : voiceReady ? (
+  <div className="flex-1 flex items-center">
+    <div className="flex-shrink-0 bg-green-500 text-white px-3 py-1 rounded-full">
+      Voice Ready
+    </div>
+
+  </div>
+) : (
             <div className="flex-1">
   {replyTo && (
     <div className="bg-gray-100 p-2 rounded-md mb-2">

@@ -7,10 +7,16 @@ interface SolvedProblemsCardProps {
     medium: number;
     hard: number;
   };
+  difficultyCount: {
+    easy: number;
+    medium: number;
+    hard: number;
+  };
 }
 
 const SolvedProblemsCard: React.FC<SolvedProblemsCardProps> = ({
   solvedProblems,
+  difficultyCount
 }) => {
   return (
     <div className='p-6 bg-white shadow-md rounded-md mb-4'>
@@ -28,7 +34,7 @@ const SolvedProblemsCard: React.FC<SolvedProblemsCardProps> = ({
               }}
             ></div>
           </div>
-          <span className='ml-2'>{solvedProblems.easy}/20</span>
+          <span className='ml-2'>{solvedProblems.easy}/{difficultyCount.easy}</span>
         </div>
         <div className='flex items-center'>
           <span className='w-20 text-gray-600'>Medium:</span>
@@ -40,7 +46,7 @@ const SolvedProblemsCard: React.FC<SolvedProblemsCardProps> = ({
               }}
             ></div>
           </div>
-          <span className='ml-2'>{solvedProblems.medium}/15</span>
+          <span className='ml-2'>{solvedProblems.medium}/{difficultyCount.medium}</span>
         </div>
         <div className='flex items-center'>
           <span className='w-20 text-gray-600'>Hard:</span>
@@ -52,7 +58,7 @@ const SolvedProblemsCard: React.FC<SolvedProblemsCardProps> = ({
               }}
             ></div>
           </div>
-          <span className='ml-2'>{solvedProblems.hard}/10</span>
+          <span className='ml-2'>{solvedProblems.hard}/{difficultyCount.hard}</span>
         </div>
       </div>
     </div>

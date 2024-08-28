@@ -263,6 +263,7 @@ const MemberTable: React.FC = () => {
       console.error('Error completing quiz:', error);
     }
   };
+  
 
   return (
     <div className='container mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-2xl mt-10 sm:mt-20'>

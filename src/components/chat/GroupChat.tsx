@@ -209,7 +209,7 @@ const handleOnlineUsers = useCallback((users: string[]) => {
 }, []);
 
 const handleSendMessage = async (text: string, replyToMessage: Message | null) => {
-  console.log("voice came");
+  console.log("voice came",voice);
   
  
   if (text.trim() !== '' || image || voice) {
@@ -316,7 +316,11 @@ console.log('all',messages)
     console.log("mmm......",messageId)
     try {
       setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
+      console.log("before delete");
+      console.log(socket);
+      
       socket?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
+      console.log("after delete");
       await ChatAxios.delete(`/messages/${messageId}`);
       
       
@@ -357,6 +361,7 @@ console.log('all',messages)
               isLoading={isLoading}
               onDeleteMessage={handleDeleteMessage}
               onReplyMessage={handleReply}
+              socket={socket}
               
             />
            <ChatInput

@@ -9,8 +9,8 @@ interface User {
   id: number;
   rank: number;
   username: string;
-  totalProblems: number;
-  totalPoints: number;
+  count: number;
+  points: number;
   languages: string[];
 }
 
@@ -30,11 +30,12 @@ const LeaderBoardTable: React.FC = () => {
       console.log(response);
 
       const sortedUsers = fetchedData
-        .sort((a: any, b: any) => b.totalPoints - a.totalPoints)
+        .sort((a: any, b: any) => b.points - a.points)
         .map((user: any, index: number) => ({
           ...user,
           rank: index + 1,
         }));
+        console.log('sorted',sortedUsers);
 
       setUsers(sortedUsers);
       setFilteredUsers(sortedUsers);
@@ -42,6 +43,7 @@ const LeaderBoardTable: React.FC = () => {
       console.error('Failed to fetch submissions:', error);
     }
   };
+  console.log('user',users)
 
   useEffect(() => {
     fetchAllSubmissions();
@@ -114,13 +116,13 @@ const LeaderBoardTable: React.FC = () => {
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <span className='bg-green-100 text-green-800 py-1 px-2 rounded-full text-sm flex items-center w-min'>
                     <FaCode className='mr-1' />
-                    {user.totalProblems}
+                    {user.count}
                   </span>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap'>
                   <span className='bg-purple-100 text-purple-800 py-1 px-2 rounded-full text-sm flex items-center w-min'>
                     <FaCoins className='mr-1' />
-                    {user.totalPoints}
+                    {user.points}
                   </span>
                 </td>
               </tr>

@@ -65,67 +65,34 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Testimonials Section */}
-      <div className='bg-slate-100 py-20'>
-        <div className='container mx-auto px-5 md:px-20'>
-          <h2 className='text-4xl font-bold text-center mb-10'>
-            What Our Users Say
-          </h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
-            <div className='bg-white p-6 rounded-md shadow-md'>
-              <p className='text-neutral-500 mb-4'>
-                "This platform has helped me sharpen my coding skills and land
-                my dream job."
-              </p>
-              <div className='flex items-center'>
-                <img
-                  src='https://via.placeholder.com/40'
-                  alt='User Avatar'
-                  className='rounded-full mr-3'
-                />
-                <div>
-                  <h4 className='font-bold'>John Doe</h4>
-                  <p className='text-neutral-500'>Software Engineer</p>
-                </div>
-              </div>
-            </div>
-            <div className='bg-white p-6 rounded-md shadow-md'>
-              <p className='text-neutral-500 mb-4'>
-                "I love the interactive coding environment and the wide range of
-                coding challenges."
-              </p>
-              <div className='flex items-center'>
-                <img
-                  src='https://via.placeholder.com/40'
-                  alt='User Avatar'
-                  className='rounded-full mr-3'
-                />
-                <div>
-                  <h4 className='font-bold'>Jane Smith</h4>
-                  <p className='text-neutral-500'>Front-End Developer</p>
-                </div>
-              </div>
-            </div>
-            <div className='bg-white p-6 rounded-md shadow-md'>
-              <p className='text-neutral-500 mb-4'>
-                "This platform has been a game-changer for my career. Highly
-                recommended!"
-              </p>
-              <div className='flex items-center'>
-                <img
-                  src='https://via.placeholder.com/40'
-                  alt='User Avatar'
-                  className='rounded-full mr-3'
-                />
-                <div>
-                  <h4 className='font-bold'>Michael Johnson</h4>
-                  <p className='text-neutral-500'>Full-Stack Developer</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+   {/* Key Benefits Section */}
+<div className='bg-slate-100 py-20'>
+  <div className='container mx-auto px-5 md:px-20'>
+    <h2 className='text-4xl font-bold text-center mb-10'>
+      Key Benefits
+    </h2>
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
+      <div className='bg-white p-6 rounded-md shadow-md'>
+        <h3 className='font-bold text-xl mb-4'>Enhance Your Skills</h3>
+        <p className='text-neutral-500'>
+          "Practice a wide range of coding challenges to improve your problem-solving abilities and technical skills."
+        </p>
       </div>
+      <div className='bg-white p-6 rounded-md shadow-md'>
+        <h3 className='font-bold text-xl mb-4'>Learn by Doing</h3>
+        <p className='text-neutral-500'>
+          "Engage with our interactive coding environment to gain hands-on experience with real-world programming scenarios."
+        </p>
+      </div>
+      <div className='bg-white p-6 rounded-md shadow-md'>
+        <h3 className='font-bold text-xl mb-4'>Track Your Progress</h3>
+        <p className='text-neutral-500'>
+          "Monitor your growth with detailed performance analytics and skill assessments to identify areas for improvement."
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   );
 };

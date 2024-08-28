@@ -121,6 +121,7 @@ const Signup: React.FC = () => {
                         name='name'
                         className='w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                         placeholder='Full Name'
+                        maxLength={30}
                       />
                       <ErrorMessage
                         name='name'
@@ -134,6 +135,7 @@ const Signup: React.FC = () => {
                         name='email'
                         className='w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                         placeholder='Email'
+                        maxLength={30}
                       />
                       <ErrorMessage
                         name='email'
@@ -149,6 +151,7 @@ const Signup: React.FC = () => {
                           name='password'
                           className='w-full px-4 py-3 bg-white rounded border border-gray-400 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                           placeholder='Your password'
+                          maxLength={30}
                         />
                         <div
                           className='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'

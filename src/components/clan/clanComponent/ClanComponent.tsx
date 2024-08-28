@@ -169,11 +169,12 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
     );
     if (response.payload?.success) {
       console.log('response', response.payload?.success);
-      setIsCreate(false)
+     
       setShowCreateModal(true);
     } else {
       setIsModalOpen(true);
     }
+    setIsCreate(false)
   };
 
   const handleJoinClan = async () => {

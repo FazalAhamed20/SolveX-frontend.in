@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   FaPlus,
-  FaTimes,
   FaDollarSign,
   FaClipboardList,
   FaCrown,

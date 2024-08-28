@@ -12,8 +12,8 @@ interface User {
   id: number;
   rank: number;
   username: string;
-  totalProblems: number;
-  totalPoints: number;
+  count: number;
+  points: number;
   languages: string[];
 }
 
@@ -32,7 +32,7 @@ const LeaderBoardTable: React.FC = () => {
       console.log(response)
 
       const sortedUsers = fetchedData
-        .sort((a: any, b: any) => b.totalPoints - a.totalPoints)
+        .sort((a: any, b: any) => b.points - a.points)
         .map((user: any, index: number) => ({
           ...user,
           rank: index + 1,
@@ -101,13 +101,13 @@ const LeaderBoardTable: React.FC = () => {
                   <td className='py-3 px-4'>
                     <span className='bg-green-100 text-green-800 py-1 px-2 rounded-full text-sm flex items-center w-min'>
                       <FaCode className='mr-1' />
-                      {user.totalProblems}
+                      {user.count}
                     </span>
                   </td>
                   <td className='py-3 px-4'>
                     <span className='bg-purple-100 text-purple-800 py-1 px-2 rounded-full text-sm flex items-center w-min'>
                       <FaCoins className='mr-1' />
-                      {user.totalPoints}
+                      {user.points}
                     </span>
                   </td>
                 </tr>

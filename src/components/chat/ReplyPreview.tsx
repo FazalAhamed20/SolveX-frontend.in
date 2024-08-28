@@ -13,9 +13,19 @@ interface ReplyTo {
     };
   }
 
+  interface ReplyPreviewProps {
+    replyTo: ReplyTo;
+    onReplyClick: (messageId: string) => void;
+  }
 
 
-const ReplyPreview: React.FC<{ replyTo: ReplyTo }> = ({ replyTo }) => (
+
+  const ReplyPreview: React.FC<ReplyPreviewProps> = ({ replyTo, onReplyClick }) => {
+    return (
+      <div 
+      className="bg-gray-100 p-2 rounded-md mb-2 cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+      onClick={() => onReplyClick(replyTo._id)}
+    >
     <div className='bg-gray-100 p-2 rounded-md mb-2 text-sm'>
       <p className='font-semibold'>{replyTo.sender.name}</p>
       {replyTo.text ? (
@@ -32,5 +42,7 @@ const ReplyPreview: React.FC<{ replyTo: ReplyTo }> = ({ replyTo }) => (
         </div>
       ) : null}
     </div>
+    </div>
   );
+}
   export default ReplyPreview

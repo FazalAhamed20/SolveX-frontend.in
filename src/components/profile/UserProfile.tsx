@@ -13,6 +13,7 @@ import CalendarHeatmapCard from './CalenderHeatmapCard';
 import UserSubscriptionPlan from './SubscriptionPlanCard';
 import './UserProfile.css'
 import { checkSubscription } from '../../redux/actions/PaymentAction';
+import { problemlist } from '../../redux/actions/ProblemActions';
 const UserProfile: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
@@ -22,6 +23,7 @@ const UserProfile: React.FC = () => {
   const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [averageSubmissions, setAverageSubmissions] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
+  const [isLoading,setIsLoading]=useState(false)
   const [profile, setProfile] = useState({
     username: user.username,
     role: user.role,
@@ -59,6 +61,11 @@ const UserProfile: React.FC = () => {
   );
   const formattedToday = today.toISOString().split('T')[0];
   const [subscription, setSubscription] = useState<SubscriptionType | null>(null);
+  const [difficultyCount, setDifficultyCount] = useState({
+    easy: 0,
+    medium: 0,
+    hard: 0
+  });
 
   const [solvedProblems, setSolvedProblems] = useState({
     easy: 0,
@@ -101,6 +108,35 @@ const UserProfile: React.FC = () => {
       
     }
   };
+  useEffect(() => {
+    const fetchProblemList = async () => {
+      try {
+        const response = await dispatch(problemlist()).unwrap();
+        console.log('problems', response);
+  
+        
+        if (Array.isArray(response)) {
+          const count = response.reduce((acc, problem) => {
+            if (problem.difficulty) {
+              const difficulty = problem.difficulty.toLowerCase();
+              acc[difficulty] = (acc[difficulty] || 0) + 1;
+            }
+            return acc;
+          }, {} as Record<string, number>);
+  
+          setDifficultyCount({
+            easy: count.easy || 0,
+            medium: count.medium || 0,
+            hard: count.hard || 0
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching problems:', error);
+      }
+    };
+  
+    fetchProblemList();
+  }, []); 
   useEffect(() => {
     const fetchSubmissionProblem = async () => {
       try {
@@ -205,44 +241,48 @@ const UserProfile: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true)
 
-    console.log('submit',profile)
+    console.log('submit', profile)
+
+    let updatedProfile = { ...profile };
 
     if (profile.profileImage?.startsWith('blob:')) {
-      try {
-        const file = await fetch(profile.profileImage)
-          .then((res) => res.blob())
-          .then((blob) => new File([blob], 'profileImage.png', { type: blob.type }));
-        const uploadedImageUrl = await uploadImageToCloudinary(file);
-        console.log('uploaded',uploadedImageUrl)
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          profileImage: uploadedImageUrl
-        }));
-        console.log('submit after',profile)
-
-        const response = await dispatch(updateProfile({ ...profile, profileImage: uploadedImageUrl || "" }));
-  
-        console.log('isBlock', response);
-  
-        if (response.payload?.success === true) {
-          toast.success('Profile Updated');
-          closeModal(); 
-        } else {
-          toast.error('Failed to update profile. Please try again.');
+        try {
+            const file = await fetch(profile.profileImage)
+                .then((res) => res.blob())
+                .then((blob) => new File([blob], 'profileImage.png', { type: blob.type }));
+            const uploadedImageUrl = await uploadImageToCloudinary(file);
+            console.log('uploaded', uploadedImageUrl)
+            updatedProfile.profileImage = uploadedImageUrl || '';
+        } catch (error) {
+            toast.error('An error occurred while uploading the image. Please try again.');
+            console.error('Image upload error:', error);
+            return;
         }
-      } catch (error) {
-        toast.error('An error occurred while uploading the image. Please try again.');
-        console.error('Image upload error:', error);
-      }
-    // const response = await dispatch(updateProfile(profile));
-    // console.log('isBlock', response);
-    // if (response.payload?.success === true) {
-    //   toast.success('Profile Updated');
-    //   closeModal();
-    // }
+    } else if (!profile.profileImage) {
+        updatedProfile.profileImage = '';
+    }
 
-    }}
+    console.log('submit after', updatedProfile)
+
+    try {
+        const response = await dispatch(updateProfile(updatedProfile));
+
+        console.log('isBlock', response);
+
+        if (response.payload?.success === true) {
+            toast.success('Profile Updated');
+            setIsLoading(false)
+            closeModal();
+        } else {
+            toast.error('Failed to update profile. Please try again.');
+        }
+    } catch (error) {
+        toast.error('An error occurred while updating the profile. Please try again.');
+        console.error('Profile update error:', error);
+    }
+}
   useLayoutEffect(() => {
     const fetchSubscription = async () => {
       try {
@@ -278,7 +318,7 @@ const UserProfile: React.FC = () => {
       <div className='md:w-2/3 flex flex-col mx-4 my-4'>
         <div className='flex flex-col md:flex-row mb-4'>
           <div className='flex-1 md:mr-2'>
-            <SolvedProblemsCard solvedProblems={solvedProblems} />
+            <SolvedProblemsCard solvedProblems={solvedProblems} difficultyCount={difficultyCount}/>
           </div>
           <div className='flex-1 md:ml-2'>
             <SubmissionActivityCard
@@ -303,7 +343,7 @@ const UserProfile: React.FC = () => {
         handleInputChange={handleInputChange}
         handleImageChange={handleImageChange}
         handleSubmit={handleSubmit}
-        isLoading={false}
+        isLoading={isLoading}
         handleRemoveImage={handleRemoveImage}
       />
     </div>

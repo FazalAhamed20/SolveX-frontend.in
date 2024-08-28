@@ -16,18 +16,21 @@ interface Notification {
     };
     clanId?: string;
     clanName?: string;
+    isRead:boolean
   }
 
 interface NotificationDropdownProps {
   notifications: Notification[];
   clearNotification: (index: number) => void;
   socket: Socket | null;
+  markAsRead:(id:string)=>void
 }
 
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   notifications,
   clearNotification,
-  socket
+  socket,
+  markAsRead
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [isAccept, setIsAccept] = useState(false);
@@ -35,6 +38,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
+    
+    notifications.forEach(notif => {
+      if (!notif.isRead) {
+        console.log("not",notif.id)
+        markAsRead(notif.id);
+     
+      }
+    });
   };
 
   const clearNotifications = () => {
@@ -92,6 +103,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       }
     }
   };
+  const unreadCount = notifications?.filter(notif => !notif.isRead).length;
 
   return (
     <div className='relative'>
@@ -102,9 +114,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         onClick={toggleNotifications}
       >
         <FaBell size={20} />
-        <span className='absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
-          {notifications?.length}
-        </span>
+        {unreadCount>0 && (
+  <span className='absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
+    {notifications.length}
+  </span>
+)}
       </motion.button>
       <AnimatePresence>
         {showNotifications && (

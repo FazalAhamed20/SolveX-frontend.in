@@ -31,7 +31,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
         )}
       </button>
       {isDropdownOpen && (
-                  <div className='mt-2 w-48 bg-white rounded-md shadow-lg py-2 mx-auto'>
+                   <div className='absolute right-0 mt-3 w-48 bg-white rounded-md shadow-lg py-2'>
                     <Link
                       to='/profile'
                       className='block px-4 py-2 text-gray-700 hover:bg-gray-100'
@@ -42,7 +42,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ user }) => {
                       Profile
                     </Link>
                     <a
-                      className='block px-4 py-2 text-gray-700 hover:bg-gray-100'
+                      className='block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer'
                       onClick={() => setShowModal(true)}
                     >
                       Logout
