@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {  generateWelcomeUserSpeech } from '../chatBot/geminiApi';
+import boy from '../../assets/boy.mp4'
 
 
 interface WelcomeModalProps {
@@ -73,7 +74,7 @@ const WelcomeUserModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose ,userna
     muted 
     playsInline
   >
-    <source src="./boy.mp4" type="video/mp4" />
+    <source src={boy} type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 </div>
