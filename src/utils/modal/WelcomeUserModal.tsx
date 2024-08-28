@@ -73,7 +73,7 @@ const WelcomeUserModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose ,userna
     muted 
     playsInline
   >
-    <source src="../../../src/assets/boy.mp4" type="video/mp4" />
+    <source src="./boy.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 </div>
