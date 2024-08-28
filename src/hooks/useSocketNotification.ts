@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-// types/notification.ts
 
 export interface Notification {
   id: string;
