@@ -60,14 +60,7 @@ export const useSocketNotification = (userId: string) => {
         setNotifications(prev => [...prev, data]);
         setIsReject(true)
       });
-      socket.on('notificationMarkedAsRead', (data: { notificationId: string }) => {
-        console.log("mark as read")
-        setNotifications(prev => 
-          prev.map(notif => 
-            notif.id === data.notificationId ? { ...notif, isRead: true } : notif
-          )
-        );
-      });
+   
     }
 
     return () => {
