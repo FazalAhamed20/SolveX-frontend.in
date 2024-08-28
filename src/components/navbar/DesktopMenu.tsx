@@ -23,14 +23,14 @@ interface DesktopMenuProps {
   notifications: Notification[];
   clearNotification: (index: number) => void;
   socket: Socket | null;
-  markAsRead:(id:string)=>void
+ 
 }
 
 const DesktopMenu: React.FC<DesktopMenuProps> = ({
   notifications,
   clearNotification,
   socket,
-  markAsRead
+
 }) => {
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -60,7 +60,7 @@ const DesktopMenu: React.FC<DesktopMenuProps> = ({
             notifications={notifications}
             clearNotification={clearNotification}
             socket={socket}
-            markAsRead={markAsRead}
+           
           />
           <UserDropdown user={user} />
         </div>

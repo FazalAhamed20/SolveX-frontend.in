@@ -146,19 +146,6 @@ const Navbar: React.FC<NavbarProps> = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const markAsRead = (id: string) => {
-    console.log("id",id)
-    
-    if (socket) {
-      socket.emit('markNotificationAsRead', { notificationId: id });
-    }
-    setNotification(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, isRead: true } : notif
-      )
-    );
-  };
-
   return (
     <nav className='bg-white shadow-md z-10'>
       <div className='max-w-full mx-auto px-2 sm:px-6 lg:px-8'>
@@ -178,7 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({
             notifications={notification}
             clearNotification={clearNotification}
             socket={socket}
-            markAsRead={markAsRead}
+          
           />
 
           <div className='flex sm:hidden'>
