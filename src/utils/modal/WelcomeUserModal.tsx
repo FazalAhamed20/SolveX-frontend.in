@@ -4,6 +4,7 @@ import {  generateWelcomeUserSpeech } from '../chatBot/geminiApi';
 
 
 
+
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -74,7 +75,7 @@ const WelcomeUserModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose ,userna
     muted 
     playsInline
   >
-    <source src="https://www.kapwing.com/videos/66cf146ae6170667168c84c5" type="video/mp4" />
+    <source src="../../assets/boy.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 </div>
