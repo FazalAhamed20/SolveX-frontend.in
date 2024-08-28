@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateWelcomeSpeech } from '../chatBot/geminiApi';
+import robot from '../../assets/chatbot.jpg'
 
 
 interface WelcomeModalProps {
@@ -64,7 +65,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
           >
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/2 bg-green-100 flex items-center justify-center p-6">
-                <img src="./boy.mp4" alt="" />
+                <img src={robot} alt="" />
               </div>
               <div className="p-8 md:w-1/2 flex flex-col justify-center">
                 <motion.div variants={container} initial="hidden" animate="show">
