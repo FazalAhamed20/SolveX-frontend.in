@@ -56,7 +56,7 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
       animate={{ opacity: 1 }}
       transition={{ staggerChildren: 0.1 }}
     >
-      {clans.map(clan => (
+      {clans?.map(clan => (
         <motion.div
           key={clan.id}
           className='bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300'

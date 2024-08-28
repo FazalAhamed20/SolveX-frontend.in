@@ -104,6 +104,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     }
   };
   const unreadCount = notifications?.filter(notif => !notif.isRead).length;
+  console.log('notification',notifications)
 
   return (
     <div className='relative'>
