@@ -31,6 +31,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
   instance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
     console.log('request', request);
+    console.log('url', authbaseUrl);
     return request;
   });
 
@@ -88,6 +89,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 };
 
 const AuthAxios = createAxiosInstance(authbaseUrl);
+
 const AdminAxios = createAxiosInstance(authbaseUrl);
 const ProblemAxios = createAxiosInstance(problemUrl);
 const PracticeAxios = createAxiosInstance(practiceUrl);

@@ -59,7 +59,7 @@ export const SignIn = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('user/userSignIn', async (userData: Signin, { rejectWithValue }) => {
   try {
-    console.log(userData.email);
+    console.log(userData.email,AuthAxios);
 
     const { data } = await AuthAxios.post<VerifyResponse>('/login', {
       email: userData.email,
@@ -81,6 +81,7 @@ export const Logout = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('user/logout', async (_, { rejectWithValue }) => {
   try {
+    console.log("auth",AuthAxios)
     const { data } = await AuthAxios.post<LogoutResponse>('/logout');
     console.log(data);
 
