@@ -21,7 +21,7 @@ export const useSocketNotification = (userId: string) => {
   const [isReject,setIsReject]=useState(false)
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3004');
+    const newSocket = io('www.thecoffeeland.shop');
     newSocket.on('connect', () => {
       console.log('Connected to socket server with ID:', newSocket.id);
       newSocket.emit('joinRoom', userId);

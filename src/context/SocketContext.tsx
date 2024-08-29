@@ -25,7 +25,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const initializeSocket = (userId: string) => {
     if (!socketRef.current) {
-      const newSocket = io('http://localhost:3006', {
+      const newSocket = io('www.thecoffeeland.shop', {
         autoConnect: false,
         transports: ['websocket'],
         query: { userId },
