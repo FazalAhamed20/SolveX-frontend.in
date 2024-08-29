@@ -8,7 +8,7 @@ interface QuizQuestion {
   correctAnswer: string;
 }
 
-export async function generateQuizQuestions(topic: 'javascript programming', numberOfQuestions: number): Promise<QuizQuestion[]> {
+export async function generateQuizQuestions(topic: string, numberOfQuestions: number): Promise<QuizQuestion[]> {
   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   const prompt = `Generate a quiz with ${numberOfQuestions} multiple-choice questions about ${topic}. 
