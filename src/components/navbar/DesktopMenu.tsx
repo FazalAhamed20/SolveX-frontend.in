@@ -16,7 +16,7 @@ interface Notification {
   };
   clanId?: string;
   clanName?: string;
-  isRead:boolean
+  seen:boolean
 }
 
 interface DesktopMenuProps {
@@ -60,6 +60,7 @@ const DesktopMenu: React.FC<DesktopMenuProps> = ({
             notifications={notifications}
             clearNotification={clearNotification}
             socket={socket}
+            
            
           />
           <UserDropdown user={user} />

@@ -72,8 +72,8 @@ export const useSocketNotification = (userId: string) => {
     };
   }, [socket]);
 
-  const clearNotification = (index: number) => {
-    setNotifications(prev => prev.filter((_, i) => i !== index));
+  const clearNotification = () => {
+    setNotifications([]);
   };
 
   return { socket, notifications, clearNotification,isAccepted,isReject };

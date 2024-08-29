@@ -32,7 +32,7 @@ interface Notification {
   };
   clanId?: string;
   clanName?: string;
-  isRead:boolean
+  seen:boolean
 }
 
 interface NavbarProps {
@@ -90,7 +90,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   },
                   clanId: clan._id,
                   clanName:clan.name,
-                   isRead: false,
+                   seen: false,
                 }));
             }
             return [];
@@ -111,20 +111,11 @@ const Navbar: React.FC<NavbarProps> = ({
             clanName: clan.name,
           },
           
-          isRead: false,
+          seen: false,
         }));
-        const acceptNotifications = userPendingClans.map(clan => ({
-          id: `${clan._id}-${user._id}-accept`,
-          type: 'acceptRequest' as const,
-          content: `Your request to join "${clan.name}" is accepted`,
-          clanData: {
-            clanId: clan._id,
-            clanName: clan.name,
-          },
-          isRead: false,
-        }));
+   
   
-        newNotifications = [...newNotifications, ...pendingNotifications,...acceptNotifications];
+        newNotifications = [...newNotifications, ...pendingNotifications];
   
         console.log('notifications', newNotifications);
         setNotification(prev => {

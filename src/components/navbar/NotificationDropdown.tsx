@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaBell } from 'react-icons/fa';
 import { Socket } from 'socket.io-client';
@@ -7,16 +7,17 @@ import { AppDispatch } from '../../redux/Store';
 import { acceptRequest, rejectRequest } from '../../redux/actions/ClanAction';
 
 interface Notification {
-    id: string;
-    type: 'clanRequest' | 'general' | 'requestPending' | "acceptRequest" | "removedClan";
-    content: string;
-    userData?: {
-      userId: string;
-      username: string;
-    };
-    clanId?: string;
-    clanName?: string;
-  }
+  id: string;
+  type: 'clanRequest' | 'general' | 'requestPending' | "acceptRequest" | "removedClan";
+  content: string;
+  userData?: {
+    userId: string;
+    username: string;
+  };
+  clanId?: string;
+  clanName?: string;
+  seen?: boolean;
+}
 
 interface NotificationDropdownProps {
   notifications: Notification[];
@@ -31,16 +32,56 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [isAccept, setIsAccept] = useState(false);
+  const [unseenCount, setUnseenCount] = useState(0);
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('notificationMarkedAsRead', ({ notificationIds }) => {
+        const updatedNotifications = notifications.map(notif => 
+          notificationIds.includes(notif.id) ? { ...notif, seen: true } : notif
+        );
+        updateUnseenCount(updatedNotifications);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('notificationMarkedAsRead');
+      }
+    };
+  }, [socket, notifications]);
+
+  useEffect(() => {
+    updateUnseenCount(notifications);
+  }, [notifications]);
+
+  const updateUnseenCount = (notifs: Notification[]) => {
+    const count = notifs.filter(notif => !notif.seen).length;
+    setUnseenCount(count);
+  };
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
+    if (!showNotifications) {
+      markNotificationsAsSeen();
+    }
+  };
+
+  const markNotificationsAsSeen = () => {
+    const unseenNotifications = notifications.filter(notif => !notif.seen);
+    if (unseenNotifications.length > 0 && socket) {
+      const notificationIds = unseenNotifications.map(notif => notif.id);
+      socket.emit('markNotificationsSeen', { notificationIds });
+      setUnseenCount(0);
+    }
   };
 
   const clearNotifications = () => {
     notifications.forEach((_, index) => {
       clearNotification(index);
     });
+    setUnseenCount(0);
   };
 
   const handleAcceptRequest = async (ClanId: string, userId: string, clanName: string) => {
@@ -64,6 +105,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       );
       if (index !== -1) {
         clearNotification(index);
+        updateUnseenCount(notifications.filter((_, i) => i !== index));
       }
       setIsAccept(false);
     }
@@ -89,6 +131,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       );
       if (index !== -1) {
         clearNotification(index);
+        updateUnseenCount(notifications.filter((_, i) => i !== index));
       }
     }
   };
@@ -102,11 +145,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         onClick={toggleNotifications}
       >
         <FaBell size={20} />
-        {notifications?.length > 0 && (
-    <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-      {notifications.length}
-    </span>
-  )}
+        {unseenCount > 0 && (
+          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {unseenCount}
+          </span>
+        )}
       </motion.button>
       <AnimatePresence>
         {showNotifications && (
@@ -131,7 +174,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className='px-4 py-2 hover:bg-gray-100 cursor-pointer'
+                className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${!notif.seen ? 'bg-blue-50' : ''}`}
               >
                 {notif.type === 'clanRequest' ? (
                   <div>
