@@ -112,6 +112,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   };
 
   const handleRejectRequest = async (ClanId: string, userId: string, clanName: string) => {
+    console.log("notofication socket",socket);
+    
     if (socket) {
       socket.emit('rejectRequest', {
         clanId: ClanId,
