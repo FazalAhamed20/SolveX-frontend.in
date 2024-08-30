@@ -19,6 +19,8 @@ const Signup: React.FC = () => {
   const [showOtpPage, setShowOtpPage] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isGoogle,setIsGoogle]=useState(false)
+  const [isFacebook,setIsFacebook]=useState(false)
   const [data, setData] = useState({
     username: '',
     email: '',
@@ -53,11 +55,13 @@ const Signup: React.FC = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
+    setIsGoogle(true)
     if (credentialResponse.credential) {
       const decodedToken: any = jwtDecode(credentialResponse.credential);
 
       await dispatch(GoogleAuth(decodedToken));
     }
+    setIsGoogle(false)
   };
 
   const handleGoogleFailure = () => {
@@ -66,6 +70,7 @@ const Signup: React.FC = () => {
   };
 
   const handleFacebookLogin = async () => {
+    setIsFacebook(true)
     const response = await login({
       scope: 'email',
     });
@@ -80,6 +85,7 @@ const Signup: React.FC = () => {
     console.log('Facebook User Data:', result.data);
 
     await dispatch(GoogleAuth(result.data));
+    setIsFacebook(false)
   };
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -221,14 +227,18 @@ const Signup: React.FC = () => {
                 </div>
                 <div className='mt-4'>
                   <div className='mt-4 flex justify-center'>
-                    <GoogleLogin
-                      onSuccess={handleGoogleSuccess}
-                      onError={handleGoogleFailure}
-                      useOneTap
-                      text='continue_with'
-                      shape='circle'
-                      width={150}
-                    />
+                  {isGoogle ? (
+                      <ClipLoader color='#000000' loading={isGoogle} size={30} />
+                    ) : (
+                      <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={handleGoogleFailure}
+                        useOneTap
+                        text='continue_with'
+                        shape='circle'
+                        width={150}
+                      />
+                    )}
                   </div>
                   <div className='flex flex-wrap gap-3 mt-3 justify-center'>
                     <button
@@ -236,13 +246,23 @@ const Signup: React.FC = () => {
                       onClick={handleFacebookLogin}
                       disabled={isLoading}
                     >
-                      <img
-                        loading='lazy'
-                        src='https://cdn.builder.io/api/v1/image/assets/TEMP/f83774a3dd6803fb37aba08ce8c27d8f2fa7689111287cf0fd4aab05ead17699?'
-                        className='w-[23px] aspect-square'
-                        alt='Facebook Logo'
-                      />
-                      <div>Facebook</div>
+                      {isFacebook ? (
+                        <ClipLoader
+                          color='#3b5998'
+                          loading={isFacebook}
+                          size={20}
+                        />
+                      ) : (
+                        <>
+                          <img
+                            loading='lazy'
+                            src='https://cdn.builder.io/api/v1/image/assets/TEMP/f83774a3dd6803fb37aba08ce8c27d8f2fa7689111287cf0fd4aab05ead17699?'
+                            className='w-[23px] aspect-square'
+                            alt='Facebook Logo'
+                          />
+                          <div>Facebook</div>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
