@@ -25,7 +25,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const initializeSocket = (userId: string) => {
     if (!socketRef.current) {
-      const newSocket = io('https://www.thecoffeeland.shop', {
+      const newSocket = io('https://www.thecoffeeland.shop/chat/api', {
         query: { userId },
       });
       socketRef.current = newSocket;
