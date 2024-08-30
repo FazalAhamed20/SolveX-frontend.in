@@ -22,7 +22,11 @@ export const useSocketNotification = (userId: string) => {
 
   useEffect(() => {
     const newSocket = io('https://www.thecoffeeland.shop/clan/api',{
-      path:'/clan-socket'
+      path: '/clan-socket',
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      timeout: 20000
     });
     newSocket.on('connect', () => {
       console.log('Connected to socket server with ID:', newSocket.id);
