@@ -102,6 +102,7 @@ const GroupChat: React.FC = () => {
 
 
   const handleNewMessage = useCallback((message: Message) => {
+    console.log('new message')
     setMessages(prevMessages => [...prevMessages, message]);
   }, []);
 
