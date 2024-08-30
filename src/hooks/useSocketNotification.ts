@@ -21,7 +21,7 @@ export const useSocketNotification = (userId: string) => {
   const [isReject,setIsReject]=useState(false)
 
   useEffect(() => {
-    const newSocket = io('https://www.thecoffeeland.shop');
+    const newSocket = io('https://www.thecoffeeland.shop/clan/api');
     newSocket.on('connect', () => {
       console.log('Connected to socket server with ID:', newSocket.id);
       newSocket.emit('joinRoom', userId);
