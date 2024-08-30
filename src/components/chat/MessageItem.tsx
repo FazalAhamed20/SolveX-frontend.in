@@ -81,46 +81,49 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     const [scrollToMessageId, setScrollToMessageId] = useState<string | null>(null);
     const user = useSelector((state: RootState) => state.user.user);
     useEffect(() => {
-   
-   if(socket){
-    socket.on('reaction_updated', ({ messageId, emoji, memberId, createdAt }) => {
-      setReactions((prevReactions) => {
-        const updatedReactions = [...prevReactions];
-        const existingReactionIndex = updatedReactions.findIndex(
-          (r) => r.memberId === memberId && r.messageId === messageId
-        );
+      if (socket) {
+        const handleReactionUpdate = ({ messageId, emoji, memberId, createdAt }:any) => {
+          console.log("all this",messageId, emoji, memberId, createdAt)
+          if (messageId === message._id) {
+            setReactions((prevReactions) => {
+              const updatedReactions = [...prevReactions];
+              const existingReactionIndex = updatedReactions.findIndex(
+                (r) => r.memberId === memberId && r.messageId === messageId
+              );
 
-        if (existingReactionIndex !== -1) {
-    
-          if (emoji === null) {
-            updatedReactions.splice(existingReactionIndex, 1);
-          } else {
-            updatedReactions[existingReactionIndex] = {
-              ...updatedReactions[existingReactionIndex],
-              emoji,
-              createdAt,
-            };
+              if (existingReactionIndex !== -1) {
+                if (emoji === null) {
+                  updatedReactions.splice(existingReactionIndex, 1);
+                } else {
+                  updatedReactions[existingReactionIndex] = {
+                    ...updatedReactions[existingReactionIndex],
+                    emoji,
+                    createdAt,
+                  };
+                }
+              } else if (emoji !== null) {
+                updatedReactions.push({
+                  memberId,
+                  emoji,
+                  messageId,
+                  createdAt,
+                });
+              }
+
+              return updatedReactions;
+            });
           }
-        } else if (emoji !== null) {
-        
-          updatedReactions.push({
-            memberId,
-            emoji,
-            messageId,
-            createdAt,
-          });
-        }
+        };
 
-        return updatedReactions;
-      });
-    });
+        socket.on('reaction_updated', handleReactionUpdate);
 
-   
-    return () => {
-      socket.off('reaction_updated');
-    };
-   }
-  }, []);
+        return () => {
+          socket.off('reaction_updated', handleReactionUpdate);
+        };
+      }
+    }, [socket, message._id]);
+
+  console.log('reactions of all',reactions)
 
     useEffect(() => {
       if (scrollToMessageId) {
@@ -183,50 +186,41 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     const handleReact = useCallback(
       async (emoji: string | null) => {
         if (socket) {
-       
           socket.emit('react_to_message', {
             messageId: message._id,
             emoji: emoji,
             userId: user._id,
           });
-          
-  
-          console.log("reaction ", socket);
         }
-  
-        let updatedReactions = [...reactions];
-        const existingReactionIndex = updatedReactions.findIndex(
-          r => r.memberId === currentUser._id
-        );
-    
-        if (existingReactionIndex !== -1) {
-          if (emoji === null) {
-            updatedReactions.splice(existingReactionIndex, 1);
-          } else {
-           
-            updatedReactions[existingReactionIndex] = {
-              ...updatedReactions[existingReactionIndex],
+
+        setReactions((prevReactions) => {
+          let updatedReactions = [...prevReactions];
+          const existingReactionIndex = updatedReactions.findIndex(
+            (r) => r.memberId === currentUser._id
+          );
+
+          if (existingReactionIndex !== -1) {
+            if (emoji === null) {
+              updatedReactions.splice(existingReactionIndex, 1);
+            } else {
+              updatedReactions[existingReactionIndex] = {
+                ...updatedReactions[existingReactionIndex],
+                emoji: emoji,
+                createdAt: new Date().toISOString(),
+              };
+            }
+          } else if (emoji !== null) {
+            updatedReactions.push({
+              memberId: currentUser._id,
               emoji: emoji,
-              createdAt: new Date().toISOString()
-            };
+              messageId: message._id,
+              createdAt: new Date().toISOString(),
+            });
           }
-        } else if (emoji !== null) {
-          
-          updatedReactions.push({
-            memberId: currentUser._id,
-            emoji: emoji,
-            messageId: message._id,
-            createdAt: new Date().toISOString(),
-          });
-        }
-        console.log('updated reaction',updatedReactions)
-    
-        setReactions(updatedReactions);
-      
-    
-       
-      
-    
+
+          return updatedReactions;
+        });
+
         try {
           await ChatAxios.post('/messages/react', {
             messageId: message._id,
@@ -237,7 +231,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           console.error('Failed to save reaction:', error);
         }
       },
-      [reactions, currentUser._id, message._id]
+      [currentUser._id, message._id, socket, user._id]
     );
 
     useEffect(() => {
