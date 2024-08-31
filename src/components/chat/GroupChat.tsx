@@ -341,7 +341,7 @@ console.log('all',messages)
   return (
     <div className='min-h-screen bg-[#f0f4f0] p-2 sm:p-4 md:p-6 lg:p-8'>
       <div className='max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden'>
-        <div className='flex flex-col md:flex-row h-[calc(100vh-2rem)] sm:h-[600px]'>
+        <div className='flex flex-col md:flex-row h-auto md:h-[calc(100vh-2rem)] sm:h-[600px]'>
           <MembersList
             showMembers={showMembers}
             groupMembers={groupMembers}
@@ -363,21 +363,20 @@ console.log('all',messages)
               onDeleteMessage={handleDeleteMessage}
               onReplyMessage={handleReply}
               socket={socket}
-              
             />
-           <ChatInput
-  inputMessage={inputMessage}
-  setInputMessage={setInputMessage}
-  handleSendMessage={handleSendMessage}
-  handleTyping={debouncedTyping}
-  showEmojiPicker={showEmojiPicker}
-  setShowEmojiPicker={setShowEmojiPicker}
-  handleEmojiClick={handleEmojiClick}
-  handleImageUpload={handleImageUpload}
-  handleVoiceMessage={handleVoiceMessage}
-  replyTo={replyTo}
-  clearReply={clearReply}
-/>
+            <ChatInput
+              inputMessage={inputMessage}
+              setInputMessage={setInputMessage}
+              handleSendMessage={handleSendMessage}
+              handleTyping={debouncedTyping}
+              showEmojiPicker={showEmojiPicker}
+              setShowEmojiPicker={setShowEmojiPicker}
+              handleEmojiClick={handleEmojiClick}
+              handleImageUpload={handleImageUpload}
+              handleVoiceMessage={handleVoiceMessage}
+              replyTo={replyTo}
+              clearReply={clearReply}
+            />
           </div>
         </div>
       </div>
