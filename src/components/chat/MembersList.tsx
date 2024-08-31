@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface GroupMember {
   id?: any;
@@ -17,58 +16,24 @@ interface MembersListProps {
   typingUser: string;
 }
 
-const DraggableOnlineUsers: React.FC<{ onlineUsers: string[] }> = ({ onlineUsers }) => {
-  const [position, setPosition] = useState({ x: 20, y: 20 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
-
-  return (
-    <div
-      className="fixed bg-white shadow-md rounded-lg p-3 cursor-move z-50"
-      style={{ left: `${position.x}px`, top: `${position.y}px` }}
-      onMouseDown={handleMouseDown}
-    >
-      <h3 className="font-semibold mb-2">Online Users</h3>
-      <ul>
-        {onlineUsers.map((user, index) => (
-          <li key={index} className="text-sm">{user}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
 const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Adjust this breakpoint as needed
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     setIsMobileMenuOpen(showMembers);
@@ -78,10 +43,32 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
     setIsMobileMenuOpen(prevState => !prevState);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isMobile) return;
+    setIsDragging(true);
+    setStartY(e.touches[0].clientY - scrollY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !isMobile) return;
+    const newScrollY = e.touches[0].clientY - startY;
+    setScrollY(Math.max(0, Math.min(newScrollY, window.innerHeight - (headerRef.current?.offsetHeight || 0))));
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobile) return;
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (!isMobile) {
+      setScrollY(0);
+      setIsDragging(false);
+    }
+  }, [isMobile]);
+
   return (
     <>
-      <DraggableOnlineUsers onlineUsers={onlineUsers} />
-
       <div 
         className={`
           ${(showMembers || isMobileMenuOpen) ? 'fixed inset-0 z-40 bg-white' : ''} 
@@ -92,16 +79,34 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
           ${(showMembers || isMobileMenuOpen) ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
-        <div className='sticky top-0 p-3 md:p-4 bg-[#e8f5e9] text-[#2e7d32] z-10 flex justify-between items-center'>
+        <div 
+          ref={headerRef}
+          className={`
+            p-3 md:p-4 bg-[#e8f5e9] text-[#2e7d32] z-10 flex justify-between items-center
+            ${isMobile ? 'fixed w-full cursor-move' : 'sticky top-0'}
+          `}
+          style={isMobile ? { transform: `translateY(${scrollY}px)` } : {}}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <h2 className='text-lg md:text-xl font-semibold'>Group Members</h2>
           <button 
             className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
             onClick={toggleMobileMenu}
           >
-            <X size={24} />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
-        <div className={`overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] ${(showMembers || isMobileMenuOpen) ? 'block' : 'hidden md:block'}`}>
+        <div 
+          className={`
+            overflow-y-auto
+            ${isMobile ? `h-[calc(100vh-${headerRef.current?.offsetHeight || 0}px)] mt-[${headerRef.current?.offsetHeight || 0}px]` : 'h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]'}
+            ${(showMembers || isMobileMenuOpen) ? 'block' : 'hidden md:block'}
+          `}
+        >
           {groupMembers
             .filter(member => member.name !== currentUser.username)
             .map(member => {
