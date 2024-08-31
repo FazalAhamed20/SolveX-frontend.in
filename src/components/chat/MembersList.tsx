@@ -26,7 +26,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
   return (
     <div 
       className={`
-        ${showMembers || isMobileMenuOpen ? 'fixed inset-0 z-50 bg-white' : 'hidden'} 
+        ${(showMembers || isMobileMenuOpen) && 'fixed inset-0 z-50 bg-white'} 
         md:relative md:block 
         w-full md:w-1/4 lg:w-1/5 
         bg-[#f8faf8] border-b md:border-r border-gray-200
@@ -50,7 +50,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
           )}
         </button>
       </div>
-      <div className='overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]'>
+      <div className={`overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
         {groupMembers
           .filter(member => member.name !== currentUser.username)
           .map(member => {
