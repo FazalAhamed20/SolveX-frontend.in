@@ -1,6 +1,5 @@
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaSmile } from "react-icons/fa";
 
 interface Reaction {
@@ -71,9 +70,9 @@ const Reactions: React.FC<ReactionProps> = ({
     <button
       key={emoji}
       onClick={() => handleReaction(emoji)}
-      className={`mx-1 text-lg hover:bg-gray-100 rounded-full p-1 transition-colors duration-200 ${
+      className={`mx-1 text-lg hover:bg-gray-200 rounded-full p-2 transition-colors duration-200 ${
         currentUserReaction === emoji ? 'bg-green-100' : ''
-      }`}
+      } ${showAllEmojis ? 'w-24' : 'w-12'}`} // Adjust width based on showAllEmojis
     >
       {emoji}
     </button>
