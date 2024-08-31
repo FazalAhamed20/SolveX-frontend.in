@@ -1,5 +1,6 @@
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaSmile } from "react-icons/fa";
 
 interface Reaction {
@@ -27,7 +28,6 @@ const Reactions: React.FC<ReactionProps> = ({
   className,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showAllEmojis, setShowAllEmojis] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,52 +66,41 @@ const Reactions: React.FC<ReactionProps> = ({
 
   const currentUserReaction = getCurrentUserReaction();
 
-  const renderEmojiButton = (emoji: string) => (
-    <button
-      key={emoji}
-      onClick={() => handleReaction(emoji)}
-      className={`mx-1 text-lg hover:bg-gray-200 rounded-full py-1 px-2 transition-colors duration-200 ${
-        currentUserReaction === emoji ? 'bg-green-100' : ''
-      }`}
-      style={{
-        height: showAllEmojis ? 'auto' : '2rem',
-      }}
-    >
-      {emoji}
-    </button>
-  );
-
   return (
     <div
       className={`${className} absolute bottom-0 ${
         isOwnMessage ? 'right-0' : 'left-0'
-      } transform translate-y-full mt-1 flex flex-wrap items-center bg-white rounded-full shadow-md p-1 z-10`}
+      } transform translate-y-full mt-1 flex items-center bg-white rounded-full shadow-md p-2 z-10 space-x-1 sm:space-x-2`}
     >
-      <div className="flex flex-wrap items-center">
-        {showAllEmojis 
-          ? DEFAULT_EMOJIS.map(renderEmojiButton)
-          : DEFAULT_EMOJIS.slice(0, 3).map(renderEmojiButton)
-        }
-        {!showAllEmojis && (
-          <button
-            onClick={() => setShowAllEmojis(true)}
-            className="mx-1 text-xs bg-gray-200 hover:bg-gray-300 rounded-full px-2 py-1 transition-colors duration-200"
-          >
-            +{DEFAULT_EMOJIS.length - 3}
-          </button>
-        )}
-        {currentUserReaction && !DEFAULT_EMOJIS.includes(currentUserReaction) && renderEmojiButton(currentUserReaction)}
-      </div>
+      {DEFAULT_EMOJIS.map(emoji => (
+        <button
+          key={emoji}
+          onClick={() => handleReaction(emoji)}
+          className={`flex items-center justify-center w-8 h-8 text-lg hover:bg-gray-100 rounded-full transition-colors duration-200 ${
+            currentUserReaction === emoji ? 'bg-green-100' : ''
+          }`}
+        >
+          {emoji}
+        </button>
+      ))}
+      {currentUserReaction && !DEFAULT_EMOJIS.includes(currentUserReaction) && (
+        <button
+          onClick={() => handleReaction(currentUserReaction)}
+          className="flex items-center justify-center w-8 h-8 text-lg bg-green-100 hover:bg-gray-100 rounded-full transition-colors duration-200"
+        >
+          {currentUserReaction}
+        </button>
+      )}
       <div className='relative' ref={emojiPickerRef}>
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className='mx-1 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200'
+          className='flex items-center justify-center w-8 h-8 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200'
         >
           <FaSmile className='text-gray-600' />
         </button>
         {showEmojiPicker && (
-          <div className='absolute bottom-full right-0 mb-2 max-w-[90vw] sm:max-w-[300px]'>
-            <EmojiPicker onEmojiClick={handleEmojiClick} width="100%" height="350px" />
+          <div className='absolute bottom-full right-0 mb-2'>
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
           </div>
         )}
       </div>
