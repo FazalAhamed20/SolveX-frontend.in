@@ -31,9 +31,11 @@ const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
   
 
     return (
-      <div  className='flex-1 overflow-y-auto px-4 py-4 bg-[#f0f4f0]'>
+      <div className="w-full max-w-3xl mx-auto">
         {messages.map(message => (
+          <div key={message._id} className="mb-4 p-3 bg-white rounded-lg shadow">
           <MessageItem ref={ref} key={message._id} message={message} currentUser={currentUser} isLoading={isLoading} onDeleteMessage={onDeleteMessage} onReplyMessage={onReplyMessage} socket={socket}  />
+          </div>
         ))}
         
       </div>

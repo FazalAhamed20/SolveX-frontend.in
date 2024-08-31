@@ -67,26 +67,23 @@ const Reactions: React.FC<ReactionProps> = ({
   const currentUserReaction = getCurrentUserReaction();
 
   return (
-    <div
-      className={`${className} absolute bottom-0 ${
-        isOwnMessage ? 'right-0' : 'left-0'
-      } transform translate-y-full mt-1 flex items-center bg-white rounded-full shadow-md p-1 z-10`}
-    >
+    <div className="flex flex-wrap items-center justify-start p-2 bg-gray-100 rounded-lg">
+      
       {DEFAULT_EMOJIS.map(emoji => (
         <button
           key={emoji}
           onClick={() => handleReaction(emoji)}
-          className={`mx-1 text-lg hover:bg-gray-100 rounded-full p-1 transition-colors duration-200 ${
+          className={`m-1 text-lg hover:bg-gray-200 rounded-full p-1 transition-colors duration-200 ${
             currentUserReaction === emoji ? 'bg-green-100' : ''
           }`}
         >
           {emoji}
         </button>
       ))}
-      {currentUserReaction && !DEFAULT_EMOJIS.includes(currentUserReaction) && (
+    {currentUserReaction && !DEFAULT_EMOJIS.includes(currentUserReaction) && (
         <button
           onClick={() => handleReaction(currentUserReaction)}
-          className="mx-1 text-lg bg-green-100 hover:bg-gray-100 rounded-full p-1 transition-colors duration-200"
+          className="m-1 text-lg bg-green-100 hover:bg-gray-200 rounded-full p-1 transition-colors duration-200"
         >
           {currentUserReaction}
         </button>
@@ -94,12 +91,12 @@ const Reactions: React.FC<ReactionProps> = ({
       <div className='relative' ref={emojiPickerRef}>
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className='mx-1 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200'
+           className="m-1 p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
         >
           <FaSmile className='text-gray-600' />
         </button>
         {showEmojiPicker && (
-          <div className='absolute bottom-full right-0 mb-2'>
+          <div className="absolute mt-2 bg-white rounded-lg shadow-lg p-2">
             <EmojiPicker onEmojiClick={handleEmojiClick} />
           </div>
         )}

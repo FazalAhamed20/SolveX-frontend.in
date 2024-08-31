@@ -23,11 +23,11 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
   console.log("typing user", typingUser);
 
   return (
-    <div className={`${showMembers ? 'block' : 'hidden'} md:block w-full md:w-1/4 lg:w-1/5 bg-[#f8faf8] border-b md:border-r border-gray-200`}>
-      <div className='p-4 bg-[#e8f5e9] text-[#2e7d32]'>
-        <h2 className='text-xl font-semibold'>Group Members</h2>
+    <div className={`${showMembers ? 'block' : 'hidden'} md:block w-full md:w-1/4 lg:w-1/5 bg-[#f8faf8] border-b md:border-r border-gray-200 fixed md:static top-0 right-0 h-full md:h-auto z-20`}>
+      <div className='p-3 sm:p-4 bg-[#e8f5e9] text-[#2e7d32]'>
+        <h2 className='text-lg sm:text-xl font-semibold'>Group Members</h2>
       </div>
-      <div className='overflow-y-auto h-[calc(100vh-10rem)] md:h-[calc(600px-60px)]'>
+      <div className='overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(600px-60px)]'>
         {groupMembers
           .filter(member => member.name !== currentUser.username)
           .map(member => {
@@ -36,16 +36,16 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
             return (
               <div
                 key={member.id}
-                className='flex items-center p-3 hover:bg-[#f1f8f1] transition duration-150'
+                className='flex items-center p-2 sm:p-3 hover:bg-[#f1f8f1] transition duration-150'
               >
-                <div className='w-10 h-10 rounded-full overflow-hidden bg-[#c8e6c9] flex items-center justify-center text-[#2e7d32] font-bold'>
+                <div className='w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-[#c8e6c9] flex items-center justify-center text-[#2e7d32] font-bold text-sm sm:text-base'>
                   {member.name.charAt(0).toUpperCase()}
                 </div>
-                <div className='ml-3 flex-1'>
-                  <p className='font-medium text-[#2e7d32]'>{member.name}</p>
-                  <p className='text-sm text-[#4caf50] flex items-center'>
+                <div className='ml-2 sm:ml-3 flex-1'>
+                  <p className='font-medium text-[#2e7d32] text-sm sm:text-base'>{member.name}</p>
+                  <p className='text-xs sm:text-sm text-[#4caf50] flex items-center'>
                     <FaCircle
-                      className={`mr-1 text-xs ${
+                      className={`mr-1 text-[8px] sm:text-xs ${
                         isOnline ? 'text-green-500' : 'text-gray-400'
                       }`}
                     />
