@@ -404,7 +404,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           </div>
         )}
         <div
-          className={`relative max-w-[90%] md:max-w-[75%] lg:max-w-[60%] px-4 py-2 rounded-lg shadow-md ${
+          className={`relative max-w-[80%] sm:max-w-[70%] md:max-w-[60%] lg:max-w-[50%] px-3 py-2 rounded-lg shadow-md ${
             isOwnMessage
               ? 'bg-green-100 text-green-900'
               : 'bg-white text-gray-900'
@@ -426,12 +426,12 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
             </div>
           )}
 
-{message.replyTo && (
-          <ReplyPreview 
-            replyTo={message.replyTo} 
-            onReplyClick={() => onReplyClick(message.replyTo!._id)} 
-          />
-        )}
+          {message.replyTo && (
+            <ReplyPreview 
+              replyTo={message.replyTo} 
+              onReplyClick={() => onReplyClick(message.replyTo!._id)} 
+            />
+          )}
 
           {message.image && (
             <>
@@ -441,59 +441,59 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
                 <img
                   src={message.image}
                   alt='Shared image'
-                  className='max-w-60 h-45 rounded-lg mb-2'
+                  className='max-w-full h-auto rounded-lg mb-2'
                 />
               )}
             </>
           )}
 
-{message.voice && (
-  <div className='flex items-center space-x-2 mb-2'>
-    <button
-      onClick={toggleAudio}
-      className='p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200'
-    >
-      {isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
-    </button>
-    <div className='flex-1 h-1 bg-green-200 rounded-full'>
-      <div
-        className='h-full bg-green-500 rounded-full'
-        style={{
-          width: `${
-            ((audio?.currentTime || 0) / (audio?.duration || 1)) * 100
-          }%`,
-        }}
-      ></div>
-    </div>
-  </div>
-)}
+          {message.voice && (
+            <div className='flex items-center space-x-2 mb-2'>
+              <button
+                onClick={toggleAudio}
+                className='p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors duration-200'
+              >
+                {isPlaying ? <FaPause size={12} /> : <FaPlay size={12} />}
+              </button>
+              <div className='flex-1 h-1 bg-green-200 rounded-full'>
+                <div
+                  className='h-full bg-green-500 rounded-full'
+                  style={{
+                    width: `${
+                      ((audio?.currentTime || 0) / (audio?.duration || 1)) * 100
+                    }%`,
+                  }}
+                ></div>
+              </div>
+            </div>
+          )}
 
-          <div className='pr-8'>
+          <div className='pr-6'>
             <p className='text-sm leading-relaxed break-words whitespace-pre-wrap'>
               {message.text}
             </p>
 
             {reactions.length > 0 && (
-  <div
-    className={`absolute -bottom-6 ${
-      isOwnMessage ? 'right-0' : 'left-0'
-    } flex space-x-1`}
-  >
-    {Object.entries(reactionSummary).map(([emoji, count]) => (
-      <div
-        key={emoji}
-        className='bg-white shadow-md px-2 py-1 rounded-full text-xs'
-      >
-        {emoji} {count}
-      </div>
-    ))}
-    {Object.keys(reactionSummary).length < reactions.length && (
-      <div className='bg-white shadow-md px-2 py-1 rounded-full text-xs'>
-        +{reactions.length - Object.keys(reactionSummary).length}
-      </div>
-    )}
-  </div>
-)}
+              <div
+                className={`absolute -bottom-6 ${
+                  isOwnMessage ? 'right-0' : 'left-0'
+                } flex flex-wrap space-x-1`}
+              >
+                {Object.entries(reactionSummary).map(([emoji, count]) => (
+                  <div
+                    key={emoji}
+                    className='bg-white shadow-md px-2 py-1 rounded-full text-xs mb-1'
+                  >
+                    {emoji} {count}
+                  </div>
+                ))}
+                {Object.keys(reactionSummary).length < reactions.length && (
+                  <div className='bg-white shadow-md px-2 py-1 rounded-full text-xs mb-1'>
+                    +{reactions.length - Object.keys(reactionSummary).length}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className='flex justify-end items-center mt-1 space-x-1.5'>
               <span className='block text-[11px] text-green-600'>
@@ -504,36 +504,36 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
           </div>
 
           <div
-    className={`absolute w-3 h-3 ${
-      isOwnMessage
-        ? 'right-0 -mr-1.5 bg-green-100'
-        : 'left-0 -ml-1.5 bg-white'
-    } bottom-[8px] transform ${
-      isOwnMessage ? 'rotate-45' : '-rotate-45'
-    }`}
-  ></div>
-         {isOwnMessage && (
-    <div className='absolute top-2 right-2 z-10'>
-      <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        className='p-1 text-gray-500 hover:text-gray-700 transition-colors duration-200'
-      >
-        <FaChevronDown size={14} />
-      </button>
-    </div>
-  )}
+            className={`absolute w-3 h-3 ${
+              isOwnMessage
+                ? 'right-0 -mr-1.5 bg-green-100'
+                : 'left-0 -ml-1.5 bg-white'
+            } bottom-[8px] transform ${
+              isOwnMessage ? 'rotate-45' : '-rotate-45'
+            }`}
+          ></div>
+          {isOwnMessage && (
+            <div className='absolute top-2 right-2 z-10'>
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className='p-1 text-gray-500 hover:text-gray-700 transition-colors duration-200'
+              >
+                <FaChevronDown size={14} />
+              </button>
+            </div>
+          )}
 
           {showReactions && (
-           <Reactions
-           reactions={reactions}
-           onReact={handleReact}
-           currentUserId={currentUser._id}
-           isOwnMessage={isOwnMessage}
-           messageId={message._id}
-           className={`absolute ${isOwnMessage ? 'right-0' : 'left-0'} ${
-             reactions.length > 0 ? '-bottom-12' : '-bottom-6'
-           }`}
-         />
+            <Reactions
+              reactions={reactions}
+              onReact={handleReact}
+              currentUserId={currentUser._id}
+              isOwnMessage={isOwnMessage}
+              messageId={message._id}
+              className={`absolute ${isOwnMessage ? 'right-0' : 'left-0'} ${
+                reactions.length > 0 ? '-bottom-12' : '-bottom-6'
+              }`}
+            />
           )}
         </div>
         <ConfirmModal
@@ -544,6 +544,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
         />
       </div>
     );
+
   },
 );
 export default React.memo(MessageItem);

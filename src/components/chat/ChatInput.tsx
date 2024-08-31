@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaSmile, FaImage, FaTimes, FaMicrophone, FaStop } from 'react-icons/fa';
+import {  SmileIcon, ImageIcon, XIcon, MicIcon, StopCircleIcon } from 'lucide-react';
+import { FaPaperPlane } from 'react-icons/fa';
 import EmojiPicker from 'emoji-picker-react';
 
 interface Message {
@@ -37,8 +38,6 @@ interface ChatInputProps {
   clearReply: () => void;
 }
 
-
-
 const ChatInput: React.FC<ChatInputProps> = ({
   inputMessage,
   setInputMessage,
@@ -54,17 +53,16 @@ const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [voiceReady, setVoiceReady] = useState<boolean>(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const [voiceReady, setVoiceReady] = useState<boolean>(false);
 
   const handleLocalImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        const result = event.target?.result as string;
-        setPreviewImage(result);
+        setPreviewImage(event.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -78,15 +76,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("sub submitted",inputMessage);
-    
     handleSendMessage(inputMessage, replyTo);
-    console.log("after submitted");
     setPreviewImage(null);
     setInputMessage('');
     setVoiceReady(false);
     clearReply();
-  
   };
 
   const startRecording = async () => {
@@ -95,46 +89,33 @@ const ChatInput: React.FC<ChatInputProps> = ({
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-  
-      const audioContext = new AudioContext();
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-     
-      const draw = () => {
-        if (!isRecording) return;
-  
-      };
-  
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
-  
+
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         handleVoiceMessage(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
-  
+
       mediaRecorder.start();
       setIsRecording(true);
-      draw();
     } catch (error) {
       console.error('Error accessing microphone:', error);
     }
   };
+
   const stopRecording = () => {
-    console.log('stopped')
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setVoiceReady(true);
     }
   };
-
 
   useEffect(() => {
     return () => {
@@ -146,11 +127,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
   }, []);
 
   return (
-    <div className='bg-white border-t border-[#c8e6c9] p-4 shadow-lg'>
+    <div className='bg-white border-t border-[#c8e6c9] p-2 sm:p-4 shadow-lg'>
       <form className='flex flex-col' onSubmit={handleSubmit}>
         {previewImage && (
-          <div className="mb-4 relative">
-            <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full h-48">
+          <div className="mb-2 sm:mb-4 relative">
+            <div className="relative group rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full h-32 sm:h-48">
               <img
                 src={previewImage}
                 alt="Preview"
@@ -160,32 +141,32 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors duration-300"
+                  className="bg-red-500 text-white rounded-full p-1 sm:p-2 hover:bg-red-600 transition-colors duration-300"
                 >
-                  <FaTimes size={16} />
+                  <XIcon size={16} />
                 </button>
               </div>
             </div>
-            <div className="absolute bottom-2 left-2 right-2 bg-white bg-opacity-75 p-2 rounded">
-              <p className="text-sm font-semibold truncate">Image Preview</p>
+            <div className="absolute bottom-2 left-2 right-2 bg-white bg-opacity-75 p-1 sm:p-2 rounded">
+              <p className="text-xs sm:text-sm font-semibold truncate">Image Preview</p>
             </div>
           </div>
         )}
-        <div className='flex items-center space-x-3'>
+        <div className='flex flex-wrap items-center space-x-1 sm:space-x-3'>
           <button
             type='button'
             onClick={() => setShowEmojiPicker(prev => !prev)}
-            className='text-[#4caf50] hover:text-[#2e7d32] transition-colors duration-300'
+            className='text-[#4caf50] hover:text-[#2e7d32] transition-colors duration-300 p-1 sm:p-2'
           >
-            <FaSmile size={24} />
+            <SmileIcon size={20} />
           </button>
           {showEmojiPicker && (
             <div className='absolute bottom-20 left-4 z-10'>
               <EmojiPicker onEmojiClick={handleEmojiClick} />
             </div>
           )}
-          <label htmlFor="imageUpload" className='cursor-pointer text-[#4caf50] hover:text-[#2e7d32] transition-colors duration-300'>
-            <FaImage size={24} />
+          <label htmlFor="imageUpload" className='cursor-pointer text-[#4caf50] hover:text-[#2e7d32] transition-colors duration-300 p-1 sm:p-2'>
+            <ImageIcon size={20} />
           </label>
           <input
             id="imageUpload"
@@ -197,78 +178,68 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <button
             type='button'
             onClick={isRecording ? stopRecording : startRecording}
-            className={`text-white p-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg ${
+            className={`text-white p-2 sm:p-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg ${
               isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-[#4caf50] hover:bg-[#43a047]'
             }`}
           >
-           {isRecording ? <FaStop size={18} /> : <FaMicrophone size={18} />}
+           {isRecording ? <StopCircleIcon size={18} /> : <MicIcon size={18} />}
           </button>
-          {isRecording ? (
-  <div className="flex-1 flex items-center">
-    <div className="flex-shrink-0 bg-red-500 text-white px-3 py-1 rounded-full animate-pulse">
-      Recording
-    </div>
-  </div>
-) : voiceReady ? (
-  <div className="flex-1 flex items-center">
-    <div className="flex-shrink-0 bg-green-500 text-white px-3 py-1 rounded-full">
-      Voice Ready
-    </div>
-
-  </div>
-) : (
-            <div className="flex-1">
-  {replyTo && (
-    <div className="bg-gray-100 p-2 rounded-md mb-2">
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-semibold">Replying to {replyTo.sender.name}</span>
-        <button 
-          onClick={clearReply} 
-          className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
-        >
-          ×
-        </button>
-      </div>
-      <div className="flex items-center">
-        {replyTo.image && (
-          <img 
-            src={replyTo.image} 
-            alt="Reply preview" 
-            className="w-10 h-10 object-cover rounded mr-2"
-          />
-        )}
-        {replyTo.voice && (
-          <div className="mr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
+          <div className="flex-1 min-w-0">
+            {replyTo && (
+              <div className="bg-gray-100 p-1 sm:p-2 rounded-md mb-1 sm:mb-2 text-xs sm:text-sm">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold truncate">Replying to {replyTo.sender.name}</span>
+                  <button 
+                    onClick={clearReply} 
+                    className="text-gray-600 hover:text-gray-800 transition-colors duration-200 ml-1"
+                  >
+                    <XIcon size={16} />
+                  </button>
+                </div>
+                <div className="flex items-center">
+                  {replyTo.image && (
+                    <img 
+                      src={replyTo.image} 
+                      alt="Reply preview" 
+                      className="w-6 h-6 sm:w-8 sm:h-8 object-cover rounded mr-1 sm:mr-2"
+                    />
+                  )}
+                  {replyTo.voice && (
+                    <div className="mr-1 sm:mr-2">
+                      <MicIcon size={16} className="text-blue-500" />
+                    </div>
+                  )}
+                  <p className="text-gray-600 truncate flex-1">
+                    {replyTo.text ? replyTo.text : replyTo.image ? 'Image' : replyTo.voice ? 'Voice message' : 'Message'}
+                  </p>
+                </div>
+              </div>
+            )}
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={e => {
+                setInputMessage(e.target.value);
+                handleTyping();
+              }}
+              className="w-full border-2 border-[#a5d6a7] rounded-full px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#4caf50] transition-all duration-300"
+              placeholder="Type a message"
+            />
           </div>
-        )}
-        <p className="text-gray-600 truncate flex-1">
-          {replyTo.text ? replyTo.text : replyTo.image ? 'Image' : replyTo.voice ? 'Voice message' : 'Message'}
-        </p>
-      </div>
-    </div>
-  )}
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={e => {
-                  setInputMessage(e.target.value);
-                  handleTyping();
-                }}
-                className="w-full border-2 border-[#a5d6a7] rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#4caf50] transition-all duration-300"
-                placeholder="Type a message"
-              />
-            </div>
-          )}
           <button
             type='submit'
-            className='bg-[#4caf50] text-white p-3 rounded-full hover:bg-[#43a047] transition-all duration-300 shadow-md hover:shadow-lg'
+            className='bg-[#4caf50] text-white p-2 sm:p-3 rounded-full hover:bg-[#43a047] transition-all duration-300 shadow-md hover:shadow-lg flex-shrink-0'
           >
             <FaPaperPlane size={18} />
           </button>
+        </div>
+        {(isRecording || voiceReady) && (
+          <div className="mt-2 flex items-center justify-center">
+            <div className={`text-xs sm:text-sm px-2 py-1 rounded-full ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-green-500 text-white'}`}>
+              {isRecording ? 'Recording' : 'Voice Ready'}
+            </div>
           </div>
+        )}
       </form>
     </div>
   );
