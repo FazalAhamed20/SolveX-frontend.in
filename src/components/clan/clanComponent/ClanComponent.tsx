@@ -313,8 +313,9 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
                 isUserMember={isUserMember}
                 pendingRequests={pendingRequests}
                 userId={user._id}
-                isAccepted={isAccepted}     
-      />
+                isAccepted={isAccepted}
+                 loading={false}
+               isReject={false}      />
       )}
 
       <AnimatePresence>
