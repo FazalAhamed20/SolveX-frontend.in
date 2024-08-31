@@ -149,11 +149,24 @@ const Login: React.FC = () => {
                         </div>
                         <div className='ml-2'>
                         <Link
-                      to='/signup'
-                      className='flex-1 px-8 py-3 text-sm leading-5 text-green-700 bg-green-100 hover:bg-green-200 rounded focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50 text-center transition duration-200 ease-in-out'
-                    >
-                      Sign Up
-                    </Link>
+      to="/signup"
+      className="
+        block w-full sm:w-auto
+        px-6 py-2 sm:px-8 sm:py-3
+        text-sm sm:text-base
+        font-medium
+        text-green-700 
+        bg-green-100 
+        hover:bg-green-200 
+        rounded-full
+        transition duration-300 ease-in-out
+        text-center
+        focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50
+        shadow-md hover:shadow-lg
+      "
+    >
+      Sign Up
+    </Link>
                         </div>
                       </div>
                       <div
