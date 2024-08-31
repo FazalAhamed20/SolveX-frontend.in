@@ -17,53 +17,39 @@ interface MembersListProps {
 }
 
 const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    setIsMobileMenuOpen(showMembers);
+    setIsExpanded(showMembers);
   }, [showMembers]);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(prevState => !prevState);
+  const toggleExpand = () => {
+    setIsExpanded(prevState => !prevState);
   };
 
   return (
-    <>
-      {/* Mobile toggle button */}
-      <button 
-        className="md:hidden fixed bottom-4 right-4 bg-[#2e7d32] text-white p-2 rounded-full shadow-lg z-50"
-        onClick={toggleMobileMenu}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </button>
-
-
-      
-
+    <div 
+      className={`
+        fixed top-0 right-0 z-40
+        w-full md:w-1/4 lg:w-1/5 
+        bg-[#f8faf8] border-l border-gray-200
+        transition-all duration-300 ease-in-out
+        ${isExpanded ? 'h-screen' : 'h-12'}
+      `}
+    >
       <div 
-        className={`
-          ${(showMembers || isMobileMenuOpen) ? 'fixed inset-0 z-40 bg-white' : ''} 
-          md:relative md:block 
-          w-full md:w-1/4 lg:w-1/5 
-          bg-[#f8faf8] border-b md:border-r border-gray-200
-          transition-all duration-300 ease-in-out
-          ${(showMembers || isMobileMenuOpen) ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-        `}
+        className='sticky top-0 p-3 bg-[#e8f5e9] text-[#2e7d32] z-10 flex justify-between items-center cursor-pointer'
+        onClick={toggleExpand}
       >
-        <div className='sticky top-0 p-3 md:p-4 bg-[#e8f5e9] text-[#2e7d32] z-10 flex justify-between items-center'>
-          <h2 className='text-lg md:text-xl font-semibold'>Group Members</h2>
-          <button 
-            className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
-            onClick={toggleMobileMenu}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        <h2 className='text-lg font-semibold'>Group Members</h2>
+        <div className="flex space-x-1">
+          <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+          <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+          <div className={`w-2 h-2 rounded-full ${isExpanded ? 'bg-green-500' : 'bg-gray-400'}`}></div>
         </div>
-        <div className={`overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] ${(showMembers || isMobileMenuOpen) ? 'block' : 'hidden md:block'}`}>
+      </div>
+      {isExpanded && (
+        <div className="overflow-y-auto h-[calc(100vh-3rem)]">
           {groupMembers
             .filter(member => member.name !== currentUser.username)
             .map(member => {
@@ -94,8 +80,8 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
               );
             })}
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
