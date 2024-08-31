@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CircleIcon } from 'lucide-react';
 
 interface GroupMember {
@@ -10,14 +10,19 @@ interface GroupMember {
 }
 
 interface MembersListProps {
-  showMembers: boolean;
   groupMembers: GroupMember[];
   currentUser: any;
   onlineUsers: string[];
   typingUser: string;
 }
 
-const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
+const MembersList: React.FC<MembersListProps> = ({ groupMembers, currentUser, onlineUsers, typingUser }) => {
+  const [showMembers, setShowMembers] = useState(false); // State to manage visibility of members list
+
+  const toggleShowMembers = () => {
+    setShowMembers(prev => !prev); // Toggle the state
+  };
+
   return (
     <div 
       className={`
@@ -32,7 +37,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
         <h2 className='text-lg md:text-xl font-semibold'>Group Members</h2>
         <button 
           className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
-          onClick={() => {/* Toggle showMembers */}}
+          onClick={toggleShowMembers} // Toggle showMembers on button click
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -58,9 +63,8 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
                   <p className='text-xs md:text-sm text-[#4caf50] flex items-center'>
                     <CircleIcon
                       className={`mr-1 ${
-                        isOnline ? 'text-green-500' : 'text-gray-400'
-                      }`}
-                      size={12}
+                        isOnline ? 'bg-green-500' : 'bg-gray-400'
+                      } rounded-full w-3 h-3`} 
                     />
                     <span className="truncate">
                       {isTyping ? 'Typing...' : (isOnline ? 'Online' : 'Offline')}
