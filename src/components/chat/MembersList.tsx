@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 interface GroupMember {
   id?: any;
@@ -16,6 +17,56 @@ interface MembersListProps {
   typingUser: string;
 }
 
+const DraggableOnlineUsers: React.FC<{ onlineUsers: string[] }> = ({ onlineUsers }) => {
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
+
+  return (
+    <div
+      className="fixed bg-white shadow-md rounded-lg p-3 cursor-move z-50"
+      style={{ left: `${position.x}px`, top: `${position.y}px` }}
+      onMouseDown={handleMouseDown}
+    >
+      <h3 className="font-semibold mb-2">Online Users</h3>
+      <ul>
+        {onlineUsers.map((user, index) => (
+          <li key={index} className="text-sm">{user}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,18 +80,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
 
   return (
     <>
-      {/* Mobile toggle button */}
-      <button 
-        className="md:hidden fixed bottom-4 right-4 bg-[#2e7d32] text-white p-2 rounded-full shadow-lg z-50"
-        onClick={toggleMobileMenu}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </button>
-
-
-      
+      <DraggableOnlineUsers onlineUsers={onlineUsers} />
 
       <div 
         className={`
@@ -58,9 +98,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
             className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
             onClick={toggleMobileMenu}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={24} />
           </button>
         </div>
         <div className={`overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] ${(showMembers || isMobileMenuOpen) ? 'block' : 'hidden md:block'}`}>
