@@ -148,12 +148,12 @@ const Login: React.FC = () => {
                           Don't have an account?
                         </div>
                         <div className='ml-2'>
-                          <Link
-                            to='/signup'
-                            className='text-sm font-medium text-blue-500 hover:underline'
-                          >
-                            Sign Up
-                          </Link>
+                        <Link
+                      to='/signup'
+                      className='flex-1 px-8 py-3 text-sm leading-5 text-green-700 bg-green-100 hover:bg-green-200 rounded focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50 text-center transition duration-200 ease-in-out'
+                    >
+                      Sign Up
+                    </Link>
                         </div>
                       </div>
                       <div
