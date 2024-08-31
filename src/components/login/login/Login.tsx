@@ -147,17 +147,14 @@ const Login: React.FC = () => {
                         <div className='text-sm leading-7 text-zinc-900'>
                           Don't have an account?
                         </div>
-               <div className='flex items-center justify-center px-4 py-2 mt-2 text-sm font-medium leading-6 text-white bg-green-500 rounded-sm w-full lg:w-auto lg:mt-0 cursor-pointer'>
-                    <div>
-                      <Link to='/signup'>Sign Up</Link>
-                    </div>
-                    <img
-                      loading='lazy'
-                      src='https://cdn.builder.io/api/v1/image/assets/TEMP/4b4dd86799c516d59b78dc6ab7ce16a924324c921558d4915043f930cf409d4a?'
-                      className='w-[11px] aspect-square ml-2'
-                      alt='Sign in icon'
-                    />
-                  </div>
+                        <div className='ml-2'>
+                        <Link
+    to='/signup'
+    className='inline-block px-4 py-2 bg-green-500 text-white font-semibold shadow hover:bg-green-600 transition duration-200'
+  >
+    Sign Up
+  </Link>
+                        </div>
                       </div>
                       <div
                         className='text-sm leading-7 text-blue-500 hover:underline cursor-pointer'
