@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { CircleIcon } from 'lucide-react';
 
 interface GroupMember {
   id?: any;
@@ -17,10 +16,12 @@ interface MembersListProps {
 }
 
 const MembersList: React.FC<MembersListProps> = ({ groupMembers, currentUser, onlineUsers, typingUser }) => {
-  const [showMembers, setShowMembers] = useState(false); // State to manage visibility of members list
+  // State to toggle visibility of the members list
+  const [showMembers, setShowMembers] = useState(false);
 
-  const toggleShowMembers = () => {
-    setShowMembers(prev => !prev); // Toggle the state
+  // Function to toggle visibility
+  const toggleMembersVisibility = () => {
+    setShowMembers(prevState => !prevState);
   };
 
   return (
@@ -37,7 +38,7 @@ const MembersList: React.FC<MembersListProps> = ({ groupMembers, currentUser, on
         <h2 className='text-lg md:text-xl font-semibold'>Group Members</h2>
         <button 
           className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
-          onClick={toggleShowMembers} // Toggle showMembers on button click
+          onClick={toggleMembersVisibility} // Attach the click handler here
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -61,10 +62,10 @@ const MembersList: React.FC<MembersListProps> = ({ groupMembers, currentUser, on
                 <div className='ml-2 md:ml-3 flex-1 min-w-0'>
                   <p className='font-medium text-[#2e7d32] text-sm md:text-base truncate'>{member.name}</p>
                   <p className='text-xs md:text-sm text-[#4caf50] flex items-center'>
-                    <CircleIcon
-                      className={`mr-1 ${
+                    <div
+                      className={`mr-1 rounded-full w-3 h-3 ${
                         isOnline ? 'bg-green-500' : 'bg-gray-400'
-                      } rounded-full w-3 h-3`} 
+                      }`} 
                     />
                     <span className="truncate">
                       {isTyping ? 'Typing...' : (isOnline ? 'Online' : 'Offline')}
