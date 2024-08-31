@@ -9,25 +9,24 @@ interface GroupMember {
 }
 
 interface MembersListProps {
+  showMembers: boolean;
   groupMembers: GroupMember[];
   currentUser: any;
   onlineUsers: string[];
   typingUser: string;
 }
 
-const MembersList: React.FC<MembersListProps> = ({ groupMembers, currentUser, onlineUsers, typingUser }) => {
-  // State to toggle visibility of the members list
-  const [showMembers, setShowMembers] = useState(false);
+const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Function to toggle visibility
-  const toggleMembersVisibility = () => {
-    setShowMembers(prevState => !prevState);
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(prevState => !prevState);
   };
 
   return (
     <div 
       className={`
-        ${showMembers ? 'fixed inset-0 z-50 bg-white' : 'hidden'} 
+        ${showMembers || isMobileMenuOpen ? 'fixed inset-0 z-50 bg-white' : 'hidden'} 
         md:relative md:block 
         w-full md:w-1/4 lg:w-1/5 
         bg-[#f8faf8] border-b md:border-r border-gray-200
@@ -38,11 +37,17 @@ const MembersList: React.FC<MembersListProps> = ({ groupMembers, currentUser, on
         <h2 className='text-lg md:text-xl font-semibold'>Group Members</h2>
         <button 
           className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
-          onClick={toggleMembersVisibility} // Attach the click handler here
+          onClick={toggleMobileMenu}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          {isMobileMenuOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          )}
         </button>
       </div>
       <div className='overflow-y-auto h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]'>
