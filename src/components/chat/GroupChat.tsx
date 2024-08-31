@@ -337,7 +337,9 @@ console.log('all',messages)
   const clearReply = () => {
     setReplyTo(null);
   };
-
+  const toggleMobileMenu = () => {
+    setShowMembers(prev => !prev);
+  };
   return (
     <div className='min-h-screen bg-[#f0f4f0] p-2 sm:p-4 md:p-6 lg:p-8'>
       <div className='max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden'>
@@ -348,6 +350,7 @@ console.log('all',messages)
             currentUser={user}
             onlineUsers={onlineUsers}
             typingUser={typingUser}
+            onToggleMobileMenu={toggleMobileMenu}
           />
           <div className='flex-1 flex flex-col'>
             <ChatHeader

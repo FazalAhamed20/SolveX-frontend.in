@@ -14,10 +14,17 @@ interface MembersListProps {
   currentUser: any;
   onlineUsers: string[];
   typingUser: string;
+  onToggleMobileMenu: () => void;  
 }
 
-const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, currentUser, onlineUsers, typingUser }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const MembersList: React.FC<MembersListProps> = ({ 
+  showMembers, 
+  groupMembers, 
+  currentUser, 
+  onlineUsers, 
+  typingUser,
+  onToggleMobileMenu  // New prop
+}) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [scrollY, setScrollY] = useState(0);
@@ -26,7 +33,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768); // Adjust this breakpoint as needed
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkMobile();
@@ -34,14 +41,6 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  useEffect(() => {
-    setIsMobileMenuOpen(showMembers);
-  }, [showMembers]);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(prevState => !prevState);
-  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!isMobile) return;
@@ -71,12 +70,12 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
     <>
       <div 
         className={`
-          ${(showMembers || isMobileMenuOpen) ? 'fixed inset-0 z-40 bg-white' : ''} 
+          ${showMembers ? 'fixed inset-0 z-40 bg-white' : ''} 
           md:relative md:block 
           w-full md:w-1/4 lg:w-1/5 
           bg-[#f8faf8] border-b md:border-r border-gray-200
           transition-all duration-300 ease-in-out
-          ${(showMembers || isMobileMenuOpen) ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          ${showMembers ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
         <div 
@@ -93,7 +92,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
           <h2 className='text-lg md:text-xl font-semibold'>Group Members</h2>
           <button 
             className="md:hidden text-[#2e7d32] hover:text-[#1b5e20] transition-colors duration-200"
-            onClick={toggleMobileMenu}
+            onClick={onToggleMobileMenu}  // Use the new prop here
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -104,7 +103,7 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
           className={`
             overflow-y-auto
             ${isMobile ? `h-[calc(100vh-${headerRef.current?.offsetHeight || 0}px)] mt-[${headerRef.current?.offsetHeight || 0}px]` : 'h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)]'}
-            ${(showMembers || isMobileMenuOpen) ? 'block' : 'hidden md:block'}
+            ${showMembers ? 'block' : 'hidden md:block'}
           `}
         >
           {groupMembers
