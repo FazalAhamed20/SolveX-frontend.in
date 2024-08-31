@@ -70,33 +70,25 @@ const Reactions: React.FC<ReactionProps> = ({
     <button
       key={emoji}
       onClick={() => handleReaction(emoji)}
-      className={`mx-1 text-lg hover:bg-gray-200 rounded-full p-2 transition-colors duration-200 ${
+      className={`mx-1 text-lg hover:bg-gray-200 rounded-full py-1 px-2 transition-colors duration-200 ${
         currentUserReaction === emoji ? 'bg-green-100' : ''
-      } ${showAllEmojis ? 'w-24' : 'w-12'}`} // Adjust width based on showAllEmojis
+      }`}
+      style={{
+        height: showAllEmojis ? 'auto' : '2rem', // Adjust height based on showAllEmojis
+      }}
     >
       {emoji}
     </button>
   );
-
+  
   return (
     <div
       className={`${className} absolute bottom-0 ${
         isOwnMessage ? 'right-0' : 'left-0'
-      } transform translate-y-full mt-1 flex flex-wrap items-center bg-white rounded-full shadow-md p-1 z-10`}
+      } transform translate-y-full mt-1 flex items-center bg-white rounded-full shadow-md p-1 z-10`}
     >
-      <div className="flex flex-wrap items-center">
-        {showAllEmojis 
-          ? DEFAULT_EMOJIS.map(renderEmojiButton)
-          : DEFAULT_EMOJIS.slice(0, 3).map(renderEmojiButton)
-        }
-        {!showAllEmojis && (
-          <button
-            onClick={() => setShowAllEmojis(true)}
-            className="mx-1 text-xs bg-gray-200 hover:bg-gray-300 rounded-full px-2 py-1 transition-colors duration-200"
-          >
-            +{DEFAULT_EMOJIS.length - 3}
-          </button>
-        )}
+      <div className="flex items-center">
+        {DEFAULT_EMOJIS.map(renderEmojiButton)}
         {currentUserReaction && !DEFAULT_EMOJIS.includes(currentUserReaction) && renderEmojiButton(currentUserReaction)}
       </div>
       <div className='relative' ref={emojiPickerRef}>
@@ -114,6 +106,5 @@ const Reactions: React.FC<ReactionProps> = ({
       </div>
     </div>
   );
-};
-
+}
 export default React.memo(Reactions);
