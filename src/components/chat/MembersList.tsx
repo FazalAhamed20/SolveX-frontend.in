@@ -39,6 +39,9 @@ const MembersList: React.FC<MembersListProps> = ({ showMembers, groupMembers, cu
         </svg>
       </button>
 
+
+      
+
       <div 
         className={`
           ${(showMembers || isMobileMenuOpen) ? 'fixed inset-0 z-40 bg-white' : ''} 
