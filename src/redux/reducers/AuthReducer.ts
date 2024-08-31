@@ -95,6 +95,7 @@ const Authreducer = createSlice({
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = errorPayload.message;
+        console.log('auth error',errorPayload.message)
         toast.error(errorPayload.message);
         state.user = null;
       })
