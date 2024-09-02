@@ -19,7 +19,7 @@ export const createClan = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('clan/createClan', async (clanData: Clan, { rejectWithValue }) => {
   try {
-    console.log('clanData', clanData);
+    ('clanData', clanData);
 
     const { data } = await ClanAxios.post<VerifyResponse>('/create-clan', {
       id: clanData.id,
@@ -29,11 +29,11 @@ export const createClan = createAsyncThunk<
       trophies: clanData.trophies,
       userId: clanData.userId,
     });
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -47,11 +47,11 @@ export const fetchAllClan = createAsyncThunk<
       '/fetch-all-clans',
       {},
     );
-    console.log('data fetch All Clans', data);
+    ('data fetch All Clans', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -62,17 +62,17 @@ export const fetchMember = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('clan/fetchMember', async (clanData: Clan, { rejectWithValue }) => {
   try {
-    console.log('clanData', clanData);
+    ('clanData', clanData);
 
     const { data } = await ClanAxios.post<VerifyResponse>('/fetchmember', {
       id: clanData.clanId,
       name: clanData.name,
     });
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -84,11 +84,11 @@ export const fetchAllUsers = createAsyncThunk<
 >('clan/fetchClan', async (_, { rejectWithValue }) => {
   try {
     const { data } = await ClanAxios.get<VerifyResponse>('/fetch-all-users');
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -99,7 +99,7 @@ export const addMember = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('clan/create-member', async (clanData: Clan, { rejectWithValue }) => {
   try {
-    console.log('clanData', clanData);
+    ('clanData', clanData);
     // Prepare the request payload
     const membersData = clanData.members?.map(member => ({
       id: member.id,
@@ -113,11 +113,11 @@ export const addMember = createAsyncThunk<
 
       name: clanData.name,
     });
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error.response.data);
+    (error.response.data);
     toast.error(error.response.data);
     return rejectWithValue(handleErrors(error));
   }
@@ -136,7 +136,7 @@ export const removeMember = createAsyncThunk<
       );
       return response.data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -151,11 +151,11 @@ export const blockClan = createAsyncThunk<
     const { data } = await ClanAxios.post<VerifyResponse>(`/blockclan/${id}`, {
       isBlocked,
     });
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -174,7 +174,7 @@ export const leaveClan = createAsyncThunk<
       });
       return response.data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -194,7 +194,7 @@ export const joinRequest = createAsyncThunk<
       });
       return response.data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -214,7 +214,7 @@ export const acceptRequest = createAsyncThunk<
       });
       return response.data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -234,7 +234,7 @@ export const rejectRequest = createAsyncThunk<
       });
       return response.data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -256,7 +256,7 @@ export const  completeQuiz = createAsyncThunk<
       });
       return response.data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },

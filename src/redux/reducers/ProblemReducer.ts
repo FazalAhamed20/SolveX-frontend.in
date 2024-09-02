@@ -28,7 +28,7 @@ const Problemreducer = createSlice({
         state.loading = false;
         state.err = false;
         state.problem = payload;
-        console.log('prob', payload);
+        ('prob', payload);
         state.message = 'Problems fetched successfully';
         state.success = true;
       })

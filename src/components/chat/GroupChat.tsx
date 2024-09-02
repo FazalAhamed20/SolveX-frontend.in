@@ -90,7 +90,6 @@ const GroupChat: React.FC = () => {
     const fetchMessages = async () => {
       try {
         const response = await ChatAxios.get(`/messages/clan/${clanId}`);
-        console.log('response',response)
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -102,12 +101,12 @@ const GroupChat: React.FC = () => {
 
 
   const handleNewMessage = useCallback((message: Message) => {
-    console.log('new message')
+   
     setMessages(prevMessages => [...prevMessages, message]);
   }, []);
 
   const handleDeleteMessage = useCallback((messageId: string) => {
-    console.log('socket',messageId)
+  
   handleDeleteMessageRequest(messageId)
     
   }, []);
@@ -161,11 +160,10 @@ const GroupChat: React.FC = () => {
 
 useEffect(() => {
   const markMessagesAsRead = () => {
-    console.log('msg._id status',messages)
     const unreadMessages = messages.filter(msg => 
       msg.sender._id !== user._id && msg.status !== 'read'
     );
-    console.log('msg._id',unreadMessages)
+    
     unreadMessages.forEach(msg => {
       socket?.emit('messageRead', { roomId: clanId, messageId: msg._id, userId: user._id });
     });
@@ -210,12 +208,12 @@ const handleOnlineUsers = useCallback((users: string[]) => {
 }, []);
 
 const handleSendMessage = async (text: string, replyToMessage: Message | null) => {
-  console.log("voice came",voice);
+ 
   
  
   if (text.trim() !== '' || image || voice) {
     try {
-      console.log("voice till came");
+     
       const messageData = {
         image: image,
         voice: voice,
@@ -234,10 +232,10 @@ const handleSendMessage = async (text: string, replyToMessage: Message | null) =
         createdAt: new Date().toISOString() 
       };
 
-      console.log('message data',messageData)
+     
       const response = await ChatAxios.post('/chat/messages', messageData);
       const newMessage = response.data;
-      console.log('newMessages',newMessage)
+      
       socket?.emit('sendMessage', {
         roomId: clanId,
         message: newMessage,
@@ -255,7 +253,7 @@ const handleSendMessage = async (text: string, replyToMessage: Message | null) =
     }
   }
 };
-console.log('all',messages)
+
 
   const debouncedTyping = useCallback(
     debounce(() => {
@@ -314,14 +312,13 @@ console.log('all',messages)
   };
 
   const handleDeleteMessageRequest = async (messageId: string) => {
-    console.log("mmm......",messageId)
+   
     try {
       setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
-      console.log("before delete");
-      console.log(socket);
+     
       
       socket?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
-      console.log("after delete");
+      
       await ChatAxios.delete(`/messages/${messageId}`);
       
       

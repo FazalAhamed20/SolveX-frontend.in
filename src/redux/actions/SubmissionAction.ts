@@ -25,7 +25,7 @@ export const submitProblem = createAsyncThunk<
   'submission/submit',
   async (submissionData: Submission, { rejectWithValue }) => {
     try {
-      console.log('......', submissionData);
+      ('......', submissionData);
 
       const { data } = await SubmissionAxios.post<VerifyResponse>('/submit', {
         code: submissionData.code,
@@ -36,11 +36,11 @@ export const submitProblem = createAsyncThunk<
         language: submissionData.language,
         submited: submissionData.submited,
       });
-      console.log('data', data);
+      ('data', data);
 
       return data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -54,7 +54,7 @@ export const fetchSubmission = createAsyncThunk<
   'submission/fetchSubmission',
   async (fetch: Submission, { rejectWithValue }) => {
     try {
-      console.log('data', fetch);
+      ('data', fetch);
 
       const { data } = await SubmissionAxios.post<VerifyResponse>(
         '/fetchSubmission',
@@ -63,11 +63,11 @@ export const fetchSubmission = createAsyncThunk<
           id: fetch.id,
         },
       );
-      console.log('data', data);
+      ('data', data);
 
       return data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -79,7 +79,7 @@ export const fetchSolved = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('submission/fetch', async (problemData: ProblemData, { rejectWithValue }) => {
   try {
-    console.log('problem', problemData);
+    ('problem', problemData);
 
     const { data } = await SubmissionAxios.post<VerifyResponse>(
       '/fetchSolved',
@@ -87,11 +87,11 @@ export const fetchSolved = createAsyncThunk<
         email: problemData.email,
       },
     );
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -104,7 +104,7 @@ export const fetchPracticalSubmit = createAsyncThunk<
   'submission/fetchPracticalSubmit',
   async (fetch: Submission, { rejectWithValue }) => {
     try {
-      console.log('data', fetch);
+      ('data', fetch);
 
       const { data } = await SubmissionAxios.post<VerifyResponse>(
         '/fetchpractical',
@@ -113,11 +113,11 @@ export const fetchPracticalSubmit = createAsyncThunk<
           id: fetch.id,
         },
       );
-      console.log('data', data);
+      ('data', data);
 
       return data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -129,7 +129,7 @@ export const fetchSolvedPracticals = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('submission/fetch', async (problemData: ProblemData, { rejectWithValue }) => {
   try {
-    console.log('problem', problemData);
+    ('problem', problemData);
 
     const { data } = await SubmissionAxios.post<VerifyResponse>(
       '/fetchsolved-practicals',
@@ -137,11 +137,11 @@ export const fetchSolvedPracticals = createAsyncThunk<
         email: problemData.email,
       },
     );
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -156,11 +156,11 @@ export const fetchAllSubmission = createAsyncThunk<
       '/submissionlist',
       {},
     );
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });

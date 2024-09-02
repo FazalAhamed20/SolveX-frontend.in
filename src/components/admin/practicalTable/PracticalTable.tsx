@@ -37,7 +37,6 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
   }, [practicals]);
 
   const handleButtonClick = (practical: Practical) => {
-    console.log('handle', practical);
 
     setPracticalIdToBlock(practical._id);
     setPracticalToBlock(practical);
@@ -78,10 +77,6 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
               ),
             );
 
-            console.log(
-              'Filtered Practicals after update:',
-              filteredPracticals,
-            );
           } else {
             console.error(
               'Failed to block/unblock practical:',

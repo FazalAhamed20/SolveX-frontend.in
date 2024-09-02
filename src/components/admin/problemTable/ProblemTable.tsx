@@ -78,7 +78,6 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
               ),
             );
 
-            console.log('Filtered Problems after update:', filteredProblems);
           } else {
             console.error('Failed to block/unblock problem:', response.payload);
           }
@@ -128,10 +127,6 @@ const ProblemTable: React.FC<Props> = ({ problems }) => {
               ),
             );
 
-            console.log(
-              'Filtered Problems after premium update:',
-              filteredProblems,
-            );
           } else {
             console.error('Failed to update premium status:', response.payload);
           }

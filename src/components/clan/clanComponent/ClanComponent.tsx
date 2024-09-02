@@ -71,7 +71,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("isAccepted",isAccepted,'isReject',isReject)
+  
 
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
       setIsLoading(true);
       try {
         const response = await dispatch(fetchAllClan());
-        console.log('Fetched clans:', response);
+        
         const fetchedClans = response.payload as unknown as Clan[];
         setClans(fetchedClans);
         setFilteredClans(fetchedClans);
@@ -87,7 +87,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
         const pendingReqs = fetchedClans.flatMap(clan => 
           clan.request?.filter((req: { userId: any; }) => req.userId === user._id).map(() => clan._id) || []
         );
-        console.log("pemdings", pendingReqs);
+        
         setPendingRequests(pendingReqs);
       } catch (error) {
         console.error('Failed to fetch clans:', error);
@@ -98,7 +98,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
     fetchAllClans();
   }, [dispatch, user._id]);
 
-  console.log("pemdings",pendingRequests)
+ 
 
  
 
@@ -134,17 +134,17 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
       leaderId: user._id,
       request: undefined
     };
-    console.log('Creating new clan:', newClan);
+   
 
     const response = await dispatch(createClan(newClan));
-    console.log('Clan created:', response);
+   
     if (response.payload) {
       setClans(prevClans => [
         ...prevClans,
         response.payload as unknown as Clan,
       ]);
     }
-    console.log('clans', clans);
+  
     setIsCreated(false)
     setShowCreateModal(false);
   };
@@ -154,7 +154,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
   };
 
   const handleEnterClan = () => {
-    console.log('selected clan', selectedClan);
+   
     if (selectedClan) {
       navigate(`/clans/${selectedClan.name}/clan/${selectedClan._id}`);
     }
@@ -168,7 +168,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
       }),
     );
     if (response.payload?.success) {
-      console.log('response', response.payload?.success);
+     
      
       setShowCreateModal(true);
     } else {
@@ -179,22 +179,20 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
 
   const handleJoinClan = async () => {
     if (selectedClan) {
-      console.log(
-        `User ${user.username} is requesting to join clan: ${selectedClan.name}`,
-      );
-      const response = await dispatch(
+     
+       await dispatch(
         joinRequest({
           clanId: selectedClan._id,
           userId: user._id,
         }),
       );
 
-      console.log('response', response);
+   
       setPendingRequests(prev => [...prev, selectedClan._id]);
-      console.log("before emitted",selectedClan);
+     
       
       if (socket) {
-        console.log("emmitted")
+       
         socket.emit('joinRequest', {
           clanId: selectedClan._id,
           userId: user._id,

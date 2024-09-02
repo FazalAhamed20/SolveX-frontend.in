@@ -42,10 +42,10 @@ const Signup: React.FC = () => {
   const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
-      console.log('Form values:', values);
+      ('Form values:', values);
       test(values);
       const response = await dispatch(SignUp(values.email));
-      console.log('response', response);
+      ('response', response);
       if (response.payload?.success == true) {
         setShowOtpPage(true);
       }
@@ -65,7 +65,7 @@ const Signup: React.FC = () => {
   };
 
   const handleGoogleFailure = () => {
-    console.log('Google Signup Error');
+    ('Google Signup Error');
     toast.error('Google Signup failed. Please try again.');
   };
 
@@ -75,14 +75,14 @@ const Signup: React.FC = () => {
       scope: 'email',
     });
 
-    console.log(response);
+    (response);
 
     const { accessToken, userID } = response.authResponse;
-    console.log('Access Token:', accessToken);
-    console.log('User ID:', userID);
+    ('Access Token:', accessToken);
+    ('User ID:', userID);
 
     const result = await axios.get(`${facebookId}${accessToken}`);
-    console.log('Facebook User Data:', result.data);
+    ('Facebook User Data:', result.data);
 
     await dispatch(GoogleAuth(result.data));
     setIsFacebook(false)

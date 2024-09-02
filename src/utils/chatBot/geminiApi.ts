@@ -17,11 +17,11 @@ export async function generateQuizQuestions(topic: string, numberOfQuestions: nu
 
   try {
     const result = await model.generateContent(prompt);
-    console.log("result",result)
+    ("result",result)
     const response = await result.response;
     const text = response.text();
     const jsonStringMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-    console.log("string",jsonStringMatch);
+    ("string",jsonStringMatch);
     
     if (!jsonStringMatch) {
       throw new Error('Failed to extract JSON from the response');

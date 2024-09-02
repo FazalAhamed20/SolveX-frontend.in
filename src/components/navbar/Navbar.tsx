@@ -60,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({
   useEffect(() => {
     const fetchPending = async () => {
       const response = await dispatch(fetchAllClan());
-      console.log('response', response);
+      
   
       if (response.payload && Array.isArray(response.payload)) {
         const clans: Clan[] = response.payload;
@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({
             member => member.id === user._id && member.role === 'leader',
           ),
         );
-        console.log('leader', userLeaderClans);
+       
   
         let newNotifications: Notification[] = [];
   
@@ -117,7 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({
   
         newNotifications = [...newNotifications, ...pendingNotifications];
   
-        console.log('notifications', newNotifications);
+       
         setNotification(prev => {
           const prevNotifications = Array.isArray(prev) ? prev : [];
           const uniqueNewNotifications = newNotifications.filter(

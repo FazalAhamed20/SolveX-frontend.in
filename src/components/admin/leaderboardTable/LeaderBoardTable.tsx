@@ -27,7 +27,6 @@ const LeaderBoardTable: React.FC = () => {
     try {
       const response = await dispatch(fetchAllSubmission() as any);
       const fetchedData = response.payload;
-      console.log(response);
 
       const sortedUsers = fetchedData
         .sort((a: any, b: any) => b.points - a.points)
@@ -35,7 +34,6 @@ const LeaderBoardTable: React.FC = () => {
           ...user,
           rank: index + 1,
         }));
-        console.log('sorted',sortedUsers);
 
       setUsers(sortedUsers);
       setFilteredUsers(sortedUsers);
@@ -43,7 +41,6 @@ const LeaderBoardTable: React.FC = () => {
       console.error('Failed to fetch submissions:', error);
     }
   };
-  console.log('user',users)
 
   useEffect(() => {
     fetchAllSubmissions();

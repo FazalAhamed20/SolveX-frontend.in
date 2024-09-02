@@ -50,7 +50,7 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleFailure = () => {
-    console.log('Google Signup Error');
+    
     toast.error('Google Signup failed. Please try again.');
   };
 
@@ -65,7 +65,7 @@ const Login: React.FC = () => {
     const result = await axios.get(
       `${facebookUrl}${accessToken}`,
     );
-    console.log('Facebook User Data:', result.data);
+    
 
     await dispatch(GoogleAuth(result.data));
     setIsFacebook(false)

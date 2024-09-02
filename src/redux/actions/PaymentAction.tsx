@@ -20,7 +20,7 @@ export const addSubscriptions = createAsyncThunk<
   'payment/addSubscription',
   async (subscriptionData: Subscription, { rejectWithValue }) => {
     try {
-      console.log(subscriptionData);
+      (subscriptionData);
 
       const { data } = await PaymentAxios.post<VerifyResponse>(
         '/createsubscription',
@@ -33,11 +33,11 @@ export const addSubscriptions = createAsyncThunk<
           tier: subscriptionData.tier,
         },
       );
-      console.log('data', data);
+      ('data', data);
 
       return data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -53,11 +53,11 @@ export const getAllSubscription = createAsyncThunk<
       '/subscription',
       {},
     );
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -70,7 +70,7 @@ export const createPayment = createAsyncThunk<
   'payment/createpayment',
   async (paymentData: Payment, { rejectWithValue }) => {
     try {
-      console.log(paymentData);
+      (paymentData);
 
       const { data } = await PaymentAxios.post<VerifyResponse>(
         '/create-payment-intent',
@@ -82,11 +82,11 @@ export const createPayment = createAsyncThunk<
           userId: paymentData.userId,
         },
       );
-      console.log('data', data);
+      ('data', data);
 
       return data;
     } catch (error: any) {
-      console.log(error);
+      (error);
       return rejectWithValue(handleErrors(error));
     }
   },
@@ -98,7 +98,7 @@ export const checkSubscription = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('payment/checkSubscription', async (userId: any, { rejectWithValue }) => {
   try {
-    console.log(userId);
+    (userId);
 
     const { data } = await PaymentAxios.post<VerifyResponse>(
       '/checkSubscription',
@@ -106,11 +106,11 @@ export const checkSubscription = createAsyncThunk<
         userId: userId.userId,
       },
     );
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });
@@ -121,17 +121,17 @@ export const blockSubscription = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('payment/subscriptionBlock', async (SubscriptionData: Subscription, { rejectWithValue }) => {
   try {
-    console.log(SubscriptionData);
+    (SubscriptionData);
 
     const { data } = await PaymentAxios.post<VerifyResponse>('/blocksubscription', {
       _id: SubscriptionData._id,
       isBlocked: SubscriptionData.isBlocked,
     });
-    console.log('data', data);
+    ('data', data);
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    (error);
     return rejectWithValue(handleErrors(error));
   }
 });

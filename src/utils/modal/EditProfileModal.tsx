@@ -77,7 +77,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   };
 
  
-  console.log('profile', profile);
+  ('profile', profile);
 
   return (
     <Modal
