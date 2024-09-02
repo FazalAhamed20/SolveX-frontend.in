@@ -26,9 +26,8 @@ export const useSocketNotification = (userId: string) => {
       
     });
 
-    
     newSocket.on('connect', () => {
-      
+     
       newSocket.emit('joinRoom', userId);
     });
     setSocket(newSocket);
@@ -41,12 +40,12 @@ export const useSocketNotification = (userId: string) => {
   useEffect(() => {
     if (socket) {
       socket.on('joinRequestNotification', (data: Notification) => {
-        
+      
         setNotifications(prev => [...prev, data]);
       });
 
       socket.on('requestPendingNotification', (data: Notification) => {
-        
+
         setNotifications(prev => [...prev, data]);
         setIsReject(false)
       });
@@ -60,7 +59,7 @@ export const useSocketNotification = (userId: string) => {
       });
 
       socket.on('requestRejectedNotification', (data: Notification) => {
-        
+
         setNotifications(prev => [...prev, data]);
         setIsReject(true)
       });

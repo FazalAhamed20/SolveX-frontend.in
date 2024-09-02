@@ -72,7 +72,7 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
       setIsVerifying(true);
       try {
         data.otp = otp;
-        
+
         const response = await dispatch(Verify(data));
         
 
@@ -96,8 +96,8 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
       setOtp('');
       setTimer(60);
       setShowResendButton(false);
-      const response = await dispatch(SignUp(data.email));
-      
+      await dispatch(SignUp(data.email));
+
       toast.success('OTP resent successfully');
     } catch (error) {
       console.error('OTP resend error:', error);

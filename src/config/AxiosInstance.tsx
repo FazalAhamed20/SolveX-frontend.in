@@ -31,7 +31,6 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
   instance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
     
-    
     return request;
   });
 
@@ -52,9 +51,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
       };
 
       if (error.response?.status === 403) {
-         error:', error.response);
         
-       
         if (error.response.data && error.response.data.message === 'User is blocked') {
          handleLogout();
           toast.error('Your account has been blocked. Please contact support.');
@@ -63,10 +60,10 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
       }
 
       if (error.response?.status === 401) {
-         error:', error.response);
+      
         try {
           const newAccessToken = await refreshAccessToken();
-          
+        
           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
           return instance(originalRequest);
         } catch (refreshError) {
@@ -108,7 +105,7 @@ const getEmailFromPersistedData = () => {
     const persistRootObject = JSON.parse(persistRootData);
     const userPersistData = JSON.parse(persistRootObject.user);
     const email = userPersistData?.user?.email;
-    
+
     return email;
   } catch (error) {
     console.error('Error parsing or accessing persist:root data:', error);
@@ -129,7 +126,7 @@ const refreshAccessToken = async () => {
       { withCredentials: true },
     );
     const { accessToken } = response.data;
-    
+   
     return accessToken;
   } catch (error) {
     console.error('Failed to refresh access token:', error);

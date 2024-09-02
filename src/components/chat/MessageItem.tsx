@@ -83,7 +83,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     useEffect(() => {
       if (socket) {
         const handleReactionUpdate = ({ messageId, emoji, memberId, createdAt }:any) => {
-          
+        
           if (messageId === message._id) {
             setReactions((prevReactions) => {
               const updatedReactions = [...prevReactions];
@@ -123,7 +123,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
       }
     }, [socket, message._id]);
 
-  
+
 
     useEffect(() => {
       if (scrollToMessageId) {
@@ -162,7 +162,7 @@ const MessageItem = forwardRef<HTMLDivElement, MessageItemProps>(
     }, []);
 
     const handleConfirmDelete = useCallback(() => {
-      
+    
       onDeleteMessage(message._id);
       setIsModalOpen(false);
     }, [message._id, onDeleteMessage]);

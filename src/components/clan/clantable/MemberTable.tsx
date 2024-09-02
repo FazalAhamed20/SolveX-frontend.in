@@ -63,7 +63,7 @@ const MemberTable: React.FC = () => {
     const currentUserMember = members.find(member => member.id === user._id);
     setIsQuizCompleted(currentUserMember?.isToday || false);
   }, [members, user._id]);
-  
+
 
   const { clanName } = useParams<{ clanName: string }>();
   const { clanId } = useParams<{ clanId: string }>();
@@ -229,7 +229,7 @@ const MemberTable: React.FC = () => {
   };
 
   const handleQuizComplete = async (score: number) => {
-    
+   
     try {
       const updatedMembers = members.map(member => {
         if (member.id === user._id) {
@@ -252,7 +252,7 @@ const MemberTable: React.FC = () => {
         }),
       );
 
-      
+
       if (response?.payload?.success) {
         setIsQuizCompleted(true);
         setIsQuizModalOpen(false);

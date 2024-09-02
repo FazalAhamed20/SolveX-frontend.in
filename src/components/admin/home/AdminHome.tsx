@@ -87,7 +87,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await PracticeAxios.get('/practice');
       const data = response.data;
-      
+     
       setPracticeData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -97,7 +97,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await ClanAxios.get('/fetch-all-clans');
       const data = response.data;
-      
+     
       setClanData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -136,7 +136,6 @@ const AdminDashboard: React.FC = () => {
   ];
 
   
-
   const userData = submission.map((user) => ({
     name: user.username,
     totalProblems:user.totalProblems,

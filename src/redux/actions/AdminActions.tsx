@@ -24,7 +24,7 @@ export const blockUser = createAsyncThunk<
       email: userData.email,
       isBlocked: userData.isBlocked,
     });
-    
+
 
     return data;
   } catch (error: any) {

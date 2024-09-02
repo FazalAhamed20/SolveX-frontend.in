@@ -81,9 +81,9 @@ export const Logout = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('user/logout', async (_, { rejectWithValue }) => {
   try {
-    
-    const { data } = await AuthAxios.post<LogoutResponse>('/logout');
-    
+   
+     await AuthAxios.post<LogoutResponse>('/logout');
+  
 
     return { success: true, message: 'Logged out successfully' };
   } catch (error: any) {
@@ -97,7 +97,7 @@ export const GoogleAuth = createAsyncThunk<
   Signup,
   { rejectValue: ErrorPayload }
 >('user/userGoogleAuth', async (userData: Signup, { rejectWithValue }) => {
-  
+
 
   try {
     const { data } = await AuthAxios.post<VerifyResponse>(
@@ -132,7 +132,7 @@ export const updateProfile = createAsyncThunk<
   Profile,
   { rejectValue: ErrorPayload }
 >('user/userProfile', async (userData: Profile, { rejectWithValue }) => {
-  
+
 
   try {
     const { data } = await AuthAxios.post<VerifyResponse>('/ProfileUpdate', {
@@ -157,12 +157,12 @@ export const ResendOtp = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('user/userResendOtp', async (userData: String, { rejectWithValue }) => {
   try {
-    
+
 
     const { data } = await AuthAxios.post<VerifyResponse>('/resendotp', {
       email: userData,
     });
-    
+
 
     return data;
   } catch (error: any) {

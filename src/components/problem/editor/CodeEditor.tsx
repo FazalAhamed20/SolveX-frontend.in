@@ -64,10 +64,8 @@ const CodeEditorMain: React.FC = () => {
         if (data) {
           
           setSolved(data);
-          
-        } else {
-          
-        }
+       
+        } 
       } catch (error) {
         console.error('Error fetching submission:', error);
       }
@@ -202,7 +200,7 @@ const CodeEditorMain: React.FC = () => {
         if (result) {
           const expectedOutput = JSON.parse(testCase.output);
           const actualOutput = result.output;
-          ,(actualOutput))
+          
 
           return (
             JSON.stringify(expectedOutput) === JSON.stringify(actualOutput)
@@ -240,10 +238,10 @@ const CodeEditorMain: React.FC = () => {
           }),
         ).unwrap();
 
-        
+      
 
         if (response.success) {
-          
+        
 
           setSolved(response?.submited);
           setIsModalOpen(true);

@@ -59,7 +59,7 @@ const UserTable: React.FC<Props> = ({ users }) => {
               ),
             );
 
-            
+           
           } else {
             console.error('Failed to block/unblock user:', response.payload);
           }

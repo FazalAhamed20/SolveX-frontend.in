@@ -50,7 +50,7 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleFailure = () => {
-    
+   
     toast.error('Google Signup failed. Please try again.');
   };
 

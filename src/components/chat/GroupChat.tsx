@@ -90,7 +90,7 @@ const GroupChat: React.FC = () => {
     const fetchMessages = async () => {
       try {
         const response = await ChatAxios.get(`/messages/clan/${clanId}`);
-        
+     
         setMessages(response.data);
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -102,12 +102,12 @@ const GroupChat: React.FC = () => {
 
 
   const handleNewMessage = useCallback((message: Message) => {
-    
+   
     setMessages(prevMessages => [...prevMessages, message]);
   }, []);
 
   const handleDeleteMessage = useCallback((messageId: string) => {
-    
+   
   handleDeleteMessageRequest(messageId)
     
   }, []);
@@ -161,11 +161,11 @@ const GroupChat: React.FC = () => {
 
 useEffect(() => {
   const markMessagesAsRead = () => {
-    
+   
     const unreadMessages = messages.filter(msg => 
       msg.sender._id !== user._id && msg.status !== 'read'
     );
-    
+   
     unreadMessages.forEach(msg => {
       socket?.emit('messageRead', { roomId: clanId, messageId: msg._id, userId: user._id });
     });
@@ -215,7 +215,7 @@ const handleSendMessage = async (text: string, replyToMessage: Message | null) =
  
   if (text.trim() !== '' || image || voice) {
     try {
-      
+     
       const messageData = {
         image: image,
         voice: voice,
@@ -234,10 +234,10 @@ const handleSendMessage = async (text: string, replyToMessage: Message | null) =
         createdAt: new Date().toISOString() 
       };
 
-      
+     
       const response = await ChatAxios.post('/chat/messages', messageData);
       const newMessage = response.data;
-      
+    
       socket?.emit('sendMessage', {
         roomId: clanId,
         message: newMessage,
@@ -314,14 +314,13 @@ const handleSendMessage = async (text: string, replyToMessage: Message | null) =
   };
 
   const handleDeleteMessageRequest = async (messageId: string) => {
-    
+   
     try {
       setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
       
       
-      
       socket?.emit('deleteMessage', { roomId: clanId, messageId: messageId });
-      
+     
       await ChatAxios.delete(`/messages/${messageId}`);
       
       

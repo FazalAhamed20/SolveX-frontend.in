@@ -16,10 +16,9 @@ const ForgotPasswordForm: React.FC = () => {
   
 
   const handleSubmit = async (values: any, actions: any) => {
-    
-    
+   
     const response = await dispatch(checkMail(values.email));
-    
+   
 
     if (response.payload && response.payload.success === true) {
       setEmail(values.email);

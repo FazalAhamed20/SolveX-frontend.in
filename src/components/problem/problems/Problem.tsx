@@ -71,9 +71,7 @@ const ProblemList: React.FC = () => {
             )
           );
           setSolvedProblems(solvedMap);
-        } else {
-          
-        }
+        } 
       } catch (error) {
         console.error('Error fetching submission:', error);
       }

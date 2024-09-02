@@ -71,7 +71,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  
+
 
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
       setIsLoading(true);
       try {
         const response = await dispatch(fetchAllClan());
-        
+
         const fetchedClans = response.payload as unknown as Clan[];
         setClans(fetchedClans);
         setFilteredClans(fetchedClans);
@@ -98,7 +98,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
     fetchAllClans();
   }, [dispatch, user._id]);
 
-  
+
 
  
 
@@ -134,17 +134,17 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
       leaderId: user._id,
       request: undefined
     };
-    
+   
 
     const response = await dispatch(createClan(newClan));
-    
+  
     if (response.payload) {
       setClans(prevClans => [
         ...prevClans,
         response.payload as unknown as Clan,
       ]);
     }
-    
+  
     setIsCreated(false)
     setShowCreateModal(false);
   };
@@ -154,7 +154,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
   };
 
   const handleEnterClan = () => {
-    
+  
     if (selectedClan) {
       navigate(`/clans/${selectedClan.name}/clan/${selectedClan._id}`);
     }
@@ -168,7 +168,7 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
       }),
     );
     if (response.payload?.success) {
-      
+
      
       setShowCreateModal(true);
     } else {
@@ -179,22 +179,20 @@ const ClanComponent: React.FC<ClanComponentProps> = ({ socket,isAccepted,isRejec
 
   const handleJoinClan = async () => {
     if (selectedClan) {
-      console.log(
-        `User ${user.username} is requesting to join clan: ${selectedClan.name}`,
-      );
-      const response = await dispatch(
+     
+      await dispatch(
         joinRequest({
           clanId: selectedClan._id,
           userId: user._id,
         }),
       );
 
-      
+   
       setPendingRequests(prev => [...prev, selectedClan._id]);
-      
+     
       
       if (socket) {
-        
+      
         socket.emit('joinRequest', {
           clanId: selectedClan._id,
           userId: user._id,

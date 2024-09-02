@@ -112,7 +112,7 @@ const UserProfile: React.FC = () => {
     const fetchProblemList = async () => {
       try {
         const response = await dispatch(problemlist()).unwrap();
-        
+       
   
         
         if (Array.isArray(response)) {
@@ -143,7 +143,7 @@ const UserProfile: React.FC = () => {
         const response = await dispatch(
           fetchSolved({ email: user.email }),
         ).unwrap();
-        
+       
 
         const problemCount = { easy: 0, medium: 0, hard: 0 };
         const submissionDates = response.map(
@@ -243,7 +243,7 @@ const UserProfile: React.FC = () => {
     e.preventDefault();
     setIsLoading(true)
 
-    
+ 
 
     let updatedProfile = { ...profile };
 
@@ -253,7 +253,7 @@ const UserProfile: React.FC = () => {
                 .then((res) => res.blob())
                 .then((blob) => new File([blob], 'profileImage.png', { type: blob.type }));
             const uploadedImageUrl = await uploadImageToCloudinary(file);
-            
+
             updatedProfile.profileImage = uploadedImageUrl || '';
         } catch (error) {
             toast.error('An error occurred while uploading the image. Please try again.');
@@ -264,12 +264,12 @@ const UserProfile: React.FC = () => {
         updatedProfile.profileImage = '';
     }
 
-    
+
 
     try {
         const response = await dispatch(updateProfile(updatedProfile));
 
-        
+
 
         if (response.payload?.success === true) {
             toast.success('Profile Updated');
@@ -301,7 +301,7 @@ const UserProfile: React.FC = () => {
 
     fetchSubscription();
   }, [dispatch, user._id]);
-  
+
   const handleRemoveImage = () => {
     setProfile((prevProfile) => ({
       ...prevProfile,

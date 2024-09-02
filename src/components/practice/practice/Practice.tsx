@@ -12,7 +12,7 @@ import { fetchPracticalSubmit } from '../../../redux/actions/SubmissionAction';
 const CodePlatform: React.FC = () => {
   const practicals = useSelector((state: any) => state.practical.practical);
   const user = useSelector((state: any) => state.user.user);
-  
+
   const { id } = useParams<{ id: string }>();
   const practical = practicals.find((p: any) => p.id === id);
   const [code, setCode] = useState<string>('// Start coding here');
@@ -67,11 +67,7 @@ const CodePlatform: React.FC = () => {
       if (typeof submissionStatus === 'boolean') {
         setIsCorrect(submissionStatus);
         
-      } else {
-        console.log(
-          'No submission found for this email or submission status is not boolean',
-        );
-      }
+      } 
     } catch (error) {
       console.error('Error fetching submission:', error);
     }
@@ -80,7 +76,7 @@ const CodePlatform: React.FC = () => {
   const handleRunCode = async () => {
     setLoading(true);
     try {
-      
+     
 
       const response = await SubmissionAxios.post('/practicalrun', {
         code: code,
@@ -92,13 +88,13 @@ const CodePlatform: React.FC = () => {
         email: user.email,
       });
 
-      
+     
       setIsCorrect(response.data?.isCorrect);
       setMessage(response.data?.message);
 
       setOutput(response.data?.output);
     } catch (error) {
-      
+     
     } finally {
       setLoading(false);
     }
