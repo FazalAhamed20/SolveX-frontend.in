@@ -33,8 +33,7 @@ export const addSubscriptions = createAsyncThunk<
           tier: subscriptionData.tier,
         },
       );
-      ('data', data);
-
+     
       return data;
     } catch (error: any) {
       (error);
@@ -53,7 +52,7 @@ export const getAllSubscription = createAsyncThunk<
       '/subscription',
       {},
     );
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {
@@ -82,7 +81,7 @@ export const createPayment = createAsyncThunk<
           userId: paymentData.userId,
         },
       );
-      ('data', data);
+    
 
       return data;
     } catch (error: any) {
@@ -106,7 +105,7 @@ export const checkSubscription = createAsyncThunk<
         userId: userId.userId,
       },
     );
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {
@@ -127,7 +126,7 @@ export const blockSubscription = createAsyncThunk<
       _id: SubscriptionData._id,
       isBlocked: SubscriptionData.isBlocked,
     });
-    ('data', data);
+    
 
     return data;
   } catch (error: any) {

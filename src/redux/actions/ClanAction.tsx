@@ -19,7 +19,7 @@ export const createClan = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('clan/createClan', async (clanData: Clan, { rejectWithValue }) => {
   try {
-    ('clanData', clanData);
+   
 
     const { data } = await ClanAxios.post<VerifyResponse>('/create-clan', {
       id: clanData.id,
@@ -29,7 +29,7 @@ export const createClan = createAsyncThunk<
       trophies: clanData.trophies,
       userId: clanData.userId,
     });
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {
@@ -47,7 +47,7 @@ export const fetchAllClan = createAsyncThunk<
       '/fetch-all-clans',
       {},
     );
-    ('data fetch All Clans', data);
+    
 
     return data;
   } catch (error: any) {
@@ -62,13 +62,13 @@ export const fetchMember = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('clan/fetchMember', async (clanData: Clan, { rejectWithValue }) => {
   try {
-    ('clanData', clanData);
+   
 
     const { data } = await ClanAxios.post<VerifyResponse>('/fetchmember', {
       id: clanData.clanId,
       name: clanData.name,
     });
-    ('data', data);
+    
 
     return data;
   } catch (error: any) {
@@ -84,7 +84,7 @@ export const fetchAllUsers = createAsyncThunk<
 >('clan/fetchClan', async (_, { rejectWithValue }) => {
   try {
     const { data } = await ClanAxios.get<VerifyResponse>('/fetch-all-users');
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {
@@ -99,7 +99,7 @@ export const addMember = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('clan/create-member', async (clanData: Clan, { rejectWithValue }) => {
   try {
-    ('clanData', clanData);
+  
     // Prepare the request payload
     const membersData = clanData.members?.map(member => ({
       id: member.id,
@@ -113,7 +113,7 @@ export const addMember = createAsyncThunk<
 
       name: clanData.name,
     });
-    ('data', data);
+    
 
     return data;
   } catch (error: any) {
@@ -151,7 +151,7 @@ export const blockClan = createAsyncThunk<
     const { data } = await ClanAxios.post<VerifyResponse>(`/blockclan/${id}`, {
       isBlocked,
     });
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {

@@ -24,7 +24,7 @@ export const blockProblem = createAsyncThunk<
       _id: problemData._id,
       isBlocked: problemData.isBlocked,
     });
-    ('data', data);
+
 
     return data;
   } catch (error: any) {
@@ -40,7 +40,7 @@ export const problemlist = createAsyncThunk<
 >('problem/problemlist', async (_, { rejectWithValue }) => {
   try {
     const { data } = await ProblemAxios.get<Problem[]>('/problemlist', {});
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {
@@ -66,7 +66,7 @@ export const updatePremiumStatus = createAsyncThunk<
           isPremium: problemData.isPremium,
         },
       );
-      ('data', data);
+    
 
       return data;
     } catch (error: any) {

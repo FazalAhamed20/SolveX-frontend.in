@@ -29,7 +29,7 @@ export const blockPractical = createAsyncThunk<
           isBlocked: practiceData.isBlocked,
         },
       );
-      ('data', data);
+     
 
       return data;
     } catch (error: any) {
@@ -46,7 +46,7 @@ export const practicallist = createAsyncThunk<
 >('practical/practicelist', async (_, { rejectWithValue }) => {
   try {
     const { data } = await PracticeAxios.get<Practice[]>('/practicelist', {});
-    ('data', data);
+   
 
     return data;
   } catch (error: any) {
