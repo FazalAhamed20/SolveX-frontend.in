@@ -17,7 +17,7 @@ import { problemlist } from '../../redux/actions/ProblemActions';
 const UserProfile: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
-  console.log('user', user);
+  
   const [submissionData, setSubmissionData] = useState([]);
   const [todaySubmissions, setTodaySubmissions] = useState([]);
   const [totalSubmissions, setTotalSubmissions] = useState(0);
@@ -112,7 +112,7 @@ const UserProfile: React.FC = () => {
     const fetchProblemList = async () => {
       try {
         const response = await dispatch(problemlist()).unwrap();
-        console.log('problems', response);
+        
   
         
         if (Array.isArray(response)) {
@@ -143,7 +143,7 @@ const UserProfile: React.FC = () => {
         const response = await dispatch(
           fetchSolved({ email: user.email }),
         ).unwrap();
-        console.log("response",response)
+        
 
         const problemCount = { easy: 0, medium: 0, hard: 0 };
         const submissionDates = response.map(
@@ -243,7 +243,7 @@ const UserProfile: React.FC = () => {
     e.preventDefault();
     setIsLoading(true)
 
-    console.log('submit', profile)
+    
 
     let updatedProfile = { ...profile };
 
@@ -253,7 +253,7 @@ const UserProfile: React.FC = () => {
                 .then((res) => res.blob())
                 .then((blob) => new File([blob], 'profileImage.png', { type: blob.type }));
             const uploadedImageUrl = await uploadImageToCloudinary(file);
-            console.log('uploaded', uploadedImageUrl)
+            
             updatedProfile.profileImage = uploadedImageUrl || '';
         } catch (error) {
             toast.error('An error occurred while uploading the image. Please try again.');
@@ -264,12 +264,12 @@ const UserProfile: React.FC = () => {
         updatedProfile.profileImage = '';
     }
 
-    console.log('submit after', updatedProfile)
+    
 
     try {
         const response = await dispatch(updateProfile(updatedProfile));
 
-        console.log('isBlock', response);
+        
 
         if (response.payload?.success === true) {
             toast.success('Profile Updated');
@@ -301,7 +301,7 @@ const UserProfile: React.FC = () => {
 
     fetchSubscription();
   }, [dispatch, user._id]);
-  console.log("subs",subscription)
+  
   const handleRemoveImage = () => {
     setProfile((prevProfile) => ({
       ...prevProfile,

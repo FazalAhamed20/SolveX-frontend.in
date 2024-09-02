@@ -43,7 +43,7 @@ const ClanGridView: React.FC<ClanGridViewProps> = ({
   isReject
  
 }) => {
-  console.log(loading)
+  
   return (
     loading ? (
       <div className="flex justify-center items-center h-64">

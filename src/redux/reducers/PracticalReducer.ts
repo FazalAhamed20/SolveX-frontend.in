@@ -30,7 +30,7 @@ const Practicalreducer = createSlice({
         state.loading = false;
         state.err = false;
         state.practical = payload;
-        console.log('prob', payload);
+        
         state.message = 'Problems fetched successfully';
         state.success = true;
       })

@@ -37,7 +37,7 @@ const PracticalTable: React.FC<Props> = ({ practicals }) => {
   }, [practicals]);
 
   const handleButtonClick = (practical: Practical) => {
-    console.log('handle', practical);
+    
 
     setPracticalIdToBlock(practical._id);
     setPracticalToBlock(practical);

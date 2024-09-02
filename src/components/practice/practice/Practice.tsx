@@ -12,7 +12,7 @@ import { fetchPracticalSubmit } from '../../../redux/actions/SubmissionAction';
 const CodePlatform: React.FC = () => {
   const practicals = useSelector((state: any) => state.practical.practical);
   const user = useSelector((state: any) => state.user.user);
-  console.log('parctical', practicals);
+  
   const { id } = useParams<{ id: string }>();
   const practical = practicals.find((p: any) => p.id === id);
   const [code, setCode] = useState<string>('// Start coding here');
@@ -23,7 +23,7 @@ const CodePlatform: React.FC = () => {
   const [isCorrect, setIsCorrect] = useState<Boolean>(false);
   const [message, setMessage] = useState<String>('');
   const [loading, setLoading] = useState<boolean>(false);
-  console.log('practical....', practical);
+  
 
   const dispatch: AppDispatch = useDispatch();
 
@@ -40,7 +40,7 @@ const CodePlatform: React.FC = () => {
       );
       const data = await response.data;
 
-      console.log('..........', response.data);
+      
       setCode(data.solutionTemplate || '');
 
       setInput(data.input);
@@ -66,7 +66,7 @@ const CodePlatform: React.FC = () => {
       const submissionStatus = response.payload?.data;
       if (typeof submissionStatus === 'boolean') {
         setIsCorrect(submissionStatus);
-        console.log('Submission fetched:', submissionStatus);
+        
       } else {
         console.log(
           'No submission found for this email or submission status is not boolean',
@@ -80,7 +80,7 @@ const CodePlatform: React.FC = () => {
   const handleRunCode = async () => {
     setLoading(true);
     try {
-      console.log('....', code);
+      
 
       const response = await SubmissionAxios.post('/practicalrun', {
         code: code,
@@ -92,13 +92,13 @@ const CodePlatform: React.FC = () => {
         email: user.email,
       });
 
-      console.log('./......', response);
+      
       setIsCorrect(response.data?.isCorrect);
       setMessage(response.data?.message);
 
       setOutput(response.data?.output);
     } catch (error) {
-      console.log(error);
+      
     } finally {
       setLoading(false);
     }

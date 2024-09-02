@@ -27,7 +27,7 @@ const Paymentreducer = createSlice({
       .addCase(addSubscriptions.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.err = false;
-        console.log('Payload received:', payload);
+        
         state.message = 'Subscription created successfully';
         // toast.success(state.message);
         state.success = true;
@@ -46,7 +46,7 @@ const Paymentreducer = createSlice({
       .addCase(createPayment.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.err = false;
-        console.log('Payload received:', payload);
+        
         state.message = 'Payment created successfully';
         // toast.success(state.message);
         state.success = true;
@@ -56,7 +56,7 @@ const Paymentreducer = createSlice({
         const errorPayload = payload as ErrorPayload;
         state.err = true;
         state.message = errorPayload?.message || 'An unknown error occurred';
-        console.log('payment message',state.message)
+        
         toast.error(state.message);
         console.error('Error creating payment:', errorPayload);
       });

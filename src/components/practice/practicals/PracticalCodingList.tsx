@@ -57,7 +57,7 @@ const PracticalCodingList: React.FC = () => {
     setIsLoading(true)
     try {
       const response = await dispatch(practicallist()).unwrap();
-      console.log('res,.,.', response);
+      
 
       const filteredCodings = (response as unknown as PracticalCoding[])
         .filter(coding => !coding.isBlocked)

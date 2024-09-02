@@ -59,7 +59,7 @@ const UserTable: React.FC<Props> = ({ users }) => {
               ),
             );
 
-            console.log('Filtered Users after update:', filteredUsers);
+            
           } else {
             console.error('Failed to block/unblock user:', response.payload);
           }

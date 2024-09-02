@@ -62,11 +62,11 @@ const CodeEditorMain: React.FC = () => {
         );
         let data = response.payload?.data;
         if (data) {
-          console.log('Submission fetched:', data);
+          
           setSolved(data);
-          console.log('Solved', solved);
+          
         } else {
-          console.log('No submission found for this email');
+          
         }
       } catch (error) {
         console.error('Error fetching submission:', error);
@@ -91,7 +91,7 @@ const CodeEditorMain: React.FC = () => {
       setFunctionName(data.driver);
       setDisplay(data.display);
       setRaw(data.input);
-      console.log("raw",raw)
+      
 
       if (
         !Array.isArray(data.input) ||
@@ -155,7 +155,7 @@ const CodeEditorMain: React.FC = () => {
       setCode(savedCode);
     }
     fetchTestCases();
-    console.log("i rendered_________________________");
+    
     
   }, [id, problem, language]);
 
@@ -181,7 +181,7 @@ const CodeEditorMain: React.FC = () => {
       });
 
       const results = submitResponse.data.results;
-      console.log('result', results);
+      
 
       const hasError = results.some((result: any) => result.error);
       if (hasError) {
@@ -202,7 +202,7 @@ const CodeEditorMain: React.FC = () => {
         if (result) {
           const expectedOutput = JSON.parse(testCase.output);
           const actualOutput = result.output;
-          console.log(JSON.stringify(expectedOutput),(actualOutput))
+          ,(actualOutput))
 
           return (
             JSON.stringify(expectedOutput) === JSON.stringify(actualOutput)
@@ -240,10 +240,10 @@ const CodeEditorMain: React.FC = () => {
           }),
         ).unwrap();
 
-        console.log('ressss.....', response);
+        
 
         if (response.success) {
-          console.log(typeof response?.submited);
+          
 
           setSolved(response?.submited);
           setIsModalOpen(true);

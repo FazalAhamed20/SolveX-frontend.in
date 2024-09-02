@@ -126,9 +126,9 @@ const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
       };
 
       const response = await dispatch(addSubscriptions(submitSubscription));
-      console.log('response', response.payload?.success);
+      
       if (response.payload?.success && response.payload?.data) {
-        console.log('response', response.payload?.data);
+        
         const newSubscriptionData: any = response.payload.data;
         setNewSubscription(initialSubscription);
         onAddSuccess(newSubscriptionData);

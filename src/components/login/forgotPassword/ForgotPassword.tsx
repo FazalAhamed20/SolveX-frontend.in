@@ -13,13 +13,13 @@ const ForgotPasswordForm: React.FC = () => {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [email, setEmail] = useState('');
   const user = useSelector((state: RootState) => state.user.user);
-  console.log('user', user);
+  
 
   const handleSubmit = async (values: any, actions: any) => {
-    console.log(values.email);
-    console.log(typeof values.email);
+    
+    
     const response = await dispatch(checkMail(values.email));
-    console.log(response);
+    
 
     if (response.payload && response.payload.success === true) {
       setEmail(values.email);

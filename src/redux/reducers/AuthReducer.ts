@@ -95,7 +95,7 @@ const Authreducer = createSlice({
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = errorPayload.message;
-        console.log('auth error',errorPayload.message)
+        
         toast.error(errorPayload.message);
         state.user = null;
       })
@@ -103,7 +103,7 @@ const Authreducer = createSlice({
         state.loading = true;
       })
       .addCase(GoogleAuth.fulfilled, (state, { payload }) => {
-        console.log('google', payload);
+        
 
         state.loading = false;
         state.err = false;
@@ -123,7 +123,7 @@ const Authreducer = createSlice({
         state.loading = true;
       })
       .addCase(checkMail.fulfilled, (state, { payload }) => {
-        console.log('checkmail', payload);
+        
 
         state.loading = false;
         state.err = false;
@@ -135,7 +135,7 @@ const Authreducer = createSlice({
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = errorPayload.message;
-        console.log(errorPayload.message);
+        
 
         toast.error(errorPayload.message);
         state.user = null;
@@ -145,7 +145,7 @@ const Authreducer = createSlice({
         state.loading = true;
       })
       .addCase(updateProfile.fulfilled, (state, { payload }) => {
-        console.log('update', payload);
+        
 
         state.loading = false;
         state.err = false;
@@ -157,7 +157,7 @@ const Authreducer = createSlice({
         state.loading = false;
         const errorPayload = payload as ErrorPayload;
         state.err = errorPayload.message;
-        console.log(errorPayload.message);
+        
 
         toast.error(errorPayload.message);
         state.user = null;

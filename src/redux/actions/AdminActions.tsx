@@ -18,17 +18,17 @@ export const blockUser = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('admin/adminBlock', async (userData: UserData, { rejectWithValue }) => {
   try {
-    console.log(userData);
+    
 
     const { data } = await AdminAxios.post<VerifyResponse>('/blockuser', {
       email: userData.email,
       isBlocked: userData.isBlocked,
     });
-    console.log('data', data);
+    
 
     return data;
   } catch (error: any) {
-    console.log(error);
+    
     return rejectWithValue(handleErrors(error));
   }
 });

@@ -72,7 +72,7 @@ const ProblemList: React.FC = () => {
           );
           setSolvedProblems(solvedMap);
         } else {
-          console.log('No submission found for this email');
+          
         }
       } catch (error) {
         console.error('Error fetching submission:', error);

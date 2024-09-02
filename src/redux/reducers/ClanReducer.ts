@@ -27,7 +27,7 @@ const Clanreducer = createSlice({
       .addCase(createClan.fulfilled, (state, { payload }) => {
         state.loading = false;
         state.err = false;
-        console.log('Payload received:', payload);
+        
         state.message = 'Clan created successfully';
         state.success = true;
       })

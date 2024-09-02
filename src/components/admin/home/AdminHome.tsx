@@ -87,7 +87,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await PracticeAxios.get('/practice');
       const data = response.data;
-      console.log('response practical', data);
+      
       setPracticeData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -97,7 +97,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await ClanAxios.get('/fetch-all-clans');
       const data = response.data;
-      console.log('response clan', data);
+      
       setClanData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -108,7 +108,7 @@ const AdminDashboard: React.FC = () => {
     try {
       const response = await SubmissionAxios.get('/submissionlist');
       const data = response.data;
-      console.log('response submission', data);
+      
       setSubmissionData(data);
     } catch (error) {
       console.error('Error fetching practicals data:', error);
@@ -126,7 +126,7 @@ const AdminDashboard: React.FC = () => {
     setActiveSection(section);
   };
 
-  console.log("problems",problems)
+  
 
   const problemDifficultyData = [
     { name: 'Easy', value: problems.filter((p) => p.difficulty === 'Easy').length },
@@ -135,7 +135,7 @@ const AdminDashboard: React.FC = () => {
   
   ];
 
-  console.log("users",users)
+  
 
   const userData = submission.map((user) => ({
     name: user.username,
