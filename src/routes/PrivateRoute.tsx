@@ -16,14 +16,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const isLoggedIn = useSelector((state: any) => state.user.isUser);
   const isAdmin = useSelector((state: any) => state.user.isAdmin);
 
-  (
-    'PrivateRoute - isLoggedIn:',
-    isLoggedIn,
-    'isAdmin:',
-    isAdmin,
-    'adminOnly:',
-    adminOnly,
-  );
+
 
   if (!isLoggedIn && !isAdmin) {
     return <Navigate to='/login' />;
