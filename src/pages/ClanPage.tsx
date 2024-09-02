@@ -9,7 +9,7 @@ import { useSocketNotification } from '../hooks/useSocketNotification';
 const ClanPage = () => {
   const user = useSelector((state: any) => state.user.user);
   const { socket, notifications, clearNotification,isAccepted,isReject } = useSocketNotification(user._id);
-  ('./././',socket)
+ 
   return (
     <div>
        <Navbar notifications={notifications} clearNotification={clearNotification} socket={socket} />

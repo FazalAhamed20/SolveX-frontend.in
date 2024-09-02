@@ -28,7 +28,7 @@ export const SignUp = createAsyncThunk<
     const { data } = await AuthAxios.post<VerifyResponse>('/signup', {
       email: userData,
     });
-    ('data', data);
+    
 
     return data;
   } catch (error: any) {
@@ -43,7 +43,7 @@ export const Verify = createAsyncThunk<
   Signup,
   { rejectValue: ErrorPayload }
 >('user/userVerify', async (userData: Signup, { rejectWithValue }) => {
-  ('otp userdata', userData);
+  
 
   try {
     const { data } = await AuthAxios.post<VerifyResponse>('/verify', userData);
@@ -65,7 +65,7 @@ export const SignIn = createAsyncThunk<
       email: userData.email,
       password: userData.password,
     });
-    ('data', data);
+  
 
     return data;
   } catch (error: any) {
@@ -81,7 +81,7 @@ export const Logout = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('user/logout', async (_, { rejectWithValue }) => {
   try {
-    ("auth",AuthAxios)
+   
     const { data } = await AuthAxios.post<LogoutResponse>('/logout');
     (data);
 
@@ -97,7 +97,7 @@ export const GoogleAuth = createAsyncThunk<
   Signup,
   { rejectValue: ErrorPayload }
 >('user/userGoogleAuth', async (userData: Signup, { rejectWithValue }) => {
-  ('Auth', userData);
+  
 
   try {
     const { data } = await AuthAxios.post<VerifyResponse>(
@@ -115,7 +115,7 @@ export const checkMail = createAsyncThunk<
   String,
   { rejectValue: ErrorPayload }
 >('user/userCheckMail', async (userData: String, { rejectWithValue }) => {
-  ('Mail', userData);
+  
 
   try {
     const { data } = await AuthAxios.post<VerifyResponse>('/checkmail', {
@@ -132,7 +132,7 @@ export const updateProfile = createAsyncThunk<
   Profile,
   { rejectValue: ErrorPayload }
 >('user/userProfile', async (userData: Profile, { rejectWithValue }) => {
-  ('userprofile', userData);
+  
 
   try {
     const { data } = await AuthAxios.post<VerifyResponse>('/ProfileUpdate', {
@@ -157,12 +157,12 @@ export const ResendOtp = createAsyncThunk<
   { rejectValue: ErrorPayload }
 >('user/userResendOtp', async (userData: String, { rejectWithValue }) => {
   try {
-    (userData);
+   
 
     const { data } = await AuthAxios.post<VerifyResponse>('/resendotp', {
       email: userData,
     });
-    ('data', data);
+    
 
     return data;
   } catch (error: any) {

@@ -72,7 +72,7 @@ const OtpPage: React.FC<UserData> = ({ data }) => {
       setIsVerifying(true);
       try {
         data.otp = otp;
-        ('OTP submitted:', otp);
+       
         const response = await dispatch(Verify(data));
         (response);
 

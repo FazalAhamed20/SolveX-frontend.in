@@ -26,9 +26,9 @@ export const useSocketNotification = (userId: string) => {
       
     });
 
-    ("newSocket",newSocket)
+    
     newSocket.on('connect', () => {
-      ('Connected to socket server with ID:', newSocket.id);
+      
       newSocket.emit('joinRoom', userId);
     });
     setSocket(newSocket);
@@ -41,18 +41,18 @@ export const useSocketNotification = (userId: string) => {
   useEffect(() => {
     if (socket) {
       socket.on('joinRequestNotification', (data: Notification) => {
-        ('Received join request notification:', data);
+        
         setNotifications(prev => [...prev, data]);
       });
 
       socket.on('requestPendingNotification', (data: Notification) => {
-        ('Received request pending notification:', data);
+        
         setNotifications(prev => [...prev, data]);
         setIsReject(false)
       });
 
       socket.on('requestAcceptedNotification', (data: Notification) => {
-        ('Received request accepted notification:', data);
+        
 
         setNotifications(prev => [...prev, data]);
         setIsAccepted(true)
@@ -60,7 +60,7 @@ export const useSocketNotification = (userId: string) => {
       });
 
       socket.on('requestRejectedNotification', (data: Notification) => {
-        ('Received request rejected notification:', data);
+        
         setNotifications(prev => [...prev, data]);
         setIsReject(true)
       });

@@ -42,10 +42,10 @@ const Signup: React.FC = () => {
   const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
-      ('Form values:', values);
+     
       test(values);
       const response = await dispatch(SignUp(values.email));
-      ('response', response);
+     
       if (response.payload?.success == true) {
         setShowOtpPage(true);
       }
@@ -77,12 +77,11 @@ const Signup: React.FC = () => {
 
     (response);
 
-    const { accessToken, userID } = response.authResponse;
-    ('Access Token:', accessToken);
-    ('User ID:', userID);
+    const { accessToken } = response.authResponse;
+    
 
     const result = await axios.get(`${facebookId}${accessToken}`);
-    ('Facebook User Data:', result.data);
+   
 
     await dispatch(GoogleAuth(result.data));
     setIsFacebook(false)
